@@ -22,6 +22,12 @@ export interface NoteType {
   rendererReference: any;
 }
 
+interface CustomNoteLineRenderer {
+  target: string;
+  renderer: string;
+  rendererReference: any;
+}
+
 interface MusicGameSystem {
   name: string;
   version: number;
@@ -29,6 +35,7 @@ interface MusicGameSystem {
   initialLanes: InitialLane[];
   measureHorizontalDivision: number;
   noteTypes: NoteType[];
+  customNoteLineRenderers: CustomNoteLineRenderer[];
 }
 
 export default MusicGameSystem;

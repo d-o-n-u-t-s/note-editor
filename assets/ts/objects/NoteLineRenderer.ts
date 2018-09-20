@@ -1,7 +1,7 @@
 import { Fraction } from "../math";
 import TimelineObject from "./TimelineObject";
 import { GUID, guid } from "../util";
-import Lane from "./Lane";
+import Lane, { LineInfo } from "./Lane";
 import {
   sortQuadPoint,
   sortQuadPointFromQuad,
@@ -13,7 +13,14 @@ import NoteRenderer from "./NoteRenderer";
 import NoteLine from "./NoteLine";
 import Pixi from "../Pixi";
 
-interface INoteLineRenderer {
+export interface INoteLineRenderer {
+  customRender(
+    graphics: PIXI.Graphics,
+    lines: LineInfo[],
+    head: Note,
+    tail: Note
+  ): void;
+
   render(noteLine: NoteLine, graphics: PIXI.Graphics, notes: Note[]): void;
 }
 
@@ -21,9 +28,36 @@ import { getLines } from "./LaneRenderer";
 import LanePoint from "./LanePoint";
 import Vector2 from "../math/Vector2";
 
-// function fixFrac()
-
 class NoteLineRenderer implements INoteLineRenderer {
+  customRender(
+    graphics: PIXI.Graphics,
+    lines: LineInfo[],
+    head: Note,
+    tail: Note
+  ) {
+    for (const line of lines) {
+      drawQuad(
+        graphics,
+
+        Vector2.sub(line.start.point, new Vector2(-line.start.width / 2, 0)),
+        Vector2.sub(line.start.point, new Vector2(line.start.width / 2, 0)),
+        Vector2.sub(line.end.point, new Vector2(line.end.width / 2, 0)),
+        Vector2.sub(line.end.point, new Vector2(-line.end.width / 2, 0)),
+
+        head.color
+      );
+
+      graphics
+        .lineStyle(1, head.color, 1)
+        .moveTo(line.start.point.x - line.start.width / 2, line.start.point.y)
+        .lineTo(line.end.point.x - line.start.width / 2, line.end.point.y);
+      graphics
+        .lineStyle(1, head.color, 1)
+        .moveTo(line.start.point.x + line.start.width / 2, line.start.point.y)
+        .lineTo(line.end.point.x + line.start.width / 2, line.end.point.y);
+    }
+  }
+
   render(noteLine: NoteLine, graphics: PIXI.Graphics, notes: Note[]) {
     const measures = Pixi.instance!.measures;
     const {
@@ -193,41 +227,8 @@ class NoteLineRenderer implements INoteLineRenderer {
     //  console.log(lps.length);
 
     const lines = getLines(lps, measures);
-    /*
-    const allLines = getLines(lanePoints, measures);
 
-    for (const line of allLines) {
-      graphics
-        .lineStyle(10, 0xff0000, 0.5)
-        .moveTo(line.start.point.x, line.start.point.y)
-        .lineTo(line.end.point.x, line.end.point.y);
-    }
-
-    return;
-    */
-
-    (window as any).testtest = false;
-    for (const line of lines) {
-      drawQuad(
-        graphics,
-
-        Vector2.sub(line.start.point, new Vector2(-line.start.width / 2, 0)),
-        Vector2.sub(line.start.point, new Vector2(line.start.width / 2, 0)),
-        Vector2.sub(line.end.point, new Vector2(line.end.width / 2, 0)),
-        Vector2.sub(line.end.point, new Vector2(-line.end.width / 2, 0)),
-
-        head.color
-      );
-
-      graphics
-        .lineStyle(1, head.color, 1)
-        .moveTo(line.start.point.x - line.start.width / 2, line.start.point.y)
-        .lineTo(line.end.point.x - line.start.width / 2, line.end.point.y);
-      graphics
-        .lineStyle(1, head.color, 1)
-        .moveTo(line.start.point.x + line.start.width / 2, line.start.point.y)
-        .lineTo(line.end.point.x + line.start.width / 2, line.end.point.y);
-    }
+    this.customRender(graphics, lines, head, tail);
   }
 }
 

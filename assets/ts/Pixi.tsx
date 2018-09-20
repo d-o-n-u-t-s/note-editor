@@ -18,6 +18,7 @@ import NoteLine from "./objects/NoteLine";
 import NoteLineRenderer from "./objects/NoteLineRenderer";
 import LaneRendererResolver from "./objects/LaneRendererResolver";
 import NoteRendererResolver from "./objects/NoteRendererResolver";
+import NoteLineRendererResolver from "./objects/NoteLineRendererResolver";
 import CustomRendererUtility from "./utils/CustomRendererUtility";
 
 interface IMainProps {
@@ -356,7 +357,6 @@ export default class Pixi extends React.Component<IMainProps, {}> {
     };
     const getMeasure = (note: Note) => this.measures[note.measureIndex];
 
-    const getNoteLineRenderer = (noteLine: NoteLine) => NoteLineRenderer;
     const getLanePointRenderer = (lanePoint: LanePoint) => LanePointRenderer;
 
     // 小節の分割線を描画
@@ -467,7 +467,7 @@ export default class Pixi extends React.Component<IMainProps, {}> {
 
     // ノートライン描画
     for (const noteLine of chart.timeline.noteLines) {
-      getNoteLineRenderer(noteLine).render(
+      NoteLineRendererResolver.resolve(noteLine).render(
         noteLine,
         graphics,
         chart.timeline.notes
@@ -694,7 +694,7 @@ export default class Pixi extends React.Component<IMainProps, {}> {
             };
 
             // ノートラインプレビュー
-            getNoteLineRenderer(newNoteLine).render(
+            NoteLineRendererResolver.resolve(newNoteLine).render(
               newNoteLine,
               graphics,
               chart.timeline.notes

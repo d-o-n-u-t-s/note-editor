@@ -142,6 +142,28 @@ export default class Asset implements IStore {
             }
           }
 
+          // ノートラインのカスタムレンダラーを読み込む
+          {
+            const renderers = musicGameSystems.customNoteLineRenderers || [];
+
+            for (const renderer of renderers) {
+              const path =
+                urlParams.mgsp + "/" + directory + "/" + renderer.renderer;
+
+              const buffer: Buffer = await util.promisify(fs.readFile)(path);
+
+              const source = buffer
+                .toString()
+                .replace("export default", `window["${path}"] = `);
+
+              // console.log(source);
+
+              eval(source);
+
+              renderer.rendererReference = (window as any)[path];
+            }
+          }
+
           this.addMusicGameSystem(musicGameSystems);
         }
       }
