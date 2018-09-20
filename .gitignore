@@ -1,0 +1,5 @@
+dist/
+.cache/
+assets/audio/
+assets/musicGameSystems/
+node_modules/

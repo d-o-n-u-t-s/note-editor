@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "es5",
+    "jsx": "react",
+    "moduleResolution": "node",
+    "downlevelIteration": true,
+
+    "module": "commonjs",
+
+    "experimentalDecorators": true,
+    "lib": ["es2017", "dom"]
+  }
+}
