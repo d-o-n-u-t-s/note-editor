@@ -1,5 +1,8 @@
 import { action, observable } from "mobx";
 import { Editor } from "./EditorStore";
+import { guid } from "../util";
+import Lane from "../objects/Lane";
+import LanePoint from "../objects/LanePoint";
 
 import * as Electrom from "electron";
 
@@ -27,7 +30,7 @@ function parseJSON(text: string) {
 interface IStore {}
 
 import MusicGameSystem from "./MusicGameSystem";
-import { render } from "react-dom";
+import { Fraction } from "../math";
 
 export default class Asset implements IStore {
   @observable
@@ -112,9 +115,50 @@ export default class Asset implements IStore {
 
           this.addMusicGameSystem(musicGameSystems);
         }
-        Editor.instance!.currentChart!.setMusicGameSystem(
-          this.musicGameSystems.find(mgs => (mgs.name || "").startsWith("o"))!
-        );
+      }
+
+      const musicGameSystem = this.musicGameSystems.find(mgs =>
+        (mgs.name || "").startsWith("d")
+      )!;
+
+      Editor.instance!.currentChart!.setMusicGameSystem(musicGameSystem);
+
+      console.log(musicGameSystem, this.musicGameSystems);
+
+      // 譜面データがないなら初期レーンを読み込む
+      if (!localStorage.getItem("chart") && musicGameSystem.initialLanes) {
+        for (const initialLane of musicGameSystem.initialLanes) {
+          const laneTemplate = musicGameSystem.laneTemplates.find(
+            lt => lt.name === initialLane.template
+          )!;
+
+          const lanePoints = Array.from({ length: 2 }).map((_, index) => {
+            const newLanePoint = {
+              measureIndex: index * 50,
+              measurePosition: new Fraction(0, 1),
+              guid: guid(),
+              color: Number(laneTemplate.color),
+              horizontalSize: initialLane.horizontalSize,
+              templateName: laneTemplate.name,
+              horizontalPosition: new Fraction(
+                initialLane.horizontalPosition,
+                musicGameSystem.measureHorizontalDivision
+              )
+            } as LanePoint;
+
+            Editor.instance!.currentChart!.timeline.addLanePoint(newLanePoint);
+
+            return newLanePoint.guid;
+          });
+
+          const newLane = {
+            guid: guid(),
+            templateName: laneTemplate.name,
+            division: laneTemplate.division,
+            points: lanePoints
+          } as Lane;
+          Editor.instance!.currentChart!.timeline.addLane(newLane);
+        }
       }
     }
 

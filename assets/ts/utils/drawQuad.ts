@@ -38,12 +38,13 @@ export function drawQuad(
   p2: Vector2,
   p3: Vector2,
   p4: Vector2,
-  color: number
+  color: number,
+  alpha: number = 0.3
 ) {
   const [pp1, pp2, pp3, pp4] = sortQuadPoint(p1, p2, p3, p4);
 
   graphics.lineStyle(0);
-  graphics.beginFill(color, 0.3);
+  graphics.beginFill(color, alpha);
 
   const margin = 0;
 

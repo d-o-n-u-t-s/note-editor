@@ -4,15 +4,17 @@ import Measure from "./Measure";
 
 import { GUID } from "../util";
 
-export default class Lane extends TimelineObject {
-  points: GUID[] = [];
+export default interface Lane {
+  guid: GUID;
 
-  templateName: string = "";
+  points: GUID[];
+
+  templateName: string;
 
   /**
    * 分割数
    */
-  division: number = 3;
+  division: number; //= 3;
 }
 
 import { Fraction, Vector2 } from "../math";

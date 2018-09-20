@@ -12,6 +12,7 @@ import Pixi from "../Pixi";
 
 import { Quad } from "../shapes/Quad";
 import { LaneTemplate } from "../stores/MusicGameSystem";
+import { drawQuad } from "../utils/drawQuad";
 
 interface LinePoint {
   measureIndex: number;
@@ -227,20 +228,40 @@ export interface ILaneRenderer {
 }
 
 class LaneRenderer implements ILaneRenderer {
-  /*
-    get laneDivision() {
-      return this.target.division;
-    }
-  
-    quadCache: QuadAndIndex[] = [];
-    */
-
   defaultRender(
     graphics: PIXI.Graphics,
     lines: LineInfo[],
     laneTemplate: LaneTemplate
   ) {
     for (const line of lines) {
+      drawQuad(
+        graphics,
+        Vector2.sub(line.start.point, new Vector2(line.start.width / 2, 0)),
+        Vector2.add(line.start.point, new Vector2(line.start.width / 2, 0)),
+        Vector2.add(line.end.point, new Vector2(line.end.width / 2, 0)),
+        Vector2.sub(line.end.point, new Vector2(line.end.width / 2, 0)),
+        Number(laneTemplate.color)
+      );
+
+      for (var i = 0; i < laneTemplate.division + 1; ++i) {
+        graphics
+          .lineStyle(1, 0xffffff)
+          .moveTo(
+            line.start.point.x -
+              line.start.width / 2 +
+              (line.start.width / laneTemplate.division) * i,
+            line.start.point.y
+          )
+          .lineTo(
+            line.end.point.x -
+              line.end.width / 2 +
+              (line.end.width / laneTemplate.division) * i,
+            line.end.point.y
+          );
+      }
+
+      /*
+
       graphics
         .lineStyle(1, Number(laneTemplate.color))
         .moveTo(line.start.point.x - line.start.width / 2, line.start.point.y)
@@ -249,6 +270,8 @@ class LaneRenderer implements ILaneRenderer {
         .lineStyle(1, Number(laneTemplate.color))
         .moveTo(line.start.point.x + line.start.width / 2, line.start.point.y)
         .lineTo(line.end.point.x + line.end.width / 2, line.end.point.y);
+    
+    */
     }
   }
 

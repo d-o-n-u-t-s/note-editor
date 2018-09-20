@@ -49,6 +49,7 @@ class NoteRenderer implements INoteRenderer {
       return console.error("ノートの描画範囲が計算できません");
     }
 
+    /*
     Pixi.instance!.drawTempText(
       `${note.measureIndex}:${note.measurePosition}`,
       q.point.x,
@@ -57,6 +58,7 @@ class NoteRenderer implements INoteRenderer {
         fontSize: 12
       }
     );
+    */
 
     graphics
       // .lineStyle(4, note.color)
