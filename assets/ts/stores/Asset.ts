@@ -12,6 +12,8 @@ var fs = (window as any).require("fs");
 
 const util = __require("util");
 
+import { getUrlParams } from "../utils/url";
+
 //console.log("fs", fs);
 const electron = (window as any).require("electron");
 const remote = electron.remote as Electrom.Remote;
@@ -29,6 +31,8 @@ function parseJSON(text: string) {
 
 interface IStore {}
 
+import CustomRendererUtility from "../utils/CustomRendererUtility";
+
 import MusicGameSystem from "./MusicGameSystem";
 import { Fraction } from "../math";
 
@@ -44,14 +48,7 @@ export default class Asset implements IStore {
     this.musicGameSystems.push(value);
 
   private async debugInitialize() {
-    const urlParams = location.search
-      .substr(1)
-      .split("&")
-      .map(v => v.split("="))
-      .reduce((a: any, b: any) => {
-        a[b[0]] = b[1];
-        return a;
-      }, {});
+    const urlParams = getUrlParams();
 
     console.warn(urlParams.aap);
     console.warn(urlParams.mgsp);
@@ -87,30 +84,62 @@ export default class Asset implements IStore {
 
           const musicGameSystems: MusicGameSystem = json;
 
-          // カスタムレンダラーを読み込む
-          const renderers = [
-            ...new Set(
-              (musicGameSystems.laneTemplates || [])
-                .map(lt => ({ renderer: lt.renderer, lanteTemplate: lt }))
-                .filter(r => r.renderer !== "default")
-            )
-          ];
+          (window as any).CustomRendererUtility = CustomRendererUtility;
 
-          for (const renderer of renderers) {
-            const path =
-              urlParams.mgsp + "/" + directory + "/" + renderer.renderer;
+          // レーンのカスタムレンダラーを読み込む
+          {
+            const renderers = [
+              ...new Set(
+                (musicGameSystems.laneTemplates || [])
+                  .map(lt => ({ renderer: lt.renderer, lanteTemplate: lt }))
+                  .filter(r => r.renderer !== "default")
+              )
+            ];
 
-            const buffer: Buffer = await util.promisify(fs.readFile)(path);
+            for (const renderer of renderers) {
+              const path =
+                urlParams.mgsp + "/" + directory + "/" + renderer.renderer;
 
-            const source = buffer
-              .toString()
-              .replace("export default", `window["${path}"] = `);
+              const buffer: Buffer = await util.promisify(fs.readFile)(path);
 
-            console.log(source);
+              const source = buffer
+                .toString()
+                .replace("export default", `window["${path}"] = `);
 
-            eval(source);
+              console.log(source);
 
-            renderer.lanteTemplate.rendererReference = (window as any)[path];
+              eval(source);
+
+              renderer.lanteTemplate.rendererReference = (window as any)[path];
+            }
+          }
+
+          // ノートのカスタムレンダラーを読み込む
+          {
+            const renderers = [
+              ...new Set(
+                (musicGameSystems.noteTypes || [])
+                  .map(lt => ({ renderer: lt.renderer, noteTemplate: lt }))
+                  .filter(r => r.renderer !== "default")
+              )
+            ];
+
+            for (const renderer of renderers) {
+              const path =
+                urlParams.mgsp + "/" + directory + "/" + renderer.renderer;
+
+              const buffer: Buffer = await util.promisify(fs.readFile)(path);
+
+              const source = buffer
+                .toString()
+                .replace("export default", `window["${path}"] = `);
+
+              console.log(source);
+
+              eval(source);
+
+              renderer.noteTemplate.rendererReference = (window as any)[path];
+            }
           }
 
           this.addMusicGameSystem(musicGameSystems);

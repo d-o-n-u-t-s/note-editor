@@ -15,12 +15,20 @@ interface InitialLane {
   horizontalPosition: number;
 }
 
+interface NoteType {
+  name: string;
+  color: string;
+  renderer: string;
+  rendererReference: any;
+}
+
 interface MusicGameSystem {
   name: string;
+  version: number;
   laneTemplates: LaneTemplate[];
   initialLanes: InitialLane[];
   measureHorizontalDivision: number;
-  noteTypes: { name: string; color: string; renderer: string }[];
+  noteTypes: NoteType[];
 }
 
 export default MusicGameSystem;

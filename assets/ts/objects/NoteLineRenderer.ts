@@ -216,15 +216,15 @@ class NoteLineRenderer implements INoteLineRenderer {
         Vector2.sub(line.end.point, new Vector2(line.end.width / 2, 0)),
         Vector2.sub(line.end.point, new Vector2(-line.end.width / 2, 0)),
 
-        0xff0000
+        head.color
       );
 
       graphics
-        .lineStyle(1, 0xff0000, 1)
+        .lineStyle(1, head.color, 1)
         .moveTo(line.start.point.x - line.start.width / 2, line.start.point.y)
         .lineTo(line.end.point.x - line.start.width / 2, line.end.point.y);
       graphics
-        .lineStyle(1, 0xff0000, 1)
+        .lineStyle(1, head.color, 1)
         .moveTo(line.start.point.x + line.start.width / 2, line.start.point.y)
         .lineTo(line.end.point.x + line.start.width / 2, line.end.point.y);
     }

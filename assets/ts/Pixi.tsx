@@ -1,35 +1,28 @@
 import * as React from "react";
-
+import * as PIXI from "pixi.js";
 import { Editor } from "./stores/EditorStore";
-
-interface IMainProps {
-  editor?: Editor;
-}
-
 import { Fraction } from "./math";
 import { EditMode, ObjectCategory } from "./stores/EditorSetting";
 import LanePoint from "./objects/LanePoint";
 import LanePointRenderer from "./objects/LanePointRenderer";
-
-import * as PIXI from "pixi.js";
-
 import { observer, inject } from "mobx-react";
-
 import Lane from "./objects/Lane";
 import Note from "./objects/Note";
 import NoteRenderer from "./objects/NoteRenderer";
-
 import Measure from "./objects/Measure";
 import { guid } from "./util";
 import { containsQuad } from "./utils/contains";
 import { drawQuad, sortQuadPoint } from "./utils/drawQuad";
-
 import Vector2 from "./math/Vector2";
-
 import NoteLine from "./objects/NoteLine";
 import NoteLineRenderer from "./objects/NoteLineRenderer";
 import LaneRendererResolver from "./objects/LaneRendererResolver";
+import NoteRendererResolver from "./objects/NoteRendererResolver";
+import CustomRendererUtility from "./utils/CustomRendererUtility";
 
+interface IMainProps {
+  editor?: Editor;
+}
 @inject("editor")
 @observer
 export default class Pixi extends React.Component<IMainProps, {}> {
@@ -159,6 +152,8 @@ export default class Pixi extends React.Component<IMainProps, {}> {
    */
   private renderCanvas() {
     if (!this.app) return;
+
+    CustomRendererUtility.update();
 
     Pixi.instance = this;
     const graphics = this.graphics!;
@@ -361,18 +356,6 @@ export default class Pixi extends React.Component<IMainProps, {}> {
     };
     const getMeasure = (note: Note) => this.measures[note.measureIndex];
 
-    const getNoteRenderer = (note: Note) => {
-      const noteType = chart.musicGameSystem!.noteTypes.find(
-        noteType => noteType.name === note.type
-      )!;
-
-      if (noteType.renderer === "default") {
-        return NoteRenderer;
-      }
-
-      // note.type;
-    };
-
     const getNoteLineRenderer = (noteLine: NoteLine) => NoteLineRenderer;
     const getLanePointRenderer = (lanePoint: LanePoint) => LanePointRenderer;
 
@@ -490,7 +473,7 @@ export default class Pixi extends React.Component<IMainProps, {}> {
       }
       */
 
-      getNoteRenderer(note)!.render(
+      NoteRendererResolver.resolve(note).render(
         note,
         graphics,
         chart.timeline.lanes.find(lane => lane.guid === note.lane)!,
@@ -514,7 +497,7 @@ export default class Pixi extends React.Component<IMainProps, {}> {
       setting.editMode === EditMode.Add &&
       setting.editObjectCategory === ObjectCategory.Note
     ) {
-      const note = {
+      const newNote = {
         guid: guid(),
         horizontalSize: 1,
         horizontalPosition: new Fraction(
@@ -526,24 +509,25 @@ export default class Pixi extends React.Component<IMainProps, {}> {
           setting.measureDivision - 1 - targetLaneVerticalIndex!,
           setting.measureDivision
         ),
-        color: 0xffffff,
-
+        color: Number(
+          chart.musicGameSystem!.noteTypes[setting.editNoteTypeIndex].color
+        ),
         type: chart.musicGameSystem!.noteTypes[setting.editNoteTypeIndex].name,
-
         lane: targetLane.guid,
         connectable: true
       } as Note;
       // note.renderer = new NoteRenderer(note);
 
       if (isClick) {
-        chart.timeline.addNote(note);
+        chart.timeline.addNote(newNote);
       } else {
         // graphics.addChild(note.renderer);
-        getNoteRenderer(note)!.render(
-          note,
+
+        NoteRendererResolver.resolve(newNote).render(
+          newNote,
           graphics,
           targetLane,
-          this.measures[note.measureIndex]
+          this.measures[newNote.measureIndex]
         );
         //graphics.removeChild(note.renderer);
       }
@@ -656,7 +640,7 @@ export default class Pixi extends React.Component<IMainProps, {}> {
       setting.editObjectCategory === ObjectCategory.Note
     ) {
       for (const note of chart.timeline.notes) {
-        const bounds = getNoteRenderer(note)!.getBounds(
+        const bounds = NoteRendererResolver.resolve(note)!.getBounds(
           note,
           getLane(note),
           getMeasure(note)
@@ -681,7 +665,7 @@ export default class Pixi extends React.Component<IMainProps, {}> {
       setting.editObjectCategory === ObjectCategory.Note
     ) {
       for (const note of chart.timeline.notes) {
-        const bounds = getNoteRenderer(note)!.getBounds(
+        const bounds = NoteRendererResolver.resolve(note)!.getBounds(
           note,
           getLane(note),
           getMeasure(note)
