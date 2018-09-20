@@ -11,8 +11,12 @@ import {
   createStyles,
   Divider,
   Menu,
-  MenuItem
+  MenuItem,
+  FormGroup
 } from "@material-ui/core";
+
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Switch from "@material-ui/core/Switch";
 
 /**
  * 編集モード
@@ -47,6 +51,7 @@ import ClearIcon from "@material-ui/icons/clear";
 import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import ShowChartIcon from "@material-ui/icons/ShowChart";
+import VisibilityIcon from "@material-ui/icons/Visibility";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -60,6 +65,12 @@ const styles = (theme: Theme) =>
           : theme.palette.grey[900]
       }`
     },
+
+    displaySetting: {
+      outline: 0,
+      padding: theme.spacing.unit * 2
+    },
+
     toggleContainer: {
       // height: 56,
       padding: `${theme.spacing.unit}px ${theme.spacing.unit * 2}px`,
@@ -92,6 +103,8 @@ class Toolbar extends React.Component<Props, {}> {
     noteAnchorEl: null,
 
     objectSizeAnchorEl: null,
+
+    displaySettingAnchorEl: null,
 
     anchorEl: null
   };
@@ -308,6 +321,51 @@ class Toolbar extends React.Component<Props, {}> {
             <AddIcon />
           </IconButton>
         ))}
+
+        {/* 表示設定 */}
+        <IconButton
+          onClick={event => {
+            this.setState({
+              displaySettingAnchorEl: event.currentTarget
+            });
+          }}
+        >
+          <VisibilityIcon />
+        </IconButton>
+        <Menu
+          anchorEl={this.state.displaySettingAnchorEl}
+          open={Boolean(this.state.displaySettingAnchorEl)}
+          onClose={() =>
+            this.setState({
+              displaySettingAnchorEl: null
+            })
+          }
+        >
+          <FormGroup className={classes.displaySetting}>
+            {[
+              ["レーン中間ポイント", "lanePoint"],
+              ["レーン", "b"],
+              ["ノート", "b"]
+            ].map(([label, key], index) => (
+              <FormControlLabel
+                key={index}
+                control={
+                  <Switch
+                    onChange={(_, v) => {
+                      this.props.editor!.setting!.setObjectVisibility({
+                        [key]: v
+                      });
+                    }}
+                    checked={
+                      (this.props.editor!.setting!.objectVisibility as any)[key]
+                    }
+                  />
+                }
+                label={label}
+              />
+            ))}
+          </FormGroup>
+        </Menu>
       </div>
     );
   }

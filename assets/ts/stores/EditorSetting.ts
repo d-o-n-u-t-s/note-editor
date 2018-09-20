@@ -22,11 +22,28 @@ export enum ObjectCategory {
   S
 }
 
+export interface ObjectVisibility {
+  lanePoint: boolean;
+}
+
 export default class EditorSetting {
   @observable
   editMode = EditMode.Select;
   @action
   setEditMode = (value: EditMode) => (this.editMode = value);
+
+  @observable
+  objectVisibility: ObjectVisibility = {
+    lanePoint: true
+  };
+
+  @action
+  setObjectVisibility(objectVisibility: any) {
+    this.objectVisibility = Object.assign(
+      this.objectVisibility,
+      objectVisibility
+    );
+  }
 
   @observable
   editObjectCategory = ObjectCategory.Note;

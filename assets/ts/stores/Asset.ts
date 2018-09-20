@@ -147,7 +147,7 @@ export default class Asset implements IStore {
       }
 
       const musicGameSystem = this.musicGameSystems.find(mgs =>
-        (mgs.name || "").startsWith("d")
+        (mgs.name || "").startsWith("o")
       )!;
 
       Editor.instance!.currentChart!.setMusicGameSystem(musicGameSystem);

@@ -417,10 +417,12 @@ export default class Pixi extends React.Component<IMainProps, {}> {
     }
 
     // レーン中間点描画
-    for (const lanePoint of chart.timeline.lanePoints) {
-      const measure = this.measures[lanePoint.measureIndex];
+    if (setting.objectVisibility.lanePoint) {
+      for (const lanePoint of chart.timeline.lanePoints) {
+        const measure = this.measures[lanePoint.measureIndex];
 
-      getLanePointRenderer(lanePoint).render(lanePoint, graphics, measure);
+        getLanePointRenderer(lanePoint).render(lanePoint, graphics, measure);
+      }
     }
 
     let targetLane: Lane | null = null;
