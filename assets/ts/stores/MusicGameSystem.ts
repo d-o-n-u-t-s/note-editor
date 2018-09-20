@@ -15,7 +15,7 @@ interface InitialLane {
   horizontalPosition: number;
 }
 
-interface NoteType {
+export interface NoteType {
   name: string;
   color: string;
   renderer: string;

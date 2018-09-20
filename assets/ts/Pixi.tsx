@@ -8,7 +8,7 @@ import LanePointRenderer from "./objects/LanePointRenderer";
 import { observer, inject } from "mobx-react";
 import Lane from "./objects/Lane";
 import Note from "./objects/Note";
-import NoteRenderer from "./objects/NoteRenderer";
+import { NoteType } from "./stores/MusicGameSystem";
 import Measure from "./objects/Measure";
 import { guid } from "./util";
 import { containsQuad } from "./utils/contains";
@@ -465,24 +465,6 @@ export default class Pixi extends React.Component<IMainProps, {}> {
       }
     }
 
-    // ノート描画
-    for (const note of chart.timeline.notes) {
-      /*
-      if (!note.renderer) continue;
-
-      if (!note.renderer.parent) {
-        graphics.addChild(note.renderer);
-      }
-      */
-
-      NoteRendererResolver.resolve(note).render(
-        note,
-        graphics,
-        chart.timeline.lanes.find(lane => lane.guid === note.lane)!,
-        this.measures[note.measureIndex]
-      );
-    }
-
     // ノートライン描画
     for (const noteLine of chart.timeline.noteLines) {
       getNoteLineRenderer(noteLine).render(
@@ -492,6 +474,29 @@ export default class Pixi extends React.Component<IMainProps, {}> {
       );
     }
 
+    // ノート描画
+    for (const note of chart.timeline.notes) {
+      NoteRendererResolver.resolve(note).render(
+        note,
+        graphics,
+        chart.timeline.lanes.find(lane => lane.guid === note.lane)!,
+        this.measures[note.measureIndex]
+      );
+    }
+
+    // ノート色を取得する
+    const getNoteColor = (noteType: NoteType) => {
+      if (noteType.color === "$laneColor") {
+        const laneTemplate = chart.musicGameSystem!.laneTemplates.find(
+          lt => lt.name === targetLane!.templateName
+        )!;
+
+        return Number(laneTemplate.color);
+      }
+
+      return Number(noteType.color);
+    };
+
     // レーン選択中ならノートを配置する
     if (
       targetMeasure &&
@@ -499,6 +504,10 @@ export default class Pixi extends React.Component<IMainProps, {}> {
       setting.editMode === EditMode.Add &&
       setting.editObjectCategory === ObjectCategory.Note
     ) {
+      const newNoteType = chart.musicGameSystem!.noteTypes[
+        setting.editNoteTypeIndex
+      ];
+
       const newNote = {
         guid: guid(),
         horizontalSize: 1,
@@ -511,10 +520,8 @@ export default class Pixi extends React.Component<IMainProps, {}> {
           setting.measureDivision - 1 - targetLaneVerticalIndex!,
           setting.measureDivision
         ),
-        color: Number(
-          chart.musicGameSystem!.noteTypes[setting.editNoteTypeIndex].color
-        ),
-        type: chart.musicGameSystem!.noteTypes[setting.editNoteTypeIndex].name,
+        color: getNoteColor(newNoteType),
+        type: newNoteType.name,
         lane: targetLane.guid,
         connectable: true
       } as Note;
