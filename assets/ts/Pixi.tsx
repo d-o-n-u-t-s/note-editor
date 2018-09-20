@@ -577,7 +577,7 @@ export default class Pixi extends React.Component<IMainProps, {}> {
         if (
           getLanePointRenderer(lanePoint)
             .getBounds(lanePoint, this.measures[lanePoint.measureIndex])
-            .contains(mousePosition.x, mousePosition.y)
+            .contains(mousePosition.x - graphics.x, mousePosition.y)
         ) {
           // console.log("接続！", lanePoint);
 

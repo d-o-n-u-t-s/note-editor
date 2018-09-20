@@ -82,7 +82,12 @@ export default class Asset implements IStore {
 
           const json = parseJSON(buffer.toString());
 
-          const musicGameSystems: MusicGameSystem = json;
+          const musicGameSystems: MusicGameSystem = Object.assign(
+            {
+              customNoteLineRenderers: []
+            },
+            json
+          );
 
           (window as any).CustomRendererUtility = CustomRendererUtility;
 
@@ -169,7 +174,7 @@ export default class Asset implements IStore {
       }
 
       const musicGameSystem = this.musicGameSystems.find(mgs =>
-        (mgs.name || "").startsWith("o")
+        (mgs.name || "").startsWith("d")
       )!;
 
       Editor.instance!.currentChart!.setMusicGameSystem(musicGameSystem);
