@@ -47,7 +47,7 @@ export default class Asset implements IStore {
   addMusicGameSystem = (value: MusicGameSystem) =>
     this.musicGameSystems.push(value);
 
-  private async debugInitialize() {
+  async debugInitialize() {
     const urlParams = getUrlParams();
 
     console.warn(urlParams.aap);
@@ -183,38 +183,7 @@ export default class Asset implements IStore {
 
       // 譜面データがないなら初期レーンを読み込む
       if (!localStorage.getItem("chart") && musicGameSystem.initialLanes) {
-        for (const initialLane of musicGameSystem.initialLanes) {
-          const laneTemplate = musicGameSystem.laneTemplates.find(
-            lt => lt.name === initialLane.template
-          )!;
-
-          const lanePoints = Array.from({ length: 2 }).map((_, index) => {
-            const newLanePoint = {
-              measureIndex: index * 50,
-              measurePosition: new Fraction(0, 1),
-              guid: guid(),
-              color: Number(laneTemplate.color),
-              horizontalSize: initialLane.horizontalSize,
-              templateName: laneTemplate.name,
-              horizontalPosition: new Fraction(
-                initialLane.horizontalPosition,
-                musicGameSystem.measureHorizontalDivision
-              )
-            } as LanePoint;
-
-            Editor.instance!.currentChart!.timeline.addLanePoint(newLanePoint);
-
-            return newLanePoint.guid;
-          });
-
-          const newLane = {
-            guid: guid(),
-            templateName: laneTemplate.name,
-            division: laneTemplate.division,
-            points: lanePoints
-          } as Lane;
-          Editor.instance!.currentChart!.timeline.addLane(newLane);
-        }
+        Editor.instance!.currentChart!.loadInitialLanes();
       }
     }
 

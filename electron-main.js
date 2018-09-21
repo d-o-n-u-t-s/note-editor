@@ -1,7 +1,9 @@
 // Modules to control application life and create native browser window
 const {
   app,
-  BrowserWindow
+  BrowserWindow,
+  Menu,
+  ipcMain
 } = require('electron')
 
 const path = require("path");
@@ -12,8 +14,6 @@ const audioAssetPath = path.resolve(__dirname, "assets/audio");
 const musicGameSystemsPath = path.resolve(__dirname, "assets/musicGameSystems");
 
 let mainWindow
-
-console.log(__dirname);
 
 function createWindow() {
   // Create the browser window.
@@ -26,6 +26,7 @@ function createWindow() {
 
 
   mainWindow.loadURL(`http://localhost:9000?aap=${audioAssetPath}&mgsp=${musicGameSystemsPath}`);
+  initWindowMenu();
 
   loadDevtool({
     id: 'pfgnfdagidkfgccljigdamigbcnndkod',
@@ -45,6 +46,8 @@ function createWindow() {
     mainWindow = null
   })
 }
+
+app.setName("NoteEditor");
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -68,5 +71,60 @@ app.on('activate', function () {
   }
 })
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
+
+function send(name, value) {
+
+  let resolve = null
+
+  ipcMain.once(name, (_, response) => {
+    resolve(response);
+  });
+
+  const ret = mainWindow.webContents.send(name, value);
+
+  return new Promise(_resolve => resolve = _resolve);
+}
+
+function initWindowMenu() {
+  const template = [{
+      label: '',
+      submenu: [{
+        label: 'test',
+        click() {}
+      }]
+    },
+    {
+
+      label: 'ファイル',
+      submenu: [{
+          label: '開く',
+          accelerator: 'Command+O',
+          click() {
+            mainWindow.webContents.send("open");
+          }
+        },
+        {
+          type: "separator"
+        },
+        {
+          label: '保存',
+          accelerator: 'Command+S',
+          click() {
+            mainWindow.webContents.send("save");
+          }
+        },
+        {
+          label: '名前を付けて保存',
+          accelerator: 'Command+Shift+S',
+          click() {
+            mainWindow.webContents.send("saveAs");
+          }
+        },
+      ]
+    }
+  ]
+
+  const menu = Menu.buildFromTemplate(template)
+
+  Menu.setApplicationMenu(menu)
+}

@@ -39,7 +39,7 @@ class AudioSelect extends React.Component<Props, {}> {
     if (!editor || !editor.currentChart) return <div />;
 
     return (
-      <FormControl>
+      <FormControl style={{ width: "100%" }}>
         <InputLabel htmlFor="audio">音源</InputLabel>
         {(() => {
           return (

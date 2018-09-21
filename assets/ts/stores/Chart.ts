@@ -15,10 +15,46 @@ import BPMChange, { BPMRenderer } from "../objects/BPMChange";
 import LanePointRenderer from "../objects/LanePoint";
 
 import NoteRenderer from "../objects/NoteRenderer";
+import { Editor } from "./EditorStore";
+import Lane from "../objects/Lane";
+import LanePoint from "../objects/LanePoint";
+import { guid } from "../util";
 
 export default class Chart implements IStore {
   @observable
   timeline: Timeline;
+
+  static fromJSON(json: string) {
+    const editor = Editor.instance!;
+
+    const jsonChart: Chart = JSON.parse(json);
+
+    const musicGameSystem = editor.asset.musicGameSystems.find(
+      mgs =>
+        mgs.name === jsonChart.musicGameSystemName &&
+        mgs.version === jsonChart.musicGameSystemVersion
+    );
+
+    if (!musicGameSystem) {
+      return console.error(
+        "MusicGameSystem が見つかりません",
+        jsonChart.musicGameSystemName,
+        jsonChart.musicGameSystemVersion
+      );
+    }
+
+    const audioPath = editor.asset.audioAssetPaths.find(aap =>
+      aap.endsWith(jsonChart.audioSource!)
+    );
+
+    if (!audioPath) {
+      return console.error("音源が見つかりません", jsonChart.audioSource);
+    }
+
+    const chart = editor.newChart(musicGameSystem, audioPath);
+    chart.load(json);
+    editor.setCurrentChart(editor.charts.length - 1);
+  }
 
   load(json: string) {
     const chart = JSON.parse(json);
@@ -71,9 +107,15 @@ export default class Chart implements IStore {
     this.timeline.setLanes(chart.timeline.lanes);
   }
 
-  constructor(src: string) {
+  constructor(musicGameSystem: MusicGameSystem, audioSource: string) {
     this.timeline = new Timeline();
 
+    this.setMusicGameSystem(musicGameSystem);
+    this.setAudioFromSource(audioSource);
+
+    console.log("newChart", musicGameSystem, audioSource);
+
+    /*
     {
       const bpmChange = {
         bpm: 120,
@@ -96,7 +138,7 @@ export default class Chart implements IStore {
       aa.renderer = new LanePointRenderer(aa);
 
       this.timeline.lanePoints.push(aa);
-      */
+      
     }
 
     {
@@ -110,6 +152,7 @@ export default class Chart implements IStore {
 
       this.timeline.bpmChanges.push(bpmChange);
     }
+    */
   }
 
   @observable
@@ -207,6 +250,12 @@ export default class Chart implements IStore {
   };
 
   @action
+  async setAudioFromSource(source: string) {
+    const audioBuffer = await Editor.instance!.asset.loadAudioAsset(source);
+    this.setAudio(audioBuffer, source);
+  }
+
+  @action
   setAudio(buffer: Buffer, source: string) {
     // BinaryString, UintXXArray, ArrayBuffer -> Blob
     const blob = new Blob([buffer], { type: "audio/wav" });
@@ -261,12 +310,68 @@ export default class Chart implements IStore {
     );
   }
 
+  private musicGameSystemName = "";
+  private musicGameSystemVersion = 0;
+
+  /**
+   * 初期レーンを読み込む
+   */
+  @action
+  loadInitialLanes() {
+    console.log("loadInitialLane!");
+
+    const musicGameSystem = this.musicGameSystem!;
+
+    for (const initialLane of musicGameSystem.initialLanes) {
+      const laneTemplate = musicGameSystem.laneTemplates.find(
+        lt => lt.name === initialLane.template
+      )!;
+
+      const lanePoints = Array.from({ length: 2 }).map((_, index) => {
+        const newLanePoint = {
+          measureIndex: index * 50,
+          measurePosition: new Fraction(0, 1),
+          guid: guid(),
+          color: Number(laneTemplate.color),
+          horizontalSize: initialLane.horizontalSize,
+          templateName: laneTemplate.name,
+          horizontalPosition: new Fraction(
+            initialLane.horizontalPosition,
+            musicGameSystem.measureHorizontalDivision
+          )
+        } as LanePoint;
+
+        this.timeline.addLanePoint(newLanePoint);
+
+        return newLanePoint.guid;
+      });
+
+      const newLane = {
+        guid: guid(),
+        templateName: laneTemplate.name,
+        division: laneTemplate.division,
+        points: lanePoints
+      } as Lane;
+      this.timeline.addLane(newLane);
+    }
+  }
+
   toJSON(): string {
+    if (!this.musicGameSystem) return "{}";
+
     const chart = Object.assign({}, this);
 
     delete chart.audio;
     delete chart.audioBuffer;
+    delete chart.isPlaying;
+    delete chart.observeTimeId;
+    delete chart.volume;
     delete chart.musicGameSystem;
+
+    chart.musicGameSystemName = this.musicGameSystem!.name;
+    chart.musicGameSystemVersion = this.musicGameSystem!.version;
+
+    chart.audioSource = (chart.audioSource || "").split("/").pop();
 
     const tl = (chart.timeline = Object.assign({}, chart.timeline));
 

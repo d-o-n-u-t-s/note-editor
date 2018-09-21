@@ -10,12 +10,18 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import AddIcon from "@material-ui/icons/Add";
 
 import AudioSelect from "./AudioSelect";
+import MusicGameSystemSelect from "./MusicGameSystemSelect";
+import { observer, inject } from "mobx-react";
+import { Editor } from "../stores/EditorStore";
 
-class NewChartDialog extends React.Component {
+@observer
+@inject("editor")
+class NewChartDialog extends React.Component<{ editor?: Editor }> {
   state = {
     open: false,
 
-    audioIndex: null
+    audioIndex: null,
+    musicGameSystemIndex: null
   };
 
   handleClickOpen = () => {
@@ -24,6 +30,20 @@ class NewChartDialog extends React.Component {
 
   handleClose = () => {
     this.setState({ open: false });
+  };
+
+  handleCreate = () => {
+    const editor = this.props.editor!;
+
+    const newChart = editor.newChart(
+      editor.asset.musicGameSystems[Number(this.state.musicGameSystemIndex)],
+      editor.asset.audioAssetPaths[Number(this.state.audioIndex)]
+    );
+
+    newChart.loadInitialLanes();
+    editor.setCurrentChart(editor.charts.length - 1);
+
+    this.handleClose();
   };
 
   render() {
@@ -56,28 +76,33 @@ class NewChartDialog extends React.Component {
               To subscribe to this website, please enter your email address
               here. We will send updates occasionally.
             </DialogContentText>
-            <TextField
-              autoFocus
-              margin="dense"
-              id="name"
-              label="システム"
-              type="email"
-              fullWidth
-            />
-            <AudioSelect
-              value={this.state.audioIndex}
-              onChange={newValue =>
-                this.setState({
-                  audioIndex: newValue
-                })
-              }
-            />
+
+            <div style={{ marginTop: ".5rem" }}>
+              <MusicGameSystemSelect
+                value={this.state.musicGameSystemIndex}
+                onChange={newValue =>
+                  this.setState({
+                    musicGameSystemIndex: newValue
+                  })
+                }
+              />
+            </div>
+            <div style={{ marginTop: ".5rem" }}>
+              <AudioSelect
+                value={this.state.audioIndex}
+                onChange={newValue =>
+                  this.setState({
+                    audioIndex: newValue
+                  })
+                }
+              />
+            </div>
           </DialogContent>
           <DialogActions>
             <Button onClick={this.handleClose} color="primary">
               キャンセル
             </Button>
-            <Button onClick={this.handleClose} color="primary">
+            <Button onClick={this.handleCreate} color="primary">
               作成
             </Button>
           </DialogActions>

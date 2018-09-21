@@ -15,6 +15,7 @@ import {
 import { Editor } from "./stores/EditorStore";
 
 import AudioSelect from "./components/AudioSelect";
+import MusicGameSystemSelect from "./components/MusicGameSystemSelect";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -62,6 +63,10 @@ class ChartSetting extends React.Component<Props, {}> {
     this.props.editor!.currentChart!.setAudio(nn, path);
   };
 
+  handleMusicGameSystemsChange = async (newValue: number | null) => {
+    console.log("handleMusicGameSystemsChange", newValue);
+  };
+
   render() {
     const editor = this.props.editor;
 
@@ -87,37 +92,12 @@ class ChartSetting extends React.Component<Props, {}> {
           onChange={this.handleAudioChange}
         />
 
-        <FormControl>
-          <InputLabel disabled htmlFor="audio">
-            システム
-          </InputLabel>
-          {(() => {
-            if (!this.props.editor) return <div />;
-            if (!this.props.editor!.currentChart) return <div />;
-
-            // 選択中のシステムのインデックス
-            const selectIndex = editor.asset.musicGameSystems.findIndex(
-              path => path === editor.currentChart!.musicGameSystem
-            );
-
-            return (
-              <Select
-                value={selectIndex}
-                // onChange={this.handleAudioChange}
-                // inputProps={{ name: "currentAudio", id: "audio" }}
-              >
-                <MenuItem value={-1}>
-                  <em>None</em>
-                </MenuItem>
-                {this.props.editor!.asset.musicGameSystems.map((c, i) => (
-                  <MenuItem value={i} key={i}>
-                    {c.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            );
-          })()}
-        </FormControl>
+        <MusicGameSystemSelect
+          value={editor.asset.musicGameSystems.findIndex(
+            path => path === editor.currentChart!.musicGameSystem
+          )}
+          onChange={this.handleMusicGameSystemsChange}
+        />
 
         <div
           style={{
