@@ -19,6 +19,8 @@ const electron = (window as any).require("electron");
 const remote = electron.remote as Electrom.Remote;
 const BrowserWindow = remote.BrowserWindow;
 
+import { normalizeMusicGameSystem } from "../stores/MusicGameSystem";
+
 // import * as config from "config";
 
 function parseJSON(text: string) {
@@ -35,6 +37,7 @@ import CustomRendererUtility from "../utils/CustomRendererUtility";
 
 import MusicGameSystem from "./MusicGameSystem";
 import { Fraction } from "../math";
+import Chart from "./Chart";
 
 export default class Asset implements IStore {
   @observable
@@ -47,18 +50,20 @@ export default class Asset implements IStore {
   addMusicGameSystem = (value: MusicGameSystem) =>
     this.musicGameSystems.push(value);
 
+  /**
+   * ローカルストレージから譜面を読み込む
+   */
   async debugInitialize() {
+    if (localStorage.getItem("chart")) {
+      Chart.fromJSON(localStorage.getItem("chart")!);
+    }
+  }
+
+  async loadAssets() {
     const urlParams = getUrlParams();
 
-    console.warn(urlParams.aap);
-    console.warn(urlParams.mgsp);
-
+    // 音源を読み込む
     await this.checkAudioAssetDirectory(decodeURIComponent(urlParams.aap));
-
-    // 譜面を読み込む
-    const path = this.audioAssetPaths[24];
-    const nn = await this.loadAudioAsset(path);
-    Editor.instance!.currentChart!.setAudio(nn, path);
 
     // MusicGameSystem を読み込む
     {
@@ -82,12 +87,7 @@ export default class Asset implements IStore {
 
           const json = parseJSON(buffer.toString());
 
-          const musicGameSystems: MusicGameSystem = Object.assign(
-            {
-              customNoteLineRenderers: []
-            },
-            json
-          );
+          const musicGameSystems = normalizeMusicGameSystem(json);
 
           (window as any).CustomRendererUtility = CustomRendererUtility;
 
@@ -172,30 +172,17 @@ export default class Asset implements IStore {
           this.addMusicGameSystem(musicGameSystems);
         }
       }
-
-      const musicGameSystem = this.musicGameSystems.find(mgs =>
-        (mgs.name || "").startsWith("o")
-      )!;
-
-      Editor.instance!.currentChart!.setMusicGameSystem(musicGameSystem);
-
-      console.log(musicGameSystem, this.musicGameSystems);
-
-      // 譜面データがないなら初期レーンを読み込む
-      if (!localStorage.getItem("chart") && musicGameSystem.initialLanes) {
-        Editor.instance!.currentChart!.loadInitialLanes();
-      }
-    }
-
-    if (localStorage.getItem("chart")) {
-      Editor.instance!.currentChart!.load(localStorage.getItem("chart")!);
     }
   }
 
   constructor(debugMode: boolean) {
-    if (debugMode) {
-      this.debugInitialize();
-    }
+    (async () => {
+      await this.loadAssets();
+
+      if (debugMode) {
+        this.debugInitialize();
+      }
+    })();
   }
 
   @action
@@ -204,7 +191,7 @@ export default class Asset implements IStore {
   }
 
   async loadAudioAsset(path: string) {
-    console.log("loadAudioAsset");
+    console.log("loadAudioAsset", path);
 
     const buffer: Buffer = await util.promisify(fs.readFile)(path);
 

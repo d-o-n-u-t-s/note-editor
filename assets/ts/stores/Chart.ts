@@ -74,6 +74,10 @@ export default class Chart implements IStore {
     }
 
     for (const note of chart.timeline.notes) {
+      note.color = this.musicGameSystem!.noteTypes.find(
+        nt => nt.name === note.type
+      )!.color;
+
       note.measurePosition = new Fraction(
         note.measurePosition.numerator,
         note.measurePosition.denominator
@@ -378,7 +382,11 @@ export default class Chart implements IStore {
     tl.bpmChanges = chart.timeline.bpmChanges.map(t => Object.assign({}, t));
     tl.lanePoints = chart.timeline.lanePoints.map(t => Object.assign({}, t));
     tl.lanes = chart.timeline.lanes.map(t => Object.assign({}, t));
-    tl.notes = chart.timeline.notes.map(t => Object.assign({}, t));
+    tl.notes = chart.timeline.notes.map(t => {
+      const note = Object.assign({}, t);
+      delete note.color;
+      return note;
+    });
 
     for (const e of tl.bpmChanges) delete e.renderer;
     // for (const e of tl.notes) delete e.renderer;

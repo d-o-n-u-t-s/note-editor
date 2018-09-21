@@ -49,7 +49,7 @@ export class Editor implements IStore {
   }
 
   @action
-  test() {
+  createEditorSetting() {
     this.setting = new EditorSetting();
   }
 
@@ -119,17 +119,20 @@ export class Editor implements IStore {
     const atRandom = (array: any[]) => {
       return array[(Math.random() * array.length) | 0];
     };
+    /*
 
-    for (var i = 3; i--; ) {
+    for (var i = 1; i--; ) {
       this.newChart(
         atRandom(this.asset.musicGameSystems),
         atRandom(this.asset.audioAssetPaths)
       );
     }
 
-    this.setCurrentChart(0);
 
-    this.test();
+    this.setCurrentChart(0);
+    
+    */
+    this.createEditorSetting();
   }
 }
 

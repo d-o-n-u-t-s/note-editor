@@ -20,6 +20,7 @@ export interface NoteType {
   color: string;
   renderer: string;
   rendererReference: any;
+  excludeLanes: string[];
 }
 
 interface CustomNoteLineRenderer {
@@ -36,6 +37,18 @@ interface MusicGameSystem {
   measureHorizontalDivision: number;
   noteTypes: NoteType[];
   customNoteLineRenderers: CustomNoteLineRenderer[];
+}
+
+export function normalizeMusicGameSystem(
+  musicGameSystem: any
+): MusicGameSystem {
+  return Object.assign(
+    {
+      initialLanes: [],
+      customNoteLineRenderers: []
+    },
+    musicGameSystem
+  );
 }
 
 export default MusicGameSystem;

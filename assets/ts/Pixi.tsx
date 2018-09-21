@@ -153,6 +153,7 @@ export default class Pixi extends React.Component<IMainProps, {}> {
    */
   private renderCanvas() {
     if (!this.app) return;
+    if (!this.props.editor!.currentChart) return;
 
     CustomRendererUtility.update();
 
@@ -440,20 +441,41 @@ export default class Pixi extends React.Component<IMainProps, {}> {
         setting.measureDivision
       );
 
-      for (const quad of quads) {
-        let color = 0xff00ff;
+      // ノート配置モードなら選択中のレーンを計算する
+      {
+        if (
+          !(
+            setting.editMode === EditMode.Add &&
+            setting.editObjectCategory === ObjectCategory.Note
+          )
+        ) {
+          continue;
+        }
 
-        const p4 = sortQuadPoint(quad.a, quad.b, quad.c, quad.d);
+        const newNoteType = chart.musicGameSystem!.noteTypes[
+          setting.editNoteTypeIndex
+        ];
 
-        const _p = new Vector2(mousePosition.x - graphics.x, mousePosition.y);
+        // 配置できないレーンならやめる
+        if ((newNoteType.excludeLanes || []).includes(lane.templateName)) {
+          continue;
+        }
 
-        if (containsQuad(_p, p4[0], p4[1], p4[2], p4[3])) {
-          color = 0xffff00;
+        for (const quad of quads) {
+          let color = 0xff00ff;
 
-          targetLane = lane;
-          targetLaneHorizontalIndex = quad.horizontalIndex;
-          targetLaneVerticalIndex = quad.verticalIndex;
+          const p4 = sortQuadPoint(quad.a, quad.b, quad.c, quad.d);
 
+          const _p = new Vector2(mousePosition.x - graphics.x, mousePosition.y);
+
+          if (containsQuad(_p, p4[0], p4[1], p4[2], p4[3])) {
+            color = 0xffff00;
+
+            targetLane = lane;
+            targetLaneHorizontalIndex = quad.horizontalIndex;
+            targetLaneVerticalIndex = quad.verticalIndex;
+
+            /*
           drawQuad(graphics, p4[0], p4[1], p4[2], p4[3], color);
           this.drawTempText(
             `${quad.horizontalIndex}/${quad.verticalIndex}`,
@@ -461,6 +483,8 @@ export default class Pixi extends React.Component<IMainProps, {}> {
             p4[0].y,
             {}
           );
+          */
+          }
         }
       }
     }
@@ -510,7 +534,7 @@ export default class Pixi extends React.Component<IMainProps, {}> {
 
       const newNote = {
         guid: guid(),
-        horizontalSize: 1,
+        horizontalSize: editor.setting!.objectSize,
         horizontalPosition: new Fraction(
           targetLaneHorizontalIndex!,
           targetLane.division
@@ -682,12 +706,17 @@ export default class Pixi extends React.Component<IMainProps, {}> {
 
         if (bounds.contains(mousePosition.x - graphics.x, mousePosition.y)) {
           graphics
-            .lineStyle(0)
-            .beginFill(0x0099ff, 0.3)
-            .drawRect(bounds.x, bounds.y, bounds.width, bounds.height)
-            .endFill();
+            .lineStyle(2, 0xff9900)
+            //.beginFill(0x0099ff, 0.3)
+            .drawRect(bounds.x, bounds.y, bounds.width, bounds.height);
+          //.endFill();
 
-          if (this.connectTargetNote) {
+          if (
+            this.connectTargetNote &&
+            this.connectTargetNote.type === note.type
+          ) {
+            //            console.log(this.connectTargetNote.type, note.type);
+
             const newNoteLine: NoteLine = {
               head: this.connectTargetNote.guid,
               tail: note.guid
@@ -701,10 +730,15 @@ export default class Pixi extends React.Component<IMainProps, {}> {
             );
 
             if (isClick) {
-              chart.timeline.addNoteLine(newNoteLine);
-              console.log("接続 2");
+              // 同じノートを接続しようとしたら接続状態をリセットする
+              if (this.connectTargetNote === note) {
+                this.connectTargetNote = null;
+              } else {
+                chart.timeline.addNoteLine(newNoteLine);
+                console.log("接続 2");
 
-              this.connectTargetNote = note;
+                this.connectTargetNote = note;
+              }
             }
           } else {
             if (isClick) {
@@ -714,6 +748,21 @@ export default class Pixi extends React.Component<IMainProps, {}> {
           }
         }
       }
+    }
+
+    // 接続しようとしてるノートの枠を描画
+    if (this.connectTargetNote) {
+      const bounds = NoteRendererResolver.resolve(
+        this.connectTargetNote
+      )!.getBounds(
+        this.connectTargetNote,
+        getLane(this.connectTargetNote),
+        getMeasure(this.connectTargetNote)
+      );
+
+      graphics
+        .lineStyle(2, 0xff9900)
+        .drawRect(bounds.x, bounds.y, bounds.width, bounds.height);
     }
 
     if (
@@ -782,6 +831,8 @@ export default class Pixi extends React.Component<IMainProps, {}> {
    */
   private updateAudioInfo() {
     const currentChart = this.props.editor!.currentChart!;
+
+    if (!currentChart) return;
 
     this.renderedAudioBuffer = currentChart!.audioBuffer;
 

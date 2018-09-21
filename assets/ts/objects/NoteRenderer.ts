@@ -32,7 +32,7 @@ class NoteRenderer implements INoteRenderer {
     return new PIXI.Rectangle(
       q.point.x - q.width / 2,
       q.point.y - 5,
-      q.width,
+      q.width * note.horizontalSize,
       10
     );
   }
@@ -58,6 +58,9 @@ class NoteRenderer implements INoteRenderer {
     if (!q) {
       return console.error("ノートの描画範囲が計算できません");
     }
+
+    q.point.x += ((note.horizontalSize - 1) * q.width) / 2;
+    q.width *= note.horizontalSize;
 
     /*
     Pixi.instance!.drawTempText(

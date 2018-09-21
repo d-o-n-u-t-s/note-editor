@@ -124,6 +124,8 @@ class Toolbar extends React.Component<Props, {}> {
 
     const { classes } = this.props;
 
+    if (!editor!.currentChart) return <div />;
+
     return (
       <div
         style={{
