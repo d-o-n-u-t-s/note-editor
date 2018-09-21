@@ -6,7 +6,7 @@ import LanePoint from "../objects/LanePoint";
 
 import * as Electrom from "electron";
 
-const __require = (window as any).require;
+import { __require } from "../utils/node";
 
 var fs = (window as any).require("fs");
 
@@ -174,7 +174,7 @@ export default class Asset implements IStore {
       }
 
       const musicGameSystem = this.musicGameSystems.find(mgs =>
-        (mgs.name || "").startsWith("d")
+        (mgs.name || "").startsWith("o")
       )!;
 
       Editor.instance!.currentChart!.setMusicGameSystem(musicGameSystem);

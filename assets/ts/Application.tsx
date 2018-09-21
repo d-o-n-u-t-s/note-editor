@@ -198,24 +198,6 @@ class Application extends React.Component<Props, {}> {
               </div>
               <Player />
             </main>
-
-            <Button
-              color="primary"
-              variant="fab"
-              aria-label="Add"
-              mini
-              className={classes.fab}
-              onClick={() => {
-                // 新規譜面
-                this.props.editor!.newChart();
-                // 新規譜面をアクティブにする
-                this.props.editor!.setCurrentChart(
-                  this.props.editor!.charts.length - 1
-                );
-              }}
-            >
-              <AddIcon />
-            </Button>
           </div>
         </div>
       </Provider>

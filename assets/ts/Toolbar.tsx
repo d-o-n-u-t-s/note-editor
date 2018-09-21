@@ -4,6 +4,8 @@ import { observer, inject } from "mobx-react";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import { safe } from "../ts/util";
 
+import NewChartDialog from "./components/NewChartDialog";
+
 import { Editor } from "./stores/EditorStore";
 import {
   withStyles,
@@ -366,6 +368,8 @@ class Toolbar extends React.Component<Props, {}> {
             ))}
           </FormGroup>
         </Menu>
+
+        <NewChartDialog />
       </div>
     );
   }

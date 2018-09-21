@@ -14,6 +14,8 @@ import {
 } from "@material-ui/core";
 import { Editor } from "./stores/EditorStore";
 
+import AudioSelect from "./components/AudioSelect";
+
 const styles = (theme: Theme) =>
   createStyles({
     playerButton: {}
@@ -42,14 +44,14 @@ class ChartSetting extends React.Component<Props, {}> {
     this.props.editor!.setCurrentChart(value);
   };
 
-  handleAudioChange = async (event: any) => {
+  handleAudioChange = async (newValue: number | null) => {
     // 音源リセット
-    if (event.target.value === -1) {
+    if (newValue === null) {
       this.props.editor!.currentChart!.resetAudio();
       return;
     }
 
-    const path = this.props.editor!.asset.audioAssetPaths[event.target.value];
+    const path = this.props.editor!.asset.audioAssetPaths[newValue];
 
     // this.props.editor!.currentChart!.setAudio();
 
@@ -77,38 +79,18 @@ class ChartSetting extends React.Component<Props, {}> {
           onChange={(e: any) => editor.currentChart!.setName(e.target.value)}
           margin="normal"
         />
-        <FormControl>
-          <InputLabel htmlFor="audio">音源</InputLabel>
-          {(() => {
-            if (!this.props.editor) return <div />;
-            if (!this.props.editor!.currentChart) return <div />;
 
-            // 選択中の楽曲のインデックス
-            const selectIndex = editor.asset.audioAssetPaths.findIndex(
-              path => path === editor.currentChart!.audioSource
-            );
-
-            return (
-              <Select
-                value={selectIndex}
-                onChange={this.handleAudioChange}
-                inputProps={{ name: "currentAudio", id: "audio" }}
-              >
-                <MenuItem value={-1}>
-                  <em>None</em>
-                </MenuItem>
-                {this.props.editor!.asset.audioAssetPaths.map((c, i) => (
-                  <MenuItem value={i} key={i}>
-                    {c.split("/").pop()}
-                  </MenuItem>
-                ))}
-              </Select>
-            );
-          })()}
-        </FormControl>
+        <AudioSelect
+          value={editor.asset.audioAssetPaths.findIndex(
+            path => path === editor.currentChart!.audioSource
+          )}
+          onChange={this.handleAudioChange}
+        />
 
         <FormControl>
-          <InputLabel htmlFor="audio">システム</InputLabel>
+          <InputLabel disabled htmlFor="audio">
+            システム
+          </InputLabel>
           {(() => {
             if (!this.props.editor) return <div />;
             if (!this.props.editor!.currentChart) return <div />;
