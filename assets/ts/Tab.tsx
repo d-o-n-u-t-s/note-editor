@@ -2,9 +2,7 @@ import * as React from "react";
 
 import { observer, inject } from "mobx-react";
 
-import { configure } from "mobx";
-
-import { Editor } from "./stores/EditorStore";
+import Editor from "./stores/EditorStore";
 
 interface Props {
   editor?: Editor;
@@ -15,9 +13,7 @@ import { Tabs, Tab } from "@material-ui/core";
 @inject("editor")
 @observer
 export default class ChartTab extends React.Component<Props, {}> {
-  state = {
-    currentAudio: ""
-  };
+  state = {};
 
   handleChange = (event: any) => {
     this.setState({ [event.target.name]: event.target.value });

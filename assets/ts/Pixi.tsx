@@ -1,11 +1,11 @@
 import * as React from "react";
 import * as PIXI from "pixi.js";
-import { Editor } from "./stores/EditorStore";
+import Editor from "./stores/EditorStore";
 import { Fraction } from "./math";
 import { EditMode, ObjectCategory } from "./stores/EditorSetting";
 import LanePoint from "./objects/LanePoint";
 import LanePointRenderer from "./objects/LanePointRenderer";
-import { observer, inject } from "mobx-react";
+import { observer } from "mobx-react";
 import Lane from "./objects/Lane";
 import Note from "./objects/Note";
 import { NoteType } from "./stores/MusicGameSystem";
@@ -21,20 +21,15 @@ import NoteRendererResolver from "./objects/NoteRendererResolver";
 import NoteLineRendererResolver from "./objects/NoteLineRendererResolver";
 import CustomRendererUtility from "./utils/CustomRendererUtility";
 
-interface IMainProps {
-  editor?: Editor;
-}
-@inject("editor")
+import { inject, InjectedComponent } from "./stores/inject";
+
+@inject
 @observer
-export default class Pixi extends React.Component<IMainProps, {}> {
+export default class Pixi extends InjectedComponent {
   private app?: PIXI.Application;
   private container?: HTMLDivElement;
 
   private renderedAudioBuffer?: AudioBuffer;
-
-  constructor(props: any) {
-    super(props);
-  }
 
   private graphics?: PIXI.Graphics;
 
@@ -51,8 +46,8 @@ export default class Pixi extends React.Component<IMainProps, {}> {
     this.container!.addEventListener(
       "mousewheel",
       e => {
-        this.props.editor!.currentChart!.setTime(
-          this.props.editor!.currentChart!.time + e.wheelDelta * 0.01,
+        this.injected.editor.currentChart!.setTime(
+          this.injected.editor.currentChart!.time + e.wheelDelta * 0.01,
           true
         );
       },
@@ -153,7 +148,7 @@ export default class Pixi extends React.Component<IMainProps, {}> {
    */
   private renderCanvas() {
     if (!this.app) return;
-    if (!this.props.editor!.currentChart) return;
+    if (!this.injected.editor.currentChart) return;
 
     CustomRendererUtility.update();
 
@@ -166,7 +161,7 @@ export default class Pixi extends React.Component<IMainProps, {}> {
     this.tempTextIndex = 0;
     // this.temporaryTexts = [];
 
-    const editor = this.props.editor!;
+    const editor = this.injected.editor;
     const chart = editor.currentChart!;
     const setting = editor.setting!;
 
@@ -189,13 +184,13 @@ export default class Pixi extends React.Component<IMainProps, {}> {
     // graphics.drawRect(0, 0, w, h);
 
     // 縦に何個小節を配置するか
-    var hC = this.props.editor!.setting!.verticalLaneCount;
+    var hC = this.injected.editor.setting!.verticalLaneCount;
 
     var wC = 50;
 
-    const padding = this.props.editor!.setting!.padding;
+    const padding = this.injected.editor.setting!.padding;
 
-    const currentTime = this.props.editor!.currentChart!.time;
+    const currentTime = this.injected.editor.currentChart!.time;
     //console.log(currentTime);
 
     const bpm = 138;
@@ -206,7 +201,7 @@ export default class Pixi extends React.Component<IMainProps, {}> {
 
     (window as any).g = graphics;
 
-    const laneWidth = this.props.editor!.setting!.laneWidth;
+    const laneWidth = this.injected.editor.setting!.laneWidth;
 
     let index = 0;
 
@@ -365,9 +360,9 @@ export default class Pixi extends React.Component<IMainProps, {}> {
     if (targetMeasure) {
       const s = targetMeasure;
 
-      for (var i = 1; i < this.props.editor!.setting!.measureDivision; ++i) {
+      for (var i = 1; i < this.injected.editor.setting!.measureDivision; ++i) {
         const y =
-          s.y + (s.height / this.props.editor!.setting!.measureDivision) * i;
+          s.y + (s.height / this.injected.editor.setting!.measureDivision) * i;
 
         graphics
           .lineStyle(2, 0xffffff, 0.8)
@@ -375,7 +370,7 @@ export default class Pixi extends React.Component<IMainProps, {}> {
           .lineTo(s.x + laneWidth, y);
       }
 
-      // if (this.props.editor!.setting!.editMode === EditMode )
+      // if (this.injected.editor.setting!.editMode === EditMode )
 
       // レーン追加モードなら小節の横分割線を描画
       if (
@@ -384,13 +379,14 @@ export default class Pixi extends React.Component<IMainProps, {}> {
       ) {
         for (
           let i = 1;
-          i < this.props.editor!.currentChart!.timeline.horizontalLaneDivision;
+          i <
+          this.injected.editor.currentChart!.timeline.horizontalLaneDivision;
           ++i
         ) {
           const x =
             s.x +
             (laneWidth /
-              this.props.editor!.currentChart!.timeline
+              this.injected.editor.currentChart!.timeline
                 .horizontalLaneDivision) *
               i;
 
@@ -593,10 +589,10 @@ export default class Pixi extends React.Component<IMainProps, {}> {
     if (
       targetMeasure &&
       // isClick &&
-      this.props.editor!.setting!.editMode === EditMode.Connect &&
-      this.props.editor!.setting!.editObjectCategory === ObjectCategory.Lane
+      this.injected.editor.setting!.editMode === EditMode.Connect &&
+      this.injected.editor.setting!.editObjectCategory === ObjectCategory.Lane
     ) {
-      for (const lanePoint of this.props.editor!.currentChart!.timeline
+      for (const lanePoint of this.injected.editor.currentChart!.timeline
         .lanePoints) {
         if (
           getLanePointRenderer(lanePoint)
@@ -768,8 +764,8 @@ export default class Pixi extends React.Component<IMainProps, {}> {
     if (
       targetMeasure &&
       // isClick &&
-      this.props.editor!.setting!.editMode === EditMode.Add &&
-      this.props.editor!.setting!.editObjectCategory === ObjectCategory.Lane
+      this.injected.editor.setting!.editMode === EditMode.Add &&
+      this.injected.editor.setting!.editObjectCategory === ObjectCategory.Lane
     ) {
       // レーンテンプレ
       const laneTemplate = editor.currentChart!.musicGameSystem!.laneTemplates[
@@ -778,10 +774,10 @@ export default class Pixi extends React.Component<IMainProps, {}> {
 
       const [nx, ny] = normalizeContainsPoint(targetMeasure, mousePosition);
 
-      const hlDiv = this.props.editor!.currentChart!.timeline
+      const hlDiv = this.injected.editor.currentChart!.timeline
         .horizontalLaneDivision;
 
-      const vlDiv = this.props.editor!.setting!.measureDivision;
+      const vlDiv = this.injected.editor.setting!.measureDivision;
 
       const clamp = (num: number, min: number, max: number) =>
         num <= min ? min : num >= max ? max : num;
@@ -813,7 +809,7 @@ export default class Pixi extends React.Component<IMainProps, {}> {
       //lane.renderer.update(graphics, this.measures);
 
       if (isClick) {
-        this.props.editor!.currentChart!.timeline.addLanePoint(newLanePoint);
+        this.injected.editor.currentChart!.timeline.addLanePoint(newLanePoint);
       } else {
         // プレビュー
 
@@ -830,7 +826,7 @@ export default class Pixi extends React.Component<IMainProps, {}> {
    * 譜面情報を更新する
    */
   private updateAudioInfo() {
-    const currentChart = this.props.editor!.currentChart!;
+    const currentChart = this.injected.editor.currentChart!;
 
     if (!currentChart) return;
 
@@ -842,7 +838,7 @@ export default class Pixi extends React.Component<IMainProps, {}> {
   render() {
     let component = this;
 
-    //console.log("再描画します: pixi", this.props.editor!.currentChart!.name);
+    //console.log("再描画します: pixi", this.injected.editor.currentChart!.name);
 
     this.updateAudioInfo();
 

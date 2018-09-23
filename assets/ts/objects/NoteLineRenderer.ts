@@ -63,7 +63,7 @@ class NoteLineRenderer implements INoteLineRenderer {
     const {
       lanes,
       lanePoints
-    } = Pixi.instance!.props.editor!.currentChart!.timeline;
+    } = Pixi.instance!.injected.editor!.currentChart!.timeline;
 
     let head = notes.find(note => note.guid === noteLine.head)!;
     let tail = notes.find(note => note.guid === noteLine.tail)!;

@@ -12,7 +12,7 @@ import {
   createStyles,
   Button
 } from "@material-ui/core";
-import { Editor } from "../stores/EditorStore";
+import Editor from "../stores/EditorStore";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -32,7 +32,7 @@ class MusicGameSystemSelect extends React.Component<Props, {}> {
     const { editor, classes } = this.props;
 
     // 譜面が存在しない
-    if (!editor || !editor.currentChart) return <div />;
+    if (!editor) return <div />;
 
     return (
       <FormControl style={{ width: "100%" }}>

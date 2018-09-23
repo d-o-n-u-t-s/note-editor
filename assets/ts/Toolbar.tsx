@@ -6,7 +6,7 @@ import { safe } from "../ts/util";
 
 import NewChartDialog from "./components/NewChartDialog";
 
-import { Editor } from "./stores/EditorStore";
+import Editor from "./stores/EditorStore";
 import {
   withStyles,
   WithStyles,

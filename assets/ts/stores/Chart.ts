@@ -15,7 +15,7 @@ import BPMChange, { BPMRenderer } from "../objects/BPMChange";
 import LanePointRenderer from "../objects/LanePoint";
 
 import NoteRenderer from "../objects/NoteRenderer";
-import { Editor } from "./EditorStore";
+import Editor from "./EditorStore";
 import Lane from "../objects/Lane";
 import LanePoint from "../objects/LanePoint";
 import { guid } from "../util";

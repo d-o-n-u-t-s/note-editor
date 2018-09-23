@@ -8,7 +8,7 @@ configure({
   enforceActions: "observed"
 });
 
-import { Editor } from "./stores/EditorStore";
+import Editor from "./stores/EditorStore";
 
 interface Props {
   editor?: Editor;

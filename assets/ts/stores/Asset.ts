@@ -1,5 +1,5 @@
 import { action, observable } from "mobx";
-import { Editor } from "./EditorStore";
+import Editor from "./EditorStore";
 import { guid } from "../util";
 import Lane from "../objects/Lane";
 import LanePoint from "../objects/LanePoint";
@@ -11,6 +11,7 @@ import { __require } from "../utils/node";
 var fs = (window as any).require("fs");
 
 const util = __require("util");
+const path = __require("path");
 
 import { getUrlParams } from "../utils/url";
 
@@ -75,14 +76,14 @@ export default class Asset implements IStore {
         console.log(directory);
 
         const files = (await util.promisify(fs.readdir)(
-          urlParams.mgsp + "/" + directory
+          path.join(urlParams.mgsp, directory)
         )) as any[];
 
         var fileList = files.filter(file => file.endsWith(".json"));
         console.log(fileList);
         for (const file of fileList) {
           const buffer: Buffer = await util.promisify(fs.readFile)(
-            urlParams.mgsp + "/" + directory + "/" + file
+            path.join(urlParams.mgsp, directory, file)
           );
 
           const json = parseJSON(buffer.toString());
@@ -102,20 +103,23 @@ export default class Asset implements IStore {
             ];
 
             for (const renderer of renderers) {
-              const path =
-                urlParams.mgsp + "/" + directory + "/" + renderer.renderer;
+              const _path = path.join(
+                urlParams.mgsp,
+                directory,
+                renderer.renderer
+              );
 
-              const buffer: Buffer = await util.promisify(fs.readFile)(path);
+              const buffer: Buffer = await util.promisify(fs.readFile)(_path);
+
+              const key = guid();
 
               const source = buffer
                 .toString()
-                .replace("export default", `window["${path}"] = `);
-
-              console.log(source);
+                .replace("export default", `window["${key}"] = `);
 
               eval(source);
 
-              renderer.lanteTemplate.rendererReference = (window as any)[path];
+              renderer.lanteTemplate.rendererReference = (window as any)[key];
             }
           }
 
@@ -130,20 +134,27 @@ export default class Asset implements IStore {
             ];
 
             for (const renderer of renderers) {
-              const path =
-                urlParams.mgsp + "/" + directory + "/" + renderer.renderer;
+              const rendererPath = path.join(
+                urlParams.mgsp,
+                directory,
+                renderer.renderer
+              );
 
-              const buffer: Buffer = await util.promisify(fs.readFile)(path);
+              const buffer: Buffer = await util.promisify(fs.readFile)(
+                rendererPath
+              );
+
+              const key = guid();
 
               const source = buffer
                 .toString()
-                .replace("export default", `window["${path}"] = `);
-
-              console.log(source);
+                .replace("export default", `window["${key}"] = `);
 
               eval(source);
 
-              renderer.noteTemplate.rendererReference = (window as any)[path];
+              console.log("NoteRender!", (window as any)[key], source);
+
+              renderer.noteTemplate.rendererReference = (window as any)[key];
             }
           }
 
@@ -152,20 +163,26 @@ export default class Asset implements IStore {
             const renderers = musicGameSystems.customNoteLineRenderers || [];
 
             for (const renderer of renderers) {
-              const path =
-                urlParams.mgsp + "/" + directory + "/" + renderer.renderer;
+              const rendererPath = path.join(
+                urlParams.mgsp,
+                directory,
+                renderer.renderer
+              );
 
-              const buffer: Buffer = await util.promisify(fs.readFile)(path);
+              const buffer: Buffer = await util.promisify(fs.readFile)(
+                rendererPath
+              );
+              const key = guid();
 
               const source = buffer
                 .toString()
-                .replace("export default", `window["${path}"] = `);
+                .replace("export default", `window["${key}"] = `);
 
               // console.log(source);
 
               eval(source);
 
-              renderer.rendererReference = (window as any)[path];
+              renderer.rendererReference = (window as any)[key];
             }
           }
 
@@ -203,7 +220,9 @@ export default class Asset implements IStore {
     const files: any[] = await util.promisify(fs.readdir)(dir);
 
     var fileList = files.filter(function(file) {
-      return fs.statSync(dir + "/" + file).isFile() && /.*\.wav$/.test(file); //絞り込み
+      return (
+        fs.statSync(path.join(dir, file)).isFile() && /.*\.wav$/.test(file)
+      ); //絞り込み
     });
 
     for (const fileName of fileList) {

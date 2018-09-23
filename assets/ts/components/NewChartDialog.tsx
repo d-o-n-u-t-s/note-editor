@@ -12,7 +12,7 @@ import AddIcon from "@material-ui/icons/Add";
 import AudioSelect from "./AudioSelect";
 import MusicGameSystemSelect from "./MusicGameSystemSelect";
 import { observer, inject } from "mobx-react";
-import { Editor } from "../stores/EditorStore";
+import Editor from "../stores/EditorStore";
 
 @observer
 @inject("editor")

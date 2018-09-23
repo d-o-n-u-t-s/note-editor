@@ -1,7 +1,10 @@
 import { action, observable } from "mobx";
 
 import Chart from "./Chart";
-interface IStore {}
+
+interface IStore {
+  readonly name: string;
+}
 
 import EditorSetting from "./EditorSetting";
 import Asset from "./Asset";
@@ -11,7 +14,9 @@ import { __require, fs } from "../utils/node";
 const { remote, ipcRenderer } = __require("electron");
 const { dialog } = remote;
 
-export class Editor implements IStore {
+export default class Editor implements IStore {
+  readonly name = "editor";
+
   readonly debugMode: boolean = true;
 
   @observable
@@ -135,7 +140,3 @@ export class Editor implements IStore {
     this.createEditorSetting();
   }
 }
-
-export default {
-  editor: new Editor()
-};

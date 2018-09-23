@@ -411,7 +411,7 @@ class LaneRenderer implements ILaneRenderer {
     // キャッシュしておく
     linesCache.set(lane, lines);
 
-    const laneTemplate = Pixi.instance!.props.editor!.currentChart!.musicGameSystem!.laneTemplates.find(
+    const laneTemplate = Pixi.instance!.injected.editor!.currentChart!.musicGameSystem!.laneTemplates.find(
       lt => lt.name === lane.templateName
     )!;
 

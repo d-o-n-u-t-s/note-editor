@@ -9,7 +9,7 @@ import SpeakerIcon from "@material-ui/icons/VolumeUp";
 import SettingsIcon from "@material-ui/icons/Settings";
 import NotesIcon from "@material-ui/icons/Notes";
 import { IconButton } from "@material-ui/core";
-import { Editor } from "./stores/EditorStore";
+import Editor from "./stores/EditorStore";
 
 import { safe } from "../ts/util";
 
@@ -145,7 +145,7 @@ class Player extends React.Component<Props, {}> {
 
           {/* volume */}
           <Slider
-            value={safe(() => editor!.currentChart!.volume)}
+            value={safe(() => editor!.currentChart!.volume, 0)}
             min={0}
             max={1}
             style={{

@@ -84,7 +84,7 @@ const styles = (theme: Theme) =>
     }
   });
 
-import { Editor } from "./stores/EditorStore";
+import Editor from "./stores/EditorStore";
 
 interface Props extends WithStyles<typeof styles> {
   editor?: Editor;
@@ -93,11 +93,12 @@ interface Props extends WithStyles<typeof styles> {
 import Menu from "./EditorSetting";
 import { Provider, inject, observer } from "mobx-react";
 
-import stores from "./stores/EditorStore";
+import stores from "./stores/stores";
 import { observable } from "mobx";
 import Slider from "@material-ui/lab/Slider";
 
 import ChartTab from "./Tab";
+import Empty from "./containers/Empty";
 
 import Toolbar from "./Toolbar";
 import Sidebar from "./Sidebar";
@@ -106,6 +107,34 @@ import { Button } from "@material-ui/core";
 
 import AddIcon from "@material-ui/icons/Add";
 
+@inject("editor")
+@observer
+class T extends React.Component<{ editor?: Editor }, {}> {
+  render() {
+    if (!this.props.editor || !this.props.editor!.currentChart) {
+      return <Empty />;
+    }
+
+    return (
+      <div style={{ flex: 1, display: "flex" }}>
+        <Pixi />
+      </div>
+    );
+  }
+}
+
+@inject("editor")
+@observer
+class T2 extends React.Component<{ editor?: Editor }, {}> {
+  render() {
+    if (!this.props.editor || !this.props.editor!.currentChart) {
+      return <div />;
+    }
+
+    return <Player />;
+  }
+}
+
 class Application extends React.Component<Props, {}> {
   state = {
     hV: 0,
@@ -113,24 +142,6 @@ class Application extends React.Component<Props, {}> {
 
     tabIndex: 0
   };
-
-  componentDidMount() {
-    /*
-    setInterval(() => {
-      var t = document.querySelector("#test") as HTMLDivElement;
-
-      t.style.height =
-        (t.parentElement as HTMLDivElement).offsetHeight - 16 + "px";
-
-      var t2 = document.querySelector("#test") as HTMLDivElement;
-      /*
-      t2.style.width =
-        (t2.parentElement as HTMLDivElement).offsetWidth - 16 + "px";
-        */
-    /*
-    }, 100);
-    */
-  }
 
   render() {
     const { classes } = this.props;
@@ -179,24 +190,8 @@ class Application extends React.Component<Props, {}> {
                 style={{ marginBottom: "25px" }}
               />
 
-              <div style={{ flex: 1, display: "flex" }}>
-                <Pixi />
-                {/*}
-                <div style={{ display: "flex" }}>
-                  <Slider
-                    id="test"
-                    value={this.state.hV}
-                    min={0}
-                    max={1}
-                    onChange={(_, value) => {
-                      this.setState({ hV: value });
-                    }}
-                    vertical
-                  />
-                </div>
-                */}
-              </div>
-              <Player />
+              <T />
+              <T2 />
             </main>
           </div>
         </div>

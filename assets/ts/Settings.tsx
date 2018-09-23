@@ -10,7 +10,7 @@ import {
   createStyles,
   Divider
 } from "@material-ui/core";
-import { Editor } from "./stores/EditorStore";
+import Editor from "./stores/EditorStore";
 
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
@@ -66,7 +66,7 @@ class Settings extends React.Component<Props, {}> {
       },
       {
         key: "アセット設定",
-        render: () => <AssetSetting />
+        render: () => <AssetSetting base={0} />
       }
     ];
 
