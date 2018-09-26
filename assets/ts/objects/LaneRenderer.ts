@@ -214,7 +214,7 @@ export interface ILaneRenderer {
   render(
     lane: Lane,
     graphics: PIXI.Graphics,
-    lanePoints: LanePoint[],
+    lanePointMap: Map<string, LanePoint>,
     measures: Measure[],
     drawHorizontalLineTargetMeasure?: Measure,
     md?: number
@@ -396,23 +396,21 @@ class LaneRenderer implements ILaneRenderer {
   render(
     lane: Lane,
     graphics: PIXI.Graphics,
-    lanePoints: LanePoint[],
+    lanePointMap: Map<string, LanePoint>,
     measures: Measure[],
     drawHorizontalLineTargetMeasure?: Measure,
     md = 4
   ): QuadAndIndex[] {
     const lines = getLines(
-      lane.points.map(
-        point => lanePoints.find(lanePoint => lanePoint.guid === point)!
-      ),
+      lane.points.map(point => lanePointMap.get(point)!),
       measures
     );
 
     // キャッシュしておく
     linesCache.set(lane, lines);
 
-    const laneTemplate = Pixi.instance!.injected.editor!.currentChart!.musicGameSystem!.laneTemplates.find(
-      lt => lt.name === lane.templateName
+    const laneTemplate = Pixi.instance!.injected.editor!.currentChart!.musicGameSystem!.laneTemplateMap.get(
+      lane.templateName
     )!;
 
     this.defaultRender(graphics, lines, laneTemplate);

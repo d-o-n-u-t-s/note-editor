@@ -431,7 +431,7 @@ export default class Pixi extends InjectedComponent {
       const quads = LaneRendererResolver.resolve(lane).render(
         lane,
         graphics,
-        chart.timeline.lanePoints,
+        chart.timeline.lanePointMap,
         this.measures,
         targetMeasure,
         setting.measureDivision
@@ -507,8 +507,8 @@ export default class Pixi extends InjectedComponent {
     // ノート色を取得する
     const getNoteColor = (noteType: NoteType) => {
       if (noteType.color === "$laneColor") {
-        const laneTemplate = chart.musicGameSystem!.laneTemplates.find(
-          lt => lt.name === targetLane!.templateName
+        const laneTemplate = chart.musicGameSystem!.laneTemplateMap.get(
+          targetLane!.templateName
         )!;
 
         return Number(laneTemplate.color);
@@ -601,8 +601,8 @@ export default class Pixi extends InjectedComponent {
         ) {
           // console.log("接続！", lanePoint);
 
-          const laneTemplate = chart.musicGameSystem!.laneTemplates.find(
-            lt => lt.name === lanePoint.templateName
+          const laneTemplate = chart.musicGameSystem!.laneTemplateMap.get(
+            lanePoint.templateName
           )!;
 
           // レーン接続プレビュー
@@ -622,7 +622,7 @@ export default class Pixi extends InjectedComponent {
             LaneRendererResolver.resolve(newLane).render(
               newLane,
               graphics,
-              chart.timeline.lanePoints,
+              chart.timeline.lanePointMap,
               this.measures
             );
 

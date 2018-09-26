@@ -33,6 +33,9 @@ interface MusicGameSystem {
   name: string;
   version: number;
   laneTemplates: LaneTemplate[];
+
+  laneTemplateMap: Map<string, LaneTemplate>;
+
   initialLanes: InitialLane[];
   measureHorizontalDivision: number;
   noteTypes: NoteType[];
@@ -45,6 +48,7 @@ export function normalizeMusicGameSystem(
   return Object.assign(
     {
       initialLanes: [],
+      laneTemplates: [],
       customNoteLineRenderers: []
     },
     musicGameSystem

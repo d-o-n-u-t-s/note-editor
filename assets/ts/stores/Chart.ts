@@ -327,8 +327,8 @@ export default class Chart implements IStore {
     const musicGameSystem = this.musicGameSystem!;
 
     for (const initialLane of musicGameSystem.initialLanes) {
-      const laneTemplate = musicGameSystem.laneTemplates.find(
-        lt => lt.name === initialLane.template
+      const laneTemplate = musicGameSystem.laneTemplateMap.get(
+        initialLane.template
       )!;
 
       const lanePoints = Array.from({ length: 2 }).map((_, index) => {

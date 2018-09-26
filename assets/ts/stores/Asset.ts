@@ -20,7 +20,10 @@ const electron = (window as any).require("electron");
 const remote = electron.remote as Electrom.Remote;
 const BrowserWindow = remote.BrowserWindow;
 
-import { normalizeMusicGameSystem } from "../stores/MusicGameSystem";
+import {
+  normalizeMusicGameSystem,
+  LaneTemplate
+} from "../stores/MusicGameSystem";
 
 // import * as config from "config";
 
@@ -90,13 +93,22 @@ export default class Asset implements IStore {
 
           const musicGameSystems = normalizeMusicGameSystem(json);
 
+          // 名前をキーにしたレーンテンプレートのマップを生成する
+          musicGameSystems.laneTemplateMap = new Map<string, LaneTemplate>();
+          for (const laneTemplate of musicGameSystems.laneTemplates) {
+            musicGameSystems.laneTemplateMap.set(
+              laneTemplate.name,
+              laneTemplate
+            );
+          }
+
           (window as any).CustomRendererUtility = CustomRendererUtility;
 
           // レーンのカスタムレンダラーを読み込む
           {
             const renderers = [
               ...new Set(
-                (musicGameSystems.laneTemplates || [])
+                musicGameSystems.laneTemplates
                   .map(lt => ({ renderer: lt.renderer, lanteTemplate: lt }))
                   .filter(r => r.renderer !== "default")
               )

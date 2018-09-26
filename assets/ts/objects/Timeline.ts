@@ -3,9 +3,29 @@ import LanePoint from "./LanePoint";
 import BPMChange from "./BPMChange";
 import Note from "./Note";
 import NoteLine from "./NoteLine";
-import { observable, action } from "mobx";
+import { observable, observe, action, computed } from "mobx";
 
 export default class Timeline {
+  constructor() {
+    observe(this.notes, () => {
+      this.noteMap.clear();
+
+      for (const note of this.notes) {
+        this.noteMap.set(note.guid, note);
+      }
+
+      console.log("NoteMap を更新しました");
+    });
+
+    observe(this.lanePoints, () => {
+      this.lanePointMap.clear();
+      for (const lanePoint of this.lanePoints) {
+        this.lanePointMap.set(lanePoint.guid, lanePoint);
+      }
+      console.log("lanePointMap を更新しました");
+    });
+  }
+
   /**
    * 水平レーン分割数
    */
@@ -18,8 +38,12 @@ export default class Timeline {
   @observable
   lanePoints: LanePoint[] = [];
 
+  lanePointMap = new Map<string, LanePoint>();
+
   @observable
   notes: Note[] = [];
+
+  noteMap = new Map<string, Note>();
 
   @observable
   noteLines: NoteLine[] = [];
