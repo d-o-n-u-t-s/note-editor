@@ -6,12 +6,13 @@ import { safe } from "../ts/util";
 
 import NewChartDialog from "./components/NewChartDialog";
 
-import Editor from "./stores/EditorStore";
+import { ObjectCategory, OtherObjectType } from "./stores/EditorSetting";
 import {
   withStyles,
   WithStyles,
   createStyles,
   Divider,
+  TextField,
   Menu,
   MenuItem,
   FormGroup
@@ -19,6 +20,12 @@ import {
 
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
+
+function getEnumKeys(_enum: any): string[] {
+  return Object.values(_enum).filter(
+    key => typeof key === "string"
+  ) as string[];
+}
 
 /**
  * 編集モード
@@ -28,18 +35,6 @@ enum EditMode {
   Add,
   Delete,
   Connect
-}
-
-/**
- *
- */
-enum ObjectCategory {
-  // ノート
-  Note = 1,
-  // レーン
-  Lane,
-  // 特殊
-  S
 }
 
 import ToggleButton from "@material-ui/lab/ToggleButton";
@@ -100,6 +95,9 @@ class Toolbar extends InjectedComponent<Props> {
     laneAnchorEl: null,
     noteAnchorEl: null,
 
+    // その他オブジェクトメニューアンカー
+    otherAnchorEl: null,
+
     objectSizeAnchorEl: null,
 
     displaySettingAnchorEl: null,
@@ -114,6 +112,55 @@ class Toolbar extends InjectedComponent<Props> {
   handleClose = () => {
     this.setState({ anchorEl: null });
   };
+
+  otherMenuValueTable: any = {
+    BPM: ["bpm", "setBpm"],
+    Speed: ["speed", "setSpeed"]
+  };
+
+  renderOtherMenu() {
+    const { setting } = this.injected.editor;
+
+    const otherMenuKey = getEnumKeys(OtherObjectType)[
+      setting.editOtherTypeIndex
+    ];
+
+    if (!this.otherMenuValueTable[otherMenuKey]) {
+      return <span>{otherMenuKey}</span>;
+    }
+
+    const defaultValue = (setting as any)[
+      this.otherMenuValueTable[otherMenuKey][0]
+    ];
+    const setter = (setting as any)[this.otherMenuValueTable[otherMenuKey][1]];
+
+    return (
+      <span>
+        {otherMenuKey}
+        <TextField
+          required
+          defaultValue={defaultValue}
+          margin="none"
+          type="number"
+          InputProps={{
+            inputProps: {
+              style: {
+                width: "4rem",
+                marginRight: "-.8rem",
+                textAlign: "center"
+              }
+            }
+          }}
+          style={{ height: "24px" }}
+          onChange={({ target: { value } }) => {
+            console.log(setter, value);
+            setter.call(setting, Number(value));
+          }}
+        />
+      </span>
+    );
+  }
+
   render() {
     const { editor } = this.injected;
     const { setting } = editor;
@@ -256,10 +303,14 @@ class Toolbar extends InjectedComponent<Props> {
                 }
               />
             </ToggleButton>
-            <ToggleButton value={ObjectCategory.S}>
-              {/*<ClearIcon />*/}
-              BPM
-              <ArrowDropDownIcon onClick={this.handleClick} />
+            {/* その他オブジェクトメニュー */}
+            <ToggleButton value={ObjectCategory.Other}>
+              {this.renderOtherMenu()}
+              <ArrowDropDownIcon
+                onClick={(e: any) =>
+                  this.setState({ otherAnchorEl: e.currentTarget })
+                }
+              />
             </ToggleButton>
           </ToggleButtonGroup>
         </div>
@@ -313,6 +364,31 @@ class Toolbar extends InjectedComponent<Props> {
                 </MenuItem>
               )
             );
+          })()}
+        </Menu>
+
+        {/* その他オブジェクトメニュー */}
+        <Menu
+          anchorEl={this.state.otherAnchorEl}
+          open={Boolean(this.state.otherAnchorEl)}
+          onClose={(e: any) => {
+            this.setState({ otherAnchorEl: null });
+          }}
+        >
+          {(() => {
+            if (!this.injected.editor.currentChart!.musicGameSystem) return;
+
+            return getEnumKeys(OtherObjectType).map((name, index) => (
+              <MenuItem
+                key={index}
+                onClick={() => {
+                  setting.setEditOtherTypeIndex(index);
+                  this.setState({ otherAnchorEl: null });
+                }}
+              >
+                {name}
+              </MenuItem>
+            ));
           })()}
         </Menu>
 

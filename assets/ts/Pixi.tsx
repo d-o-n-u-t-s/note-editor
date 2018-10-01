@@ -821,26 +821,14 @@ export default class Pixi extends InjectedComponent {
     if (
       targetMeasure &&
       setting.editMode === EditMode.Add &&
-      setting.editObjectCategory === ObjectCategory.S
+      setting.editObjectCategory === ObjectCategory.Other
     ) {
-      // レーンテンプレ
-      const laneTemplate = editor.currentChart!.musicGameSystem!.laneTemplates[
-        editor.setting!.editLaneTypeIndex
-      ];
-
-      const [nx, ny] = normalizeContainsPoint(targetMeasure, mousePosition);
-
-      const hlDiv = this.injected.editor.currentChart!.timeline
-        .horizontalLaneDivision;
+      const [_, ny] = normalizeContainsPoint(targetMeasure, mousePosition);
 
       const vlDiv = this.injected.editor.setting!.measureDivision;
 
       const clamp = (num: number, min: number, max: number) =>
         num <= min ? min : num >= max ? max : num;
-
-      const maxObjectSize = 16;
-
-      const p = (editor.setting!.objectSize - 1) / maxObjectSize / 2;
 
       const newLanePoint = {
         measureIndex: targetMeasure.index,
@@ -849,19 +837,8 @@ export default class Pixi extends InjectedComponent {
           vlDiv
         ),
         guid: guid(),
-        bpm: 120,
-        horizontalSize: editor.setting!.objectSize,
-        horizontalPosition: new Fraction(
-          clamp(
-            Math.floor((nx - p) * hlDiv),
-            0,
-            hlDiv - editor.setting!.objectSize
-          ),
-          hlDiv
-        )
+        bpm: setting.bpm
       } as BPMChange;
-
-      //lane.renderer.update(graphics, this.measures);
 
       if (isClick) {
         this.injected.editor.currentChart!.timeline.addBPMChange(newLanePoint);

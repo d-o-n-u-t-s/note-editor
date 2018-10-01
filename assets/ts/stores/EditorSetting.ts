@@ -19,7 +19,14 @@ export enum ObjectCategory {
   // レーン
   Lane,
   // 特殊
-  S
+  Other
+}
+
+export enum OtherObjectType {
+  BPM = 1,
+  Stop,
+  Speed,
+  BarLine
 }
 
 export interface ObjectVisibility {
@@ -64,6 +71,14 @@ export default class EditorSetting {
   setEditLaneTypeIndex = (value: number) => (this.editLaneTypeIndex = value);
 
   @observable
+  editOtherTypeIndex = 0;
+
+  @action
+  setEditOtherTypeIndex(value: number) {
+    this.editOtherTypeIndex = value;
+  }
+
+  @observable
   laneWidth = 300;
 
   @action
@@ -99,4 +114,19 @@ export default class EditorSetting {
 
   @action
   setObjectSize = (value: number) => (this.objectSize = value);
+
+  @observable
+  bpm = 120;
+
+  @action
+  setBpm(bpm: number) {
+    this.bpm = bpm;
+  }
+  @observable
+  speed = 1.0;
+
+  @action
+  setSpeed(speed: number) {
+    this.speed = speed;
+  }
 }
