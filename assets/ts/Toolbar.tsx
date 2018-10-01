@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { observer, inject } from "mobx-react";
+import { observer } from "mobx-react";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import { safe } from "../ts/util";
 
@@ -84,17 +84,13 @@ const styles = (theme: Theme) =>
     }
   });
 
-interface Props extends WithStyles<typeof styles> {
-  editor?: Editor;
-}
+interface Props extends WithStyles<typeof styles> {}
 
-interface INoteType {
-  name: string;
-}
+import { inject, InjectedComponent } from "./stores/inject";
 
-@inject("editor")
+@inject
 @observer
-class Toolbar extends React.Component<Props, {}> {
+class Toolbar extends InjectedComponent<Props> {
   state = {
     // タイムライン上に配置するオブジェクトのサイズ
     timelineDivisionSize: 1,
@@ -119,12 +115,14 @@ class Toolbar extends React.Component<Props, {}> {
     this.setState({ anchorEl: null });
   };
   render() {
-    const editor = this.props.editor;
+    const { editor } = this.injected;
+    const { setting } = editor;
+
     const { anchorEl } = this.state;
 
     const { classes } = this.props;
 
-    if (!editor!.currentChart) return <div />;
+    if (!editor.currentChart) return <div />;
 
     return (
       <div
@@ -135,7 +133,7 @@ class Toolbar extends React.Component<Props, {}> {
         }}
       >
         <Badge
-          badgeContent={this.props.editor!.setting!.measureDivision}
+          badgeContent={setting.measureDivision}
           color="primary"
           classes={{ badge: this.props.classes.badge }}
         >
@@ -145,7 +143,7 @@ class Toolbar extends React.Component<Props, {}> {
         </Badge>
 
         <Badge
-          badgeContent={this.props.editor!.setting!.objectSize}
+          badgeContent={setting.objectSize}
           color="primary"
           classes={{ badge: this.props.classes.badge }}
         >
@@ -169,7 +167,7 @@ class Toolbar extends React.Component<Props, {}> {
             <MenuItem
               key={index}
               onClick={(e: any) => {
-                this.props.editor!.setting!.setMeasureDivision(value);
+                setting.setMeasureDivision(value);
                 this.handleClose();
               }}
             >
@@ -191,7 +189,7 @@ class Toolbar extends React.Component<Props, {}> {
               <MenuItem
                 key={index}
                 onClick={(e: any) => {
-                  this.props.editor!.setting!.setObjectSize(value);
+                  setting.setObjectSize(value);
                   this.setState({ objectSizeAnchorEl: null });
                 }}
               >
@@ -202,11 +200,11 @@ class Toolbar extends React.Component<Props, {}> {
 
         <div className={classes.toggleContainer}>
           <ToggleButtonGroup
-            value={this.props.editor!.setting!.editMode}
+            value={setting.editMode}
             exclusive
             onChange={(_, value: EditMode | null) => {
               if (value === null) return;
-              this.props.editor!.setting!.setEditMode(value);
+              setting.setEditMode(value);
             }}
           >
             <ToggleButton value={EditMode.Select}>
@@ -226,18 +224,18 @@ class Toolbar extends React.Component<Props, {}> {
 
         <div className={classes.toggleContainer}>
           <ToggleButtonGroup
-            value={this.props.editor!.setting!.editObjectCategory}
+            value={setting.editObjectCategory}
             exclusive
             onChange={(_, value: ObjectCategory | null) => {
               if (value === null) return;
-              this.props.editor!.setting!.setEditObjectCategory(value);
+              setting.setEditObjectCategory(value);
             }}
           >
             <ToggleButton value={ObjectCategory.Note}>
               {safe(
                 () =>
-                  this.props.editor!.currentChart!.musicGameSystem!.noteTypes[
-                    this.props.editor!.setting!.editNoteTypeIndex
+                  this.injected.editor.currentChart!.musicGameSystem!.noteTypes[
+                    setting.editNoteTypeIndex
                   ].name
               )}
               <ArrowDropDownIcon
@@ -249,10 +247,8 @@ class Toolbar extends React.Component<Props, {}> {
             <ToggleButton value={ObjectCategory.Lane}>
               {safe(
                 () =>
-                  this.props.editor!.currentChart!.musicGameSystem!
-                    .laneTemplates[
-                    this.props.editor!.setting!.editLaneTypeIndex
-                  ].name
+                  this.injected.editor.currentChart!.musicGameSystem!
+                    .laneTemplates[setting.editLaneTypeIndex].name
               )}
               <ArrowDropDownIcon
                 onClick={(e: any) =>
@@ -277,13 +273,13 @@ class Toolbar extends React.Component<Props, {}> {
           }}
         >
           {(() => {
-            if (!this.props.editor!.currentChart!.musicGameSystem) return;
-            return this.props.editor!.currentChart!.musicGameSystem!.noteTypes.map(
+            if (!this.injected.editor.currentChart!.musicGameSystem) return;
+            return this.injected.editor.currentChart!.musicGameSystem!.noteTypes.map(
               ({ name }, index) => (
                 <MenuItem
                   key={index}
                   onClick={() => {
-                    this.props.editor!.setting!.setEditNoteTypeIndex(index);
+                    setting.setEditNoteTypeIndex(index);
                     this.setState({ noteAnchorEl: null });
                   }}
                 >
@@ -303,13 +299,13 @@ class Toolbar extends React.Component<Props, {}> {
           }}
         >
           {(() => {
-            if (!this.props.editor!.currentChart!.musicGameSystem) return;
-            return this.props.editor!.currentChart!.musicGameSystem!.laneTemplates.map(
+            if (!this.injected.editor.currentChart!.musicGameSystem) return;
+            return this.injected.editor.currentChart!.musicGameSystem!.laneTemplates.map(
               ({ name }, index) => (
                 <MenuItem
                   key={index}
                   onClick={() => {
-                    this.props.editor!.setting!.setEditLaneTypeIndex(index);
+                    setting.setEditLaneTypeIndex(index);
                     this.setState({ laneAnchorEl: null });
                   }}
                 >
@@ -356,13 +352,11 @@ class Toolbar extends React.Component<Props, {}> {
                 control={
                   <Switch
                     onChange={(_, v) => {
-                      this.props.editor!.setting!.setObjectVisibility({
+                      setting.setObjectVisibility({
                         [key]: v
                       });
                     }}
-                    checked={
-                      (this.props.editor!.setting!.objectVisibility as any)[key]
-                    }
+                    checked={(setting.objectVisibility as any)[key]}
                   />
                 }
                 label={label}

@@ -35,6 +35,11 @@ export default class Timeline {
   @observable
   bpmChanges: BPMChange[] = [];
 
+  @action
+  addBPMChange(value: BPMChange) {
+    this.bpmChanges.push(value);
+  }
+
   @observable
   lanePoints: LanePoint[] = [];
 

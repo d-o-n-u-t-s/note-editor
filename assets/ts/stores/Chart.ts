@@ -388,7 +388,7 @@ export default class Chart implements IStore {
       return note;
     });
 
-    for (const e of tl.bpmChanges) delete e.renderer;
+    //  for (const e of tl.bpmChanges) delete e.renderer;
     // for (const e of tl.notes) delete e.renderer;
 
     delete chart.time;
@@ -401,6 +401,5 @@ export default class Chart implements IStore {
     //    localStorage.setItem("chart", json);
 
     return json;
-    return "1";
   }
 }

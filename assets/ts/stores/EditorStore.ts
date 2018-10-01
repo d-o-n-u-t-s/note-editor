@@ -26,7 +26,7 @@ export default class Editor implements IStore {
   currentChartIndex: number = -1;
 
   @observable
-  setting?: EditorSetting;
+  setting = new EditorSetting();
 
   @observable
   asset: Asset = new Asset(this.debugMode);
@@ -51,11 +51,6 @@ export default class Editor implements IStore {
   setCurrentChart(chartIndex: number) {
     this.currentChartIndex = chartIndex;
     this.currentChart = this.charts[chartIndex];
-  }
-
-  @action
-  createEditorSetting() {
-    this.setting = new EditorSetting();
   }
 
   public static instance: Editor | null = null;
@@ -124,19 +119,5 @@ export default class Editor implements IStore {
     const atRandom = (array: any[]) => {
       return array[(Math.random() * array.length) | 0];
     };
-    /*
-
-    for (var i = 1; i--; ) {
-      this.newChart(
-        atRandom(this.asset.musicGameSystems),
-        atRandom(this.asset.audioAssetPaths)
-      );
-    }
-
-
-    this.setCurrentChart(0);
-    
-    */
-    this.createEditorSetting();
   }
 }

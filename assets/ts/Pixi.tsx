@@ -22,6 +22,7 @@ import NoteLineRendererResolver from "./objects/NoteLineRendererResolver";
 import CustomRendererUtility from "./utils/CustomRendererUtility";
 
 import { inject, InjectedComponent } from "./stores/inject";
+import BPMChange, { BPMRenderer } from "./objects/BPMChange";
 
 @inject
 @observer
@@ -161,9 +162,10 @@ export default class Pixi extends InjectedComponent {
     this.tempTextIndex = 0;
     // this.temporaryTexts = [];
 
-    const editor = this.injected.editor;
+    const { editor } = this.injected;
+    const { setting } = editor;
+
     const chart = editor.currentChart!;
-    const setting = editor.setting!;
 
     const w = this.app!.renderer.width;
     const h = this.app!.renderer.height;
@@ -356,7 +358,6 @@ export default class Pixi extends InjectedComponent {
     const getLanePointRenderer = (lanePoint: LanePoint) => LanePointRenderer;
 
     // 小節の分割線を描画
-
     if (targetMeasure) {
       const s = targetMeasure;
 
@@ -400,17 +401,9 @@ export default class Pixi extends InjectedComponent {
 
     // BPM 描画
     for (const bpm of chart.timeline.bpmChanges) {
-      if (!bpm.renderer) continue;
+      const measure = this.measures[bpm.measureIndex];
 
-      // console.log("renderer!!");
-
-      const lane = this.measures[bpm.measureIndex];
-
-      if (!bpm.renderer!.parent) {
-        graphics.addChild(bpm.renderer!);
-      }
-
-      bpm.renderer.update(graphics, lane);
+      BPMRenderer.render(bpm, graphics, measure);
     }
 
     // レーン中間点描画
@@ -502,6 +495,33 @@ export default class Pixi extends InjectedComponent {
         chart.timeline.lanes.find(lane => lane.guid === note.lane)!,
         this.measures[note.measureIndex]
       );
+    }
+
+    // ノート選択
+    if (
+      setting.editMode === EditMode.Select &&
+      setting.editObjectCategory === ObjectCategory.Note
+    ) {
+      for (const note of chart.timeline.notes) {
+        const bounds = NoteRendererResolver.resolve(note)!.getBounds(
+          note,
+          getLane(note),
+          getMeasure(note)
+        );
+
+        if (bounds.contains(mousePosition.x - graphics.x, mousePosition.y)) {
+          graphics
+            .lineStyle(2, 0xff9900)
+            //.beginFill(0x0099ff, 0.3)
+            .drawRect(
+              bounds.x - 2,
+              bounds.y - 2,
+              bounds.width + 4,
+              bounds.height + 4
+            );
+          //.endFill();
+        }
+      }
     }
 
     // ノート色を取得する
@@ -634,30 +654,6 @@ export default class Pixi extends InjectedComponent {
 
           if (isClick) {
             this.connectTargetLanePoint = lanePoint;
-            /*
-            // 接続テスト
-            console.log("接続テスト");
-
-            let ps = chart.timeline.lanePoints
-              .map(lp => ({
-                lp,
-                t: lp.measureIndex + lp.measurePosition.to01Number()
-              }))
-              .sort((a, b) => a.t - b.t);
-
-            const laneTemplate = chart.musicGameSystem!.laneTemplates.find(
-              lt => lt.name === ps[0].lp.templateName
-            )!;
-
-            chart.timeline.setLanes([
-              {
-                guid: guid(),
-                division: laneTemplate.division,
-                points: ps.map(p => p.lp.guid)
-              } as Lane
-            ]);
-
-            */
           }
         }
       }
@@ -761,11 +757,11 @@ export default class Pixi extends InjectedComponent {
         .drawRect(bounds.x, bounds.y, bounds.width, bounds.height);
     }
 
+    // レーン配置
     if (
       targetMeasure &&
-      // isClick &&
-      this.injected.editor.setting!.editMode === EditMode.Add &&
-      this.injected.editor.setting!.editObjectCategory === ObjectCategory.Lane
+      setting.editMode === EditMode.Add &&
+      setting.editObjectCategory === ObjectCategory.Lane
     ) {
       // レーンテンプレ
       const laneTemplate = editor.currentChart!.musicGameSystem!.laneTemplates[
@@ -814,6 +810,65 @@ export default class Pixi extends InjectedComponent {
         // プレビュー
 
         getLanePointRenderer(newLanePoint).render(
+          newLanePoint,
+          graphics,
+          this.measures[newLanePoint.measureIndex]
+        );
+      }
+    }
+
+    // 特殊オブジェクト配置
+    if (
+      targetMeasure &&
+      setting.editMode === EditMode.Add &&
+      setting.editObjectCategory === ObjectCategory.S
+    ) {
+      // レーンテンプレ
+      const laneTemplate = editor.currentChart!.musicGameSystem!.laneTemplates[
+        editor.setting!.editLaneTypeIndex
+      ];
+
+      const [nx, ny] = normalizeContainsPoint(targetMeasure, mousePosition);
+
+      const hlDiv = this.injected.editor.currentChart!.timeline
+        .horizontalLaneDivision;
+
+      const vlDiv = this.injected.editor.setting!.measureDivision;
+
+      const clamp = (num: number, min: number, max: number) =>
+        num <= min ? min : num >= max ? max : num;
+
+      const maxObjectSize = 16;
+
+      const p = (editor.setting!.objectSize - 1) / maxObjectSize / 2;
+
+      const newLanePoint = {
+        measureIndex: targetMeasure.index,
+        measurePosition: new Fraction(
+          vlDiv - 1 - clamp(Math.floor(ny * vlDiv), 0, vlDiv - 1),
+          vlDiv
+        ),
+        guid: guid(),
+        bpm: 120,
+        horizontalSize: editor.setting!.objectSize,
+        horizontalPosition: new Fraction(
+          clamp(
+            Math.floor((nx - p) * hlDiv),
+            0,
+            hlDiv - editor.setting!.objectSize
+          ),
+          hlDiv
+        )
+      } as BPMChange;
+
+      //lane.renderer.update(graphics, this.measures);
+
+      if (isClick) {
+        this.injected.editor.currentChart!.timeline.addBPMChange(newLanePoint);
+      } else {
+        // プレビュー
+
+        BPMRenderer.render(
           newLanePoint,
           graphics,
           this.measures[newLanePoint.measureIndex]
