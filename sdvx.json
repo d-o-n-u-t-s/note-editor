@@ -1,0 +1,1689 @@
+{
+  "timeline": {
+    "horizontalLaneDivision": 16,
+    "bpmChanges": [],
+    "lanePoints": [
+      {
+        "measureIndex": 0,
+        "measurePosition": {
+          "numerator": 0,
+          "denominator": 1
+        },
+        "guid": "ba733a7d62fab206ed1412be7576e405",
+        "color": 3355443,
+        "horizontalSize": 12,
+        "templateName": "bt",
+        "horizontalPosition": {
+          "numerator": 2,
+          "denominator": 16
+        }
+      },
+      {
+        "measureIndex": 50,
+        "measurePosition": {
+          "numerator": 0,
+          "denominator": 1
+        },
+        "guid": "a6000dcbba37a6abbe0683346e456ba6",
+        "color": 3355443,
+        "horizontalSize": 12,
+        "templateName": "bt",
+        "horizontalPosition": {
+          "numerator": 2,
+          "denominator": 16
+        }
+      },
+      {
+        "measureIndex": 0,
+        "measurePosition": {
+          "numerator": 0,
+          "denominator": 1
+        },
+        "guid": "6a6b60fee89b9a4623820885b66487ab",
+        "color": 3355443,
+        "horizontalSize": 12,
+        "templateName": "fx",
+        "horizontalPosition": {
+          "numerator": 2,
+          "denominator": 16
+        }
+      },
+      {
+        "measureIndex": 50,
+        "measurePosition": {
+          "numerator": 0,
+          "denominator": 1
+        },
+        "guid": "3d567b48c57d18a53dfc6dd0ae103eb2",
+        "color": 3355443,
+        "horizontalSize": 12,
+        "templateName": "fx",
+        "horizontalPosition": {
+          "numerator": 2,
+          "denominator": 16
+        }
+      },
+      {
+        "measureIndex": 0,
+        "measurePosition": {
+          "numerator": 0,
+          "denominator": 1
+        },
+        "guid": "cea0adfca1b71b580d11e5ce37f78b61",
+        "color": 3355443,
+        "horizontalSize": 16,
+        "templateName": "laser",
+        "horizontalPosition": {
+          "numerator": 0,
+          "denominator": 16
+        }
+      },
+      {
+        "measureIndex": 50,
+        "measurePosition": {
+          "numerator": 0,
+          "denominator": 1
+        },
+        "guid": "eb6e251ecffe1d1aa6b50e98c3b43387",
+        "color": 3355443,
+        "horizontalSize": 16,
+        "templateName": "laser",
+        "horizontalPosition": {
+          "numerator": 0,
+          "denominator": 16
+        }
+      }
+    ],
+    "notes": [
+      {
+        "guid": "f0043075768709ba82e9a47b6fdcd1bb",
+        "horizontalSize": 2,
+        "horizontalPosition": {
+          "numerator": 0,
+          "denominator": 16
+        },
+        "measureIndex": 0,
+        "measurePosition": {
+          "numerator": 1,
+          "denominator": 4
+        },
+        "type": "laser-l",
+        "lane": "f92eb2da4f6b1a8f64e83434c8ddf289",
+        "connectable": true
+      },
+      {
+        "guid": "56cf053d029a9c691999abb4730fce99",
+        "horizontalSize": 2,
+        "horizontalPosition": {
+          "numerator": 0,
+          "denominator": 16
+        },
+        "measureIndex": 1,
+        "measurePosition": {
+          "numerator": 0,
+          "denominator": 4
+        },
+        "type": "laser-l",
+        "lane": "f92eb2da4f6b1a8f64e83434c8ddf289",
+        "connectable": true
+      },
+      {
+        "guid": "d9d6cf800a4e366a9584529d83eea805",
+        "horizontalSize": 2,
+        "horizontalPosition": {
+          "numerator": 14,
+          "denominator": 16
+        },
+        "measureIndex": 1,
+        "measurePosition": {
+          "numerator": 0,
+          "denominator": 4
+        },
+        "type": "laser-l",
+        "lane": "f92eb2da4f6b1a8f64e83434c8ddf289",
+        "connectable": true
+      },
+      {
+        "guid": "65cea14bb38dc4000f3f176760e8eb3f",
+        "horizontalSize": 2,
+        "horizontalPosition": {
+          "numerator": 0,
+          "denominator": 16
+        },
+        "measureIndex": 1,
+        "measurePosition": {
+          "numerator": 1,
+          "denominator": 4
+        },
+        "type": "laser-l",
+        "lane": "f92eb2da4f6b1a8f64e83434c8ddf289",
+        "connectable": true
+      },
+      {
+        "guid": "76017f5636b4f66d0352cfddc6212a61",
+        "horizontalSize": 2,
+        "horizontalPosition": {
+          "numerator": 9,
+          "denominator": 16
+        },
+        "measureIndex": 1,
+        "measurePosition": {
+          "numerator": 1,
+          "denominator": 4
+        },
+        "type": "laser-l",
+        "lane": "f92eb2da4f6b1a8f64e83434c8ddf289",
+        "connectable": true
+      },
+      {
+        "guid": "fe606612de4c877bede258539f91bc8a",
+        "horizontalSize": 2,
+        "horizontalPosition": {
+          "numerator": 0,
+          "denominator": 16
+        },
+        "measureIndex": 1,
+        "measurePosition": {
+          "numerator": 2,
+          "denominator": 4
+        },
+        "type": "laser-l",
+        "lane": "f92eb2da4f6b1a8f64e83434c8ddf289",
+        "connectable": true
+      },
+      {
+        "guid": "7d17308327972d05716e736bea93013c",
+        "horizontalSize": 2,
+        "horizontalPosition": {
+          "numerator": 4,
+          "denominator": 16
+        },
+        "measureIndex": 1,
+        "measurePosition": {
+          "numerator": 2,
+          "denominator": 4
+        },
+        "type": "laser-l",
+        "lane": "f92eb2da4f6b1a8f64e83434c8ddf289",
+        "connectable": true
+      },
+      {
+        "guid": "13eb8bb2dde6b15c44475a71b75d2638",
+        "horizontalSize": 2,
+        "horizontalPosition": {
+          "numerator": 0,
+          "denominator": 16
+        },
+        "measureIndex": 1,
+        "measurePosition": {
+          "numerator": 3,
+          "denominator": 4
+        },
+        "type": "laser-l",
+        "lane": "f92eb2da4f6b1a8f64e83434c8ddf289",
+        "connectable": true
+      },
+      {
+        "guid": "100306761a2f1e044d0189a7e6c794fd",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 3,
+          "denominator": 4
+        },
+        "measureIndex": 0,
+        "measurePosition": {
+          "numerator": 2,
+          "denominator": 8
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "6538ef6dc803fd39e829d03e14aaed19",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 2,
+          "denominator": 4
+        },
+        "measureIndex": 0,
+        "measurePosition": {
+          "numerator": 3,
+          "denominator": 8
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "583c101abb5b9df4c4f8306863440ef9",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 1,
+          "denominator": 4
+        },
+        "measureIndex": 0,
+        "measurePosition": {
+          "numerator": 4,
+          "denominator": 8
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "7b836173eaee957f7e628985369654d9",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 0,
+          "denominator": 4
+        },
+        "measureIndex": 0,
+        "measurePosition": {
+          "numerator": 5,
+          "denominator": 8
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "6d8f2a7d8e4e6f0fb1e7e671375ba09f",
+        "horizontalSize": 2,
+        "horizontalPosition": {
+          "numerator": 14,
+          "denominator": 16
+        },
+        "measureIndex": 2,
+        "measurePosition": {
+          "numerator": 1,
+          "denominator": 16
+        },
+        "type": "laser-r",
+        "lane": "f92eb2da4f6b1a8f64e83434c8ddf289",
+        "connectable": true
+      },
+      {
+        "guid": "45bb4f3e59e61742a3db746bb938c043",
+        "horizontalSize": 2,
+        "horizontalPosition": {
+          "numerator": 12,
+          "denominator": 16
+        },
+        "measureIndex": 2,
+        "measurePosition": {
+          "numerator": 3,
+          "denominator": 16
+        },
+        "type": "laser-r",
+        "lane": "f92eb2da4f6b1a8f64e83434c8ddf289",
+        "connectable": true
+      },
+      {
+        "guid": "0a27f21ea6b061317c802857c588cfbe",
+        "horizontalSize": 2,
+        "horizontalPosition": {
+          "numerator": 10,
+          "denominator": 16
+        },
+        "measureIndex": 2,
+        "measurePosition": {
+          "numerator": 6,
+          "denominator": 16
+        },
+        "type": "laser-r",
+        "lane": "f92eb2da4f6b1a8f64e83434c8ddf289",
+        "connectable": true
+      },
+      {
+        "guid": "72f12a4c554f628de3b34174cde79925",
+        "horizontalSize": 2,
+        "horizontalPosition": {
+          "numerator": 9,
+          "denominator": 16
+        },
+        "measureIndex": 2,
+        "measurePosition": {
+          "numerator": 9,
+          "denominator": 16
+        },
+        "type": "laser-r",
+        "lane": "f92eb2da4f6b1a8f64e83434c8ddf289",
+        "connectable": true
+      },
+      {
+        "guid": "e65dfc1d51101f0cc9e769cdab9538e0",
+        "horizontalSize": 2,
+        "horizontalPosition": {
+          "numerator": 10,
+          "denominator": 16
+        },
+        "measureIndex": 2,
+        "measurePosition": {
+          "numerator": 12,
+          "denominator": 16
+        },
+        "type": "laser-r",
+        "lane": "f92eb2da4f6b1a8f64e83434c8ddf289",
+        "connectable": true
+      },
+      {
+        "guid": "5cb72f7f492ddcef5b3fe31538f19146",
+        "horizontalSize": 2,
+        "horizontalPosition": {
+          "numerator": 12,
+          "denominator": 16
+        },
+        "measureIndex": 2,
+        "measurePosition": {
+          "numerator": 15,
+          "denominator": 16
+        },
+        "type": "laser-r",
+        "lane": "f92eb2da4f6b1a8f64e83434c8ddf289",
+        "connectable": true
+      },
+      {
+        "guid": "0fc4ed4909840c8bd75abffbe836e81e",
+        "horizontalSize": 2,
+        "horizontalPosition": {
+          "numerator": 14,
+          "denominator": 16
+        },
+        "measureIndex": 3,
+        "measurePosition": {
+          "numerator": 1,
+          "denominator": 16
+        },
+        "type": "laser-r",
+        "lane": "f92eb2da4f6b1a8f64e83434c8ddf289",
+        "connectable": true
+      },
+      {
+        "guid": "09386aeb02a0a3ab5f3b394c72b1c4a0",
+        "horizontalSize": 2,
+        "horizontalPosition": {
+          "numerator": 5,
+          "denominator": 16
+        },
+        "measureIndex": 3,
+        "measurePosition": {
+          "numerator": 6,
+          "denominator": 16
+        },
+        "type": "laser-r",
+        "lane": "f92eb2da4f6b1a8f64e83434c8ddf289",
+        "connectable": true
+      },
+      {
+        "guid": "72ea31f5ac585ad4407821a98286c278",
+        "horizontalSize": 2,
+        "horizontalPosition": {
+          "numerator": 14,
+          "denominator": 16
+        },
+        "measureIndex": 3,
+        "measurePosition": {
+          "numerator": 11,
+          "denominator": 16
+        },
+        "type": "laser-r",
+        "lane": "f92eb2da4f6b1a8f64e83434c8ddf289",
+        "connectable": true
+      },
+      {
+        "guid": "df0eead993c7741ab60c1d313f4aae01",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 0,
+          "denominator": 4
+        },
+        "measureIndex": 4,
+        "measurePosition": {
+          "numerator": 0,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "e8a22aeb4d68ebda553d3b4a72bdf22c",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 0,
+          "denominator": 4
+        },
+        "measureIndex": 4,
+        "measurePosition": {
+          "numerator": 2,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "37e07b6d5c2f37192a9871496fcad5ff",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 1,
+          "denominator": 4
+        },
+        "measureIndex": 4,
+        "measurePosition": {
+          "numerator": 0,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "dc58f9333cd8f5aa92f10d99d2bc52a7",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 0,
+          "denominator": 4
+        },
+        "measureIndex": 4,
+        "measurePosition": {
+          "numerator": 4,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "46f412f99fa2286e92f1c32ba1c60e2b",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 0,
+          "denominator": 4
+        },
+        "measureIndex": 4,
+        "measurePosition": {
+          "numerator": 6,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "15d6a2000ce394d2d30c4730344696eb",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 0,
+          "denominator": 4
+        },
+        "measureIndex": 4,
+        "measurePosition": {
+          "numerator": 8,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "2a1804d7fdcdb6f23afe76e7707f8ecf",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 0,
+          "denominator": 4
+        },
+        "measureIndex": 4,
+        "measurePosition": {
+          "numerator": 10,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "199e2af3d5527e713432c5dfe2942fa9",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 0,
+          "denominator": 4
+        },
+        "measureIndex": 4,
+        "measurePosition": {
+          "numerator": 12,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "cdc3736b884909a1a99eaddefe5992f9",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 0,
+          "denominator": 4
+        },
+        "measureIndex": 4,
+        "measurePosition": {
+          "numerator": 14,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "db96b599f730192345e3b6006b05ac06",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 0,
+          "denominator": 4
+        },
+        "measureIndex": 5,
+        "measurePosition": {
+          "numerator": 0,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "9aa76a4ebcca1dfa79b6fad9801415d9",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 1,
+          "denominator": 4
+        },
+        "measureIndex": 4,
+        "measurePosition": {
+          "numerator": 4,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "fb3b31717ea2d37fc73f303d950a1d78",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 1,
+          "denominator": 4
+        },
+        "measureIndex": 4,
+        "measurePosition": {
+          "numerator": 6,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "eb7e5aa2c7b05ff03d4567754b3bdd34",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 1,
+          "denominator": 4
+        },
+        "measureIndex": 4,
+        "measurePosition": {
+          "numerator": 10,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "2a5aa4648ad4c4f63c998a937a222447",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 1,
+          "denominator": 4
+        },
+        "measureIndex": 4,
+        "measurePosition": {
+          "numerator": 14,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "48e815323b662bfb4424bd6f336b40c5",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 1,
+          "denominator": 4
+        },
+        "measureIndex": 5,
+        "measurePosition": {
+          "numerator": 0,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "9902223cf7b9fd2e94a59b4f46efc638",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 1,
+          "denominator": 2
+        },
+        "measureIndex": 5,
+        "measurePosition": {
+          "numerator": 1,
+          "denominator": 16
+        },
+        "type": "fx",
+        "lane": "a1bc09cf9398fbaf69ccf4c1fec41247",
+        "connectable": true
+      },
+      {
+        "guid": "28d4e0cacce868bfde71ec856cadcab3",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 0,
+          "denominator": 2
+        },
+        "measureIndex": 5,
+        "measurePosition": {
+          "numerator": 3,
+          "denominator": 16
+        },
+        "type": "fx",
+        "lane": "a1bc09cf9398fbaf69ccf4c1fec41247",
+        "connectable": true
+      },
+      {
+        "guid": "f11ea8ba480ff473fe4f8535a9c80669",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 1,
+          "denominator": 2
+        },
+        "measureIndex": 5,
+        "measurePosition": {
+          "numerator": 5,
+          "denominator": 16
+        },
+        "type": "fx",
+        "lane": "a1bc09cf9398fbaf69ccf4c1fec41247",
+        "connectable": true
+      },
+      {
+        "guid": "1a7a9026caa0c2596d591b59c54fcafa",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 0,
+          "denominator": 2
+        },
+        "measureIndex": 5,
+        "measurePosition": {
+          "numerator": 7,
+          "denominator": 16
+        },
+        "type": "fx",
+        "lane": "a1bc09cf9398fbaf69ccf4c1fec41247",
+        "connectable": true
+      },
+      {
+        "guid": "a5f92e9a7de600f39769b059d4843bca",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 0,
+          "denominator": 2
+        },
+        "measureIndex": 5,
+        "measurePosition": {
+          "numerator": 10,
+          "denominator": 16
+        },
+        "type": "fx",
+        "lane": "a1bc09cf9398fbaf69ccf4c1fec41247",
+        "connectable": true
+      },
+      {
+        "guid": "5822dc6ef2418fd632b3e30521e7b4e2",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 1,
+          "denominator": 2
+        },
+        "measureIndex": 5,
+        "measurePosition": {
+          "numerator": 12,
+          "denominator": 16
+        },
+        "type": "fx",
+        "lane": "a1bc09cf9398fbaf69ccf4c1fec41247",
+        "connectable": true
+      },
+      {
+        "guid": "fe54bfe82796c4fc85e3cc8b9ce6203e",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 1,
+          "denominator": 2
+        },
+        "measureIndex": 5,
+        "measurePosition": {
+          "numerator": 15,
+          "denominator": 16
+        },
+        "type": "fx",
+        "lane": "a1bc09cf9398fbaf69ccf4c1fec41247",
+        "connectable": true
+      },
+      {
+        "guid": "6fbcabaf81d58d1d439a999034a079ce",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 1,
+          "denominator": 2
+        },
+        "measureIndex": 6,
+        "measurePosition": {
+          "numerator": 0,
+          "denominator": 16
+        },
+        "type": "fx",
+        "lane": "a1bc09cf9398fbaf69ccf4c1fec41247",
+        "connectable": true
+      },
+      {
+        "guid": "bdf1779fd7c5dd647b113456f2711188",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 0,
+          "denominator": 2
+        },
+        "measureIndex": 7,
+        "measurePosition": {
+          "numerator": 0,
+          "denominator": 16
+        },
+        "type": "fx",
+        "lane": "a1bc09cf9398fbaf69ccf4c1fec41247",
+        "connectable": true
+      },
+      {
+        "guid": "7509bd23e1a3cab158d0295e5e076d29",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 1,
+          "denominator": 2
+        },
+        "measureIndex": 8,
+        "measurePosition": {
+          "numerator": 0,
+          "denominator": 16
+        },
+        "type": "fx",
+        "lane": "a1bc09cf9398fbaf69ccf4c1fec41247",
+        "connectable": true
+      },
+      {
+        "guid": "b77475d613cba55731b4de6e060640c5",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 3,
+          "denominator": 4
+        },
+        "measureIndex": 6,
+        "measurePosition": {
+          "numerator": 0,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "e96c6636678c1c495b2961ff3027b5b1",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 3,
+          "denominator": 4
+        },
+        "measureIndex": 7,
+        "measurePosition": {
+          "numerator": 0,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "31b90bb293cd06f2dc3208009f13ad14",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 0,
+          "denominator": 4
+        },
+        "measureIndex": 7,
+        "measurePosition": {
+          "numerator": 0,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "2a3fea9cc59d195fb43614e4406d2911",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 0,
+          "denominator": 4
+        },
+        "measureIndex": 8,
+        "measurePosition": {
+          "numerator": 0,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "8cd9b660f3ba8460843497476a7807ff",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 3,
+          "denominator": 4
+        },
+        "measureIndex": 8,
+        "measurePosition": {
+          "numerator": 0,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "65981599ae278c20bb131a978e51af16",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 0,
+          "denominator": 4
+        },
+        "measureIndex": 9,
+        "measurePosition": {
+          "numerator": 0,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "c8ceed70f6357ca3467b910d29d03b51",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 3,
+          "denominator": 4
+        },
+        "measureIndex": 9,
+        "measurePosition": {
+          "numerator": 0,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "f6779728ca53e92fa81661ab864a8019",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 0,
+          "denominator": 4
+        },
+        "measureIndex": 6,
+        "measurePosition": {
+          "numerator": 0,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "d1659593d1c077401f19c925cff04f45",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 1,
+          "denominator": 4
+        },
+        "measureIndex": 6,
+        "measurePosition": {
+          "numerator": 2,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "ea31264749112f2ec3f21ab26102eaac",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 2,
+          "denominator": 4
+        },
+        "measureIndex": 6,
+        "measurePosition": {
+          "numerator": 3,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "df3e0b88baf1c47778e681e58b007752",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 0,
+          "denominator": 4
+        },
+        "measureIndex": 6,
+        "measurePosition": {
+          "numerator": 5,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "c7f1ba065b43bb757f209ff4f6c12caa",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 1,
+          "denominator": 4
+        },
+        "measureIndex": 6,
+        "measurePosition": {
+          "numerator": 7,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "d0eeb5aef4f80252763737103e24b613",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 2,
+          "denominator": 4
+        },
+        "measureIndex": 6,
+        "measurePosition": {
+          "numerator": 8,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "e97363e614d57561bb9121df901aa2a0",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 1,
+          "denominator": 4
+        },
+        "measureIndex": 6,
+        "measurePosition": {
+          "numerator": 11,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "da61aa35d2bb26d6b47937fe8f6f4dad",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 0,
+          "denominator": 4
+        },
+        "measureIndex": 6,
+        "measurePosition": {
+          "numerator": 13,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "3d706fea65e7470890b51f47e6711d68",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 2,
+          "denominator": 4
+        },
+        "measureIndex": 6,
+        "measurePosition": {
+          "numerator": 15,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "fe497ff73bf6b176c0dc405fde3d8772",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 3,
+          "denominator": 4
+        },
+        "measureIndex": 7,
+        "measurePosition": {
+          "numerator": 2,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "997b7f524ca747c8375793509b7b10b1",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 2,
+          "denominator": 4
+        },
+        "measureIndex": 7,
+        "measurePosition": {
+          "numerator": 4,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "00b6a4ae63ed08deae97ea183d828c2e",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 1,
+          "denominator": 4
+        },
+        "measureIndex": 7,
+        "measurePosition": {
+          "numerator": 6,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "cc5d5a0019cb71bfe2f8a483c48259ef",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 2,
+          "denominator": 4
+        },
+        "measureIndex": 7,
+        "measurePosition": {
+          "numerator": 7,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "c8dbac1589d799af5b7b6e89595390f7",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 3,
+          "denominator": 4
+        },
+        "measureIndex": 7,
+        "measurePosition": {
+          "numerator": 9,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "fa9ba7bdb43d0d1f1dc49717513c9c14",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 2,
+          "denominator": 4
+        },
+        "measureIndex": 7,
+        "measurePosition": {
+          "numerator": 10,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "1e147b79bc29bc8ea599bd6000a518f6",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 1,
+          "denominator": 4
+        },
+        "measureIndex": 7,
+        "measurePosition": {
+          "numerator": 12,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "4dd762df86d3fa1b54e83466c29109cc",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 3,
+          "denominator": 4
+        },
+        "measureIndex": 7,
+        "measurePosition": {
+          "numerator": 14,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "0483bdfebf532daf593149a47fe11973",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 1,
+          "denominator": 4
+        },
+        "measureIndex": 8,
+        "measurePosition": {
+          "numerator": 3,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "a510c584be83b1000609e2b11e7d2fe7",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 0,
+          "denominator": 4
+        },
+        "measureIndex": 8,
+        "measurePosition": {
+          "numerator": 5,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "099fc662171d9f2498ff0feccd42ed4a",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 1,
+          "denominator": 4
+        },
+        "measureIndex": 8,
+        "measurePosition": {
+          "numerator": 7,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "bbaebb0becd566f23e090848d378e32e",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 1,
+          "denominator": 4
+        },
+        "measureIndex": 8,
+        "measurePosition": {
+          "numerator": 10,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "35c84fc5453c85dd7caf9cc9b9de5d4b",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 0,
+          "denominator": 4
+        },
+        "measureIndex": 8,
+        "measurePosition": {
+          "numerator": 12,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "1c5f4879c282ac7c808225832308c46c",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 2,
+          "denominator": 4
+        },
+        "measureIndex": 8,
+        "measurePosition": {
+          "numerator": 14,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "c7ad8848c872d2bba988ff5c68aa61b3",
+        "horizontalSize": 1,
+        "horizontalPosition": {
+          "numerator": 0,
+          "denominator": 4
+        },
+        "measureIndex": 5,
+        "measurePosition": {
+          "numerator": 14,
+          "denominator": 16
+        },
+        "type": "bt",
+        "lane": "04416983a5c08b41a4ada591630af741",
+        "connectable": true
+      },
+      {
+        "guid": "fb70bc281599b28e3cfdfce2658a7f2e",
+        "horizontalSize": 2,
+        "horizontalPosition": {
+          "numerator": 6,
+          "denominator": 16
+        },
+        "measureIndex": 2,
+        "measurePosition": {
+          "numerator": 2,
+          "denominator": 16
+        },
+        "type": "laser-l",
+        "lane": "f92eb2da4f6b1a8f64e83434c8ddf289",
+        "connectable": true
+      },
+      {
+        "guid": "6f590c2fe5e67cedda5f2c6896a8f09a",
+        "horizontalSize": 2,
+        "horizontalPosition": {
+          "numerator": 2,
+          "denominator": 16
+        },
+        "measureIndex": 2,
+        "measurePosition": {
+          "numerator": 7,
+          "denominator": 16
+        },
+        "type": "laser-l",
+        "lane": "f92eb2da4f6b1a8f64e83434c8ddf289",
+        "connectable": true
+      },
+      {
+        "guid": "e09356990cfb99a84b6631a165fbdaaf",
+        "horizontalSize": 2,
+        "horizontalPosition": {
+          "numerator": 6,
+          "denominator": 16
+        },
+        "measureIndex": 2,
+        "measurePosition": {
+          "numerator": 12,
+          "denominator": 16
+        },
+        "type": "laser-l",
+        "lane": "f92eb2da4f6b1a8f64e83434c8ddf289",
+        "connectable": true
+      },
+      {
+        "guid": "693b3e836df63bdae2c4f242c7d27e30",
+        "horizontalSize": 2,
+        "horizontalPosition": {
+          "numerator": 3,
+          "denominator": 16
+        },
+        "measureIndex": 2,
+        "measurePosition": {
+          "numerator": 14,
+          "denominator": 16
+        },
+        "type": "laser-l",
+        "lane": "f92eb2da4f6b1a8f64e83434c8ddf289",
+        "connectable": true
+      },
+      {
+        "guid": "4050b63283a7e5d752345cdb10aec0ec",
+        "horizontalSize": 2,
+        "horizontalPosition": {
+          "numerator": 5,
+          "denominator": 16
+        },
+        "measureIndex": 3,
+        "measurePosition": {
+          "numerator": 1,
+          "denominator": 16
+        },
+        "type": "laser-l",
+        "lane": "f92eb2da4f6b1a8f64e83434c8ddf289",
+        "connectable": true
+      },
+      {
+        "guid": "9336729a7f980ff24f12e53ff9917bd4",
+        "horizontalSize": 2,
+        "horizontalPosition": {
+          "numerator": 2,
+          "denominator": 16
+        },
+        "measureIndex": 3,
+        "measurePosition": {
+          "numerator": 10,
+          "denominator": 16
+        },
+        "type": "laser-l",
+        "lane": "f92eb2da4f6b1a8f64e83434c8ddf289",
+        "connectable": true
+      },
+      {
+        "guid": "b3e934b122c86d1ab8c0b9e01bc55762",
+        "horizontalSize": 2,
+        "horizontalPosition": {
+          "numerator": 12,
+          "denominator": 16
+        },
+        "measureIndex": 4,
+        "measurePosition": {
+          "numerator": 1,
+          "denominator": 16
+        },
+        "type": "laser-l",
+        "lane": "f92eb2da4f6b1a8f64e83434c8ddf289",
+        "connectable": true
+      },
+      {
+        "guid": "8d914f477152cd11f415b3766d994ab3",
+        "horizontalSize": 2,
+        "horizontalPosition": {
+          "numerator": 9,
+          "denominator": 16
+        },
+        "measureIndex": 4,
+        "measurePosition": {
+          "numerator": 10,
+          "denominator": 16
+        },
+        "type": "laser-l",
+        "lane": "f92eb2da4f6b1a8f64e83434c8ddf289",
+        "connectable": true
+      },
+      {
+        "guid": "7657d23ae1b466e00880a43a3806ac26",
+        "horizontalSize": 2,
+        "horizontalPosition": {
+          "numerator": 13,
+          "denominator": 16
+        },
+        "measureIndex": 4,
+        "measurePosition": {
+          "numerator": 10,
+          "denominator": 16
+        },
+        "type": "laser-l",
+        "lane": "f92eb2da4f6b1a8f64e83434c8ddf289",
+        "connectable": true
+      },
+      {
+        "guid": "fa79d3ea49f5f9f131fc61c45b8ce287",
+        "horizontalSize": 2,
+        "horizontalPosition": {
+          "numerator": 11,
+          "denominator": 16
+        },
+        "measureIndex": 4,
+        "measurePosition": {
+          "numerator": 12,
+          "denominator": 16
+        },
+        "type": "laser-l",
+        "lane": "f92eb2da4f6b1a8f64e83434c8ddf289",
+        "connectable": true
+      },
+      {
+        "guid": "ff0ee2276be53fe5e945b294efd34c43",
+        "horizontalSize": 2,
+        "horizontalPosition": {
+          "numerator": 14,
+          "denominator": 16
+        },
+        "measureIndex": 4,
+        "measurePosition": {
+          "numerator": 12,
+          "denominator": 16
+        },
+        "type": "laser-l",
+        "lane": "f92eb2da4f6b1a8f64e83434c8ddf289",
+        "connectable": true
+      },
+      {
+        "guid": "f296a71243dadfd483582d8ba189ca0c",
+        "horizontalSize": 2,
+        "horizontalPosition": {
+          "numerator": 14,
+          "denominator": 16
+        },
+        "measureIndex": 5,
+        "measurePosition": {
+          "numerator": 0,
+          "denominator": 16
+        },
+        "type": "laser-l",
+        "lane": "f92eb2da4f6b1a8f64e83434c8ddf289",
+        "connectable": true
+      }
+    ],
+    "noteLines": [
+      {
+        "head": "f0043075768709ba82e9a47b6fdcd1bb",
+        "tail": "56cf053d029a9c691999abb4730fce99"
+      },
+      {
+        "head": "56cf053d029a9c691999abb4730fce99",
+        "tail": "d9d6cf800a4e366a9584529d83eea805"
+      },
+      {
+        "head": "d9d6cf800a4e366a9584529d83eea805",
+        "tail": "65cea14bb38dc4000f3f176760e8eb3f"
+      },
+      {
+        "head": "65cea14bb38dc4000f3f176760e8eb3f",
+        "tail": "76017f5636b4f66d0352cfddc6212a61"
+      },
+      {
+        "head": "76017f5636b4f66d0352cfddc6212a61",
+        "tail": "fe606612de4c877bede258539f91bc8a"
+      },
+      {
+        "head": "fe606612de4c877bede258539f91bc8a",
+        "tail": "7d17308327972d05716e736bea93013c"
+      },
+      {
+        "head": "7d17308327972d05716e736bea93013c",
+        "tail": "13eb8bb2dde6b15c44475a71b75d2638"
+      },
+      {
+        "head": "6d8f2a7d8e4e6f0fb1e7e671375ba09f",
+        "tail": "45bb4f3e59e61742a3db746bb938c043"
+      },
+      {
+        "head": "45bb4f3e59e61742a3db746bb938c043",
+        "tail": "0a27f21ea6b061317c802857c588cfbe"
+      },
+      {
+        "head": "0a27f21ea6b061317c802857c588cfbe",
+        "tail": "72f12a4c554f628de3b34174cde79925"
+      },
+      {
+        "head": "72f12a4c554f628de3b34174cde79925",
+        "tail": "e65dfc1d51101f0cc9e769cdab9538e0"
+      },
+      {
+        "head": "e65dfc1d51101f0cc9e769cdab9538e0",
+        "tail": "5cb72f7f492ddcef5b3fe31538f19146"
+      },
+      {
+        "head": "5cb72f7f492ddcef5b3fe31538f19146",
+        "tail": "0fc4ed4909840c8bd75abffbe836e81e"
+      },
+      {
+        "head": "0fc4ed4909840c8bd75abffbe836e81e",
+        "tail": "09386aeb02a0a3ab5f3b394c72b1c4a0"
+      },
+      {
+        "head": "09386aeb02a0a3ab5f3b394c72b1c4a0",
+        "tail": "72ea31f5ac585ad4407821a98286c278"
+      },
+      {
+        "head": "a5f92e9a7de600f39769b059d4843bca",
+        "tail": "1a7a9026caa0c2596d591b59c54fcafa"
+      },
+      {
+        "head": "5822dc6ef2418fd632b3e30521e7b4e2",
+        "tail": "fe54bfe82796c4fc85e3cc8b9ce6203e"
+      },
+      {
+        "head": "b77475d613cba55731b4de6e060640c5",
+        "tail": "e96c6636678c1c495b2961ff3027b5b1"
+      },
+      {
+        "head": "31b90bb293cd06f2dc3208009f13ad14",
+        "tail": "2a3fea9cc59d195fb43614e4406d2911"
+      },
+      {
+        "head": "8cd9b660f3ba8460843497476a7807ff",
+        "tail": "c8ceed70f6357ca3467b910d29d03b51"
+      },
+      {
+        "head": "13eb8bb2dde6b15c44475a71b75d2638",
+        "tail": "fb70bc281599b28e3cfdfce2658a7f2e"
+      },
+      {
+        "head": "fb70bc281599b28e3cfdfce2658a7f2e",
+        "tail": "6f590c2fe5e67cedda5f2c6896a8f09a"
+      },
+      {
+        "head": "6f590c2fe5e67cedda5f2c6896a8f09a",
+        "tail": "e09356990cfb99a84b6631a165fbdaaf"
+      },
+      {
+        "head": "e09356990cfb99a84b6631a165fbdaaf",
+        "tail": "693b3e836df63bdae2c4f242c7d27e30"
+      },
+      {
+        "head": "693b3e836df63bdae2c4f242c7d27e30",
+        "tail": "4050b63283a7e5d752345cdb10aec0ec"
+      },
+      {
+        "head": "4050b63283a7e5d752345cdb10aec0ec",
+        "tail": "9336729a7f980ff24f12e53ff9917bd4"
+      },
+      {
+        "head": "9336729a7f980ff24f12e53ff9917bd4",
+        "tail": "b3e934b122c86d1ab8c0b9e01bc55762"
+      },
+      {
+        "head": "b3e934b122c86d1ab8c0b9e01bc55762",
+        "tail": "7657d23ae1b466e00880a43a3806ac26"
+      },
+      {
+        "head": "7657d23ae1b466e00880a43a3806ac26",
+        "tail": "8d914f477152cd11f415b3766d994ab3"
+      },
+      {
+        "head": "8d914f477152cd11f415b3766d994ab3",
+        "tail": "ff0ee2276be53fe5e945b294efd34c43"
+      },
+      {
+        "head": "ff0ee2276be53fe5e945b294efd34c43",
+        "tail": "fa79d3ea49f5f9f131fc61c45b8ce287"
+      },
+      {
+        "head": "fa79d3ea49f5f9f131fc61c45b8ce287",
+        "tail": "f296a71243dadfd483582d8ba189ca0c"
+      }
+    ],
+    "lanes": [
+      {
+        "guid": "04416983a5c08b41a4ada591630af741",
+        "templateName": "bt",
+        "division": 4,
+        "points": [
+          "ba733a7d62fab206ed1412be7576e405",
+          "a6000dcbba37a6abbe0683346e456ba6"
+        ]
+      },
+      {
+        "guid": "a1bc09cf9398fbaf69ccf4c1fec41247",
+        "templateName": "fx",
+        "division": 2,
+        "points": [
+          "6a6b60fee89b9a4623820885b66487ab",
+          "3d567b48c57d18a53dfc6dd0ae103eb2"
+        ]
+      },
+      {
+        "guid": "f92eb2da4f6b1a8f64e83434c8ddf289",
+        "templateName": "laser",
+        "division": 16,
+        "points": [
+          "cea0adfca1b71b580d11e5ce37f78b61",
+          "eb6e251ecffe1d1aa6b50e98c3b43387"
+        ]
+      }
+    ],
+    "lanePointMap": {},
+    "noteMap": {}
+  },
+  "name": "新規譜面",
+  "audioSource": "AozoraTrain_1.wav",
+  "musicGameSystemName": "sdvx",
+  "musicGameSystemVersion": 0.1
+}

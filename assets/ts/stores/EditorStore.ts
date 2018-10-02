@@ -62,6 +62,9 @@ export default class Editor implements IStore {
 
   @action
   saveAs() {
+    // 譜面を最適化する
+    this.currentChart!.timeline.optimise();
+
     var fs = __require("fs");
 
     var window = remote.getCurrentWindow();
