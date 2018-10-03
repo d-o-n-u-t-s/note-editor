@@ -119,6 +119,7 @@ class ChartSetting extends React.Component<Props, {}> {
         </Button>
         <Button
           onClick={() => {
+            editor.currentChart!.timeline.optimizeNoteLine();
             editor.currentChart!.timeline.optimiseLane();
           }}
         >

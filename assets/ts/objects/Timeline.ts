@@ -4,6 +4,7 @@ import BPMChange from "./BPMChange";
 import Note from "./Note";
 import NoteLine from "./NoteLine";
 import { observable, observe, action, computed } from "mobx";
+import { sortMeasure } from "./Measure";
 
 export default class Timeline {
   constructor() {
@@ -73,6 +74,32 @@ export default class Timeline {
 
   @action
   addLane = (lane: Lane) => this.lanes.push(lane);
+
+  /**
+   * ノートラインを最適化する
+   */
+  @action
+  optimizeNoteLine() {
+    for (const noteLine of this.noteLines) {
+      // 先頭と末尾をソートして正しい順序にする
+      const [head, tail] = [
+        this.noteMap.get(noteLine.head)!,
+        this.noteMap.get(noteLine.tail)!
+      ].sort(sortMeasure);
+
+      noteLine.head = head.guid;
+      noteLine.tail = tail.guid;
+    }
+  }
+
+  /**
+   * 最適化する
+   */
+  @action
+  optimise() {
+    this.optimiseLane();
+    this.optimizeNoteLine();
+  }
 
   /**
    * レーンを最適化する

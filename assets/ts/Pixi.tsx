@@ -20,6 +20,7 @@ import LaneRendererResolver from "./objects/LaneRendererResolver";
 import NoteRendererResolver from "./objects/NoteRendererResolver";
 import NoteLineRendererResolver from "./objects/NoteLineRendererResolver";
 import CustomRendererUtility from "./utils/CustomRendererUtility";
+import { sortMeasure } from "./objects/Measure";
 
 import { inject, InjectedComponent } from "./stores/inject";
 import BPMChange, { BPMRenderer } from "./objects/BPMChange";
@@ -707,11 +708,13 @@ export default class Pixi extends InjectedComponent {
             this.connectTargetNote &&
             this.connectTargetNote.type === note.type
           ) {
-            //            console.log(this.connectTargetNote.type, note.type);
+            const [head, tail] = [this.connectTargetNote, note].sort(
+              sortMeasure
+            );
 
             const newNoteLine: NoteLine = {
-              head: this.connectTargetNote.guid,
-              tail: note.guid
+              head: head.guid,
+              tail: tail.guid
             };
 
             // ノートラインプレビュー
