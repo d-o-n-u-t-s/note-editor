@@ -39,6 +39,9 @@ interface MusicGameSystem {
   initialLanes: InitialLane[];
   measureHorizontalDivision: number;
   noteTypes: NoteType[];
+
+  noteTypeMap: Map<string, NoteType>;
+
   customNoteLineRenderers: CustomNoteLineRenderer[];
 }
 

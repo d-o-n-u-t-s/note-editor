@@ -188,7 +188,7 @@ export default class Pixi extends InjectedComponent {
     // 縦に何個小節を配置するか
     var hC = this.injected.editor.setting!.verticalLaneCount;
 
-    var wC = 50;
+    var wC = 300;
 
     const padding = this.injected.editor.setting!.padding;
 

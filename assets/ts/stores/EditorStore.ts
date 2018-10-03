@@ -11,6 +11,7 @@ import Asset from "./Asset";
 import MusicGameSystem from "./MusicGameSystem";
 
 import { __require, fs } from "../utils/node";
+import BMSImporter from "../plugins/BMSImporter";
 const { remote, ipcRenderer } = __require("electron");
 const { dialog } = remote;
 
@@ -113,6 +114,14 @@ export default class Editor implements IStore {
     ipcRenderer.on("open", () => this.open());
     ipcRenderer.on("save", () => this.save());
     ipcRenderer.on("saveAs", () => this.saveAs());
+    ipcRenderer.on("importBMS", () => BMSImporter.import());
+
+    // テスト処理
+    if (localStorage.getItem("_test_bms_chart")) {
+      setTimeout(() => {
+        BMSImporter.importImplement(localStorage.getItem("_test_bms_chart")!);
+      }, 1000);
+    }
 
     Editor.instance = this;
 

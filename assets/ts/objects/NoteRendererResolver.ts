@@ -5,8 +5,8 @@ import Pixi from "../Pixi";
 
 export default class NoteRendererResolver {
   static resolve(note: Note): INoteRenderer {
-    const noteType = Pixi.instance!.injected.editor!.currentChart!.musicGameSystem!.noteTypes.find(
-      lt => lt.name === note.type
+    const noteType = Pixi.instance!.injected.editor!.currentChart!.musicGameSystem!.noteTypeMap.get(
+      note.type
     )!;
 
     // console.log(noteType.rendererReference);

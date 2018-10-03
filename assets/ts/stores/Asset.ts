@@ -22,7 +22,8 @@ const BrowserWindow = remote.BrowserWindow;
 
 import {
   normalizeMusicGameSystem,
-  LaneTemplate
+  LaneTemplate,
+  NoteType
 } from "../stores/MusicGameSystem";
 
 // import * as config from "config";
@@ -100,6 +101,12 @@ export default class Asset implements IStore {
               laneTemplate.name,
               laneTemplate
             );
+          }
+
+          // 名前をキーにしたノートタイプのマップを生成する
+          musicGameSystems.noteTypeMap = new Map<string, NoteType>();
+          for (const noteType of musicGameSystems.noteTypes) {
+            musicGameSystems.noteTypeMap.set(noteType.name, noteType);
           }
 
           (window as any).CustomRendererUtility = CustomRendererUtility;

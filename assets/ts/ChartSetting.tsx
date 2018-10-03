@@ -107,7 +107,7 @@ class ChartSetting extends React.Component<Props, {}> {
             background: "#eee"
           }}
         >
-          {editor.currentChart!.toJSON()}
+          {/*editor.currentChart!.toJSON()*/}
         </div>
 
         <Button
