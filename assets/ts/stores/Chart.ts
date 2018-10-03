@@ -1,5 +1,5 @@
 import { Howl } from "howler";
-import { action, observable, computed } from "mobx";
+import { action, observable, computed, transaction } from "mobx";
 
 import HotReload from "../HotReload";
 
@@ -56,47 +56,51 @@ export default class Chart implements IStore {
     editor.setCurrentChart(editor.charts.length - 1);
   }
 
+  @action
   load(json: string) {
     const chart = JSON.parse(json);
     console.log("Load!", chart);
+    transaction(() => {
+      for (const lanePoint of chart.timeline.lanePoints) {
+        lanePoint.measurePosition = new Fraction(
+          lanePoint.measurePosition.numerator,
+          lanePoint.measurePosition.denominator
+        );
+        lanePoint.horizontalPosition = new Fraction(
+          lanePoint.horizontalPosition.numerator,
+          lanePoint.horizontalPosition.denominator
+        );
 
-    for (const lanePoint of chart.timeline.lanePoints) {
-      lanePoint.measurePosition = new Fraction(
-        lanePoint.measurePosition.numerator,
-        lanePoint.measurePosition.denominator
-      );
-      lanePoint.horizontalPosition = new Fraction(
-        lanePoint.horizontalPosition.numerator,
-        lanePoint.horizontalPosition.denominator
-      );
+        this.timeline.addLanePoint(lanePoint);
+      }
 
-      this.timeline.addLanePoint(lanePoint);
-    }
+      const notes: any[] = [];
 
-    for (const note of chart.timeline.notes) {
-      note.color = this.musicGameSystem!.noteTypes.find(
-        nt => nt.name === note.type
-      )!.color;
+      for (const note of chart.timeline.notes) {
+        note.color = this.musicGameSystem!.noteTypes.find(
+          nt => nt.name === note.type
+        )!.color;
 
-      note.measurePosition = new Fraction(
-        note.measurePosition.numerator,
-        note.measurePosition.denominator
-      );
-      note.horizontalPosition = new Fraction(
-        note.horizontalPosition.numerator,
-        note.horizontalPosition.denominator
-      );
+        note.measurePosition = new Fraction(
+          note.measurePosition.numerator,
+          note.measurePosition.denominator
+        );
+        note.horizontalPosition = new Fraction(
+          note.horizontalPosition.numerator,
+          note.horizontalPosition.denominator
+        );
 
-      //  note.renderer = new NoteRenderer(note);
-      this.timeline.addNote(note);
-    }
+        //  note.renderer = new NoteRenderer(note);
+        notes.push(note);
+      }
+      this.timeline.addNotes(notes);
 
-    for (const noteLine of chart.timeline.noteLines) {
-      this.timeline.addNoteLine(noteLine);
-    }
+      for (const noteLine of chart.timeline.noteLines) {
+        this.timeline.addNoteLine(noteLine);
+      }
 
-    for (const lane of chart.timeline.lanes) {
-      /*
+      for (const lane of chart.timeline.lanes) {
+        /*
       lane.measurePosition = new Fraction(
         lane.measurePosition.numerator,
         lane.measurePosition.denominator
@@ -107,8 +111,9 @@ export default class Chart implements IStore {
         lane.horizontalPosition.denominator
       );
       */
-    }
-    this.timeline.setLanes(chart.timeline.lanes);
+      }
+      this.timeline.setLanes(chart.timeline.lanes);
+    });
   }
 
   constructor(musicGameSystem: MusicGameSystem, audioSource: string) {

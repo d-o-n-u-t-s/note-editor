@@ -48,6 +48,30 @@ class NoteRenderer implements INoteRenderer {
   }
 
   render(note: Note, graphics: PIXI.Graphics, lane: Lane, measure: Measure) {
+    const renderArea = Pixi.instance!.getRenderArea();
+    const measureBounds = measure.getBounds();
+
+    /*
+    if (
+      [
+        [measureBounds.x, measureBounds.y],
+        [measureBounds.x + measureBounds.width, measureBounds.y],
+        [
+          measureBounds.x + measureBounds.width,
+          measureBounds.y + measureBounds.height
+        ],
+        [measureBounds.x, measureBounds.y + measureBounds.height]
+      ]
+        .map(pos => renderArea.contains(pos[0], pos[1]))
+        .every(_ => _ === false)
+    ) {
+      return;
+    }
+*/
+
+    if (measureBounds.x + measureBounds.width < 0) return;
+    if (measureBounds.x > Pixi.instance!.getRenderAreaSize().x) return;
+
     const q = LaneRendererResolver.resolve(lane).getQuad(
       lane,
       measure,
@@ -58,7 +82,6 @@ class NoteRenderer implements INoteRenderer {
     if (!q) {
       return console.error("ノートの描画範囲が計算できません");
     }
-    
 
     q.point.x += ((note.horizontalSize - 1) * q.width) / 2;
     q.width *= note.horizontalSize;

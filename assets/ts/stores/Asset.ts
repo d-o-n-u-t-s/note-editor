@@ -105,7 +105,7 @@ export default class Asset implements IStore {
 
           // 名前をキーにしたノートタイプのマップを生成する
           musicGameSystems.noteTypeMap = new Map<string, NoteType>();
-          for (const noteType of musicGameSystems.noteTypes) {
+          for (const noteType of musicGameSystems.noteTypes || []) {
             musicGameSystems.noteTypeMap.set(noteType.name, noteType);
           }
 

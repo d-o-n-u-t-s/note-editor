@@ -98,6 +98,22 @@ export default class Pixi extends InjectedComponent {
 
   private tempTextIndex = 0;
 
+  getRenderAreaSize() {
+    return new Vector2(this.app!.renderer.width, this.app!.renderer.height);
+  }
+
+  /**
+   * 描画範囲を取得する
+   */
+  getRenderArea() {
+    return new PIXI.Rectangle(
+      -this.graphics!.x,
+      0,
+      this.app!.renderer.width,
+      this.app!.renderer.height
+    );
+  }
+
   drawTempText(
     text: string,
     x: number,
@@ -847,7 +863,6 @@ export default class Pixi extends InjectedComponent {
         this.injected.editor.currentChart!.timeline.addBPMChange(newLanePoint);
       } else {
         // プレビュー
-
         BPMRenderer.render(
           newLanePoint,
           graphics,

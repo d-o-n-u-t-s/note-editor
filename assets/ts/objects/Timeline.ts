@@ -58,6 +58,9 @@ export default class Timeline {
   addNote = (note: Note) => this.notes.push(note);
 
   @action
+  addNotes = (notes: Note[]) => this.notes.push(...notes);
+
+  @action
   addNoteLine = (noteLine: NoteLine) => this.noteLines.push(noteLine);
 
   @action

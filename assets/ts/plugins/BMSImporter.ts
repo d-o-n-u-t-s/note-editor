@@ -93,12 +93,80 @@ export default class BMSImporter {
       }
     };
 
+    const bpms: any[] = [];
+
+    const bpmN = (laneIndex: number, source: string) => {
+      var values = source.match(/.{2}/)!;
+
+      var denominator = values.length;
+      var count = 0;
+
+      console.log("BPM_N", values);
+
+      for (const value of values) {
+        var index = count++;
+
+        if (value === "00") continue;
+
+        // 00 ~ FF
+        var bpm = parseInt(value, 16);
+
+        if (bpm == 0) continue;
+
+        console.log("bpm", bpm);
+        bpms.push({
+          bpm: bpm,
+          laneIndex: laneIndex,
+          position: new Fraction(index, denominator)
+        });
+        /*
+            BPM bpmObj = new BPM();
+
+            bpmObj.laneIndex = laneIndex;
+            bpmObj.position = new NotePosition(index, denominator);
+
+            bpmObj.value = (float)(bpm);
+*/
+      }
+    };
+
+    const bpmEx = (laneIndex: number, source: string) => {
+      var values = source.match(/".{2}/g)!;
+
+      var denominator = values.length;
+      var count = 0;
+
+      for (var value of values) {
+        var index = count++;
+
+        if (value.length == 0) continue;
+
+        // 00 ~ FF
+        var bpmIndex = parseInt(value[0], 16);
+
+        if (bpmIndex == 0) continue;
+
+        console.log("BPM", bpmIndex);
+
+        /*
+            BPM bpmObj = new BPM();
+
+            bpmObj.laneIndex = laneIndex;
+            bpmObj.position = new NotePosition(index, denominator);
+
+
+            println(bpmIndex.ToString());
+
+            bpmObj.value = HeaderCollection_BPM[bpmIndex].floatValue();
+*/
+      }
+    };
     const channel = (index: number, id: number, values: string) => {
       var laneIndex = index;
 
       // 拡張 BPM
       if (id == 8) {
-        //  bpmEx(laneIndex, values);
+        bpmEx(laneIndex, values);
 
         return;
       }
@@ -114,6 +182,8 @@ export default class BMSImporter {
         // values には 0.125 みたいな文字列が入っている
         var value = Number(values);
 
+        console.log("Tempo", value, laneIndex);
+
         //    var tempo = new Tempo(laneIndex, value);
 
         return;
@@ -121,7 +191,7 @@ export default class BMSImporter {
 
       // xxx03: BPM
       if (id == 3) {
-        //     bpmN(laneIndex, values);
+        bpmN(laneIndex, values);
 
         return;
       }
@@ -201,12 +271,15 @@ export default class BMSImporter {
           const bpm = Number(line.substr(5));
           const defaultBPM = bpm;
 
+          console.log("default bpm", bpm);
+
           continue;
         }
 
         if (line.match(/#BPM[0-9A-F]{2} .+/)) {
           const bpm = Number(headerN(line));
 
+          console.log("bpm2", bpm);
           // println(bpm.ToString());
 
           //    BMS_Header header = new BMS_Header(line, 16);
@@ -236,13 +309,18 @@ export default class BMSImporter {
       }
     }
 
-    console.log(notes);
+    console.log(notes, bpms);
 
     Chart.fromJSON(
       JSON.stringify({
         timeline: {
           horizontalLaneDivision: 9,
-          bpmChanges: [],
+          bpmChanges: bpms.map(bpm => ({
+            measureIndex: bpm.laneIndex,
+            measurePosition: bpm.position,
+            bpm: bpm.bpm,
+            guid: guid()
+          })),
           lanePoints: [
             {
               measureIndex: 0,
