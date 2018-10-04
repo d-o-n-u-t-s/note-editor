@@ -3,6 +3,7 @@ import Editor from "./EditorStore";
 import { guid } from "../util";
 import Lane from "../objects/Lane";
 import LanePoint from "../objects/LanePoint";
+import { CustomNoteLineRenderer } from "../stores/MusicGameSystem";
 
 import * as Electrom from "electron";
 
@@ -77,14 +78,14 @@ export default class Asset implements IStore {
       );
 
       for (const directory of directories) {
-        console.log(directory);
+        // console.log(directory);
 
         const files = (await util.promisify(fs.readdir)(
           path.join(urlParams.mgsp, directory)
         )) as any[];
 
         var fileList = files.filter(file => file.endsWith(".json"));
-        console.log(fileList);
+        console.log("MusicGameSystem を読み込みます", fileList);
         for (const file of fileList) {
           const buffer: Buffer = await util.promisify(fs.readFile)(
             path.join(urlParams.mgsp, directory, file)
@@ -171,8 +172,6 @@ export default class Asset implements IStore {
 
               eval(source);
 
-              console.log("NoteRender!", (window as any)[key], source);
-
               renderer.noteTemplate.rendererReference = (window as any)[key];
             }
           }
@@ -180,6 +179,10 @@ export default class Asset implements IStore {
           // ノートラインのカスタムレンダラーを読み込む
           {
             const renderers = musicGameSystems.customNoteLineRenderers || [];
+            musicGameSystems.customNoteLineRendererMap = new Map<
+              string,
+              CustomNoteLineRenderer
+            >();
 
             for (const renderer of renderers) {
               const rendererPath = path.join(
@@ -202,6 +205,11 @@ export default class Asset implements IStore {
               eval(source);
 
               renderer.rendererReference = (window as any)[key];
+
+              musicGameSystems.customNoteLineRendererMap.set(
+                renderer.target,
+                renderer
+              );
             }
           }
 
@@ -240,7 +248,8 @@ export default class Asset implements IStore {
 
     var fileList = files.filter(function(file) {
       return (
-        fs.statSync(path.join(dir, file)).isFile() && /.*\.wav$/.test(file)
+        fs.statSync(path.join(dir, file)).isFile() &&
+        /.*\.(wav|mp3)$/.test(file)
       ); //絞り込み
     });
 

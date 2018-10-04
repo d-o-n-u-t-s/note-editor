@@ -27,6 +27,8 @@ interface QuadAndIndex extends Quad {
 }
 
 export function getLines(points: LinePoint[], measures: Measure[]): LineInfo[] {
+  performance.mark("getLines");
+
   const lines: LineInfo[] = [];
 
   points = points.slice().sort(sortMeasure);
@@ -159,10 +161,6 @@ export function getLines(points: LinePoint[], measures: Measure[]): LineInfo[] {
       {
         const b = a.pop()!;
 
-        if ((window as any).testtest) {
-          console.log("last", b);
-        }
-
         const measure = measures[b.measureIndex];
 
         const x1 =
@@ -198,6 +196,8 @@ export function getLines(points: LinePoint[], measures: Measure[]): LineInfo[] {
       }
     }
   }
+
+  performance.measure("getLines", "getLines");
 
   return lines;
 }
@@ -275,6 +275,13 @@ class LaneRenderer implements ILaneRenderer {
     }
   }
 
+  /**
+   * 小節番号からレーンの矩形を取得する
+   * @param lane
+   * @param measure
+   * @param horizontal
+   * @param vertical
+   */
   getQuad(
     lane: Lane,
     measure: Measure,
@@ -305,11 +312,7 @@ class LaneRenderer implements ILaneRenderer {
       end: new Vector2(measure!.x + measure!.width, y)
     };
 
-    //}
-    // }
-
     // 横
-
     for (var i = 0; i < 2; ++i) {
       xLines[i] = [];
 
@@ -384,8 +387,22 @@ class LaneRenderer implements ILaneRenderer {
           point: Vector2.add(ret1, ret2).multiplyScalar(0.5),
           width: ret2.x - ret1.x
         };
+      } else {
+        console.error(
+          "レーンの領域を計算できませんでした",
+          measure.index,
+          lane,
+          ret1,
+          ret2
+        );
+
+        return {
+          point: new Vector2(-100, -100),
+          width: 1
+        };
       }
     }
+
     return null;
   }
 
@@ -406,6 +423,8 @@ class LaneRenderer implements ILaneRenderer {
       measures
     );
 
+    // console.log(lines);
+
     // キャッシュしておく
     linesCache.set(lane, lines);
 
@@ -416,9 +435,11 @@ class LaneRenderer implements ILaneRenderer {
     this.defaultRender(graphics, lines, laneTemplate);
 
     // 選択中の小節に乗っているレーン
-    const targetMeasureLines = lines.filter(
-      ({ measure }) => measure === drawHorizontalLineTargetMeasure
-    );
+    const targetMeasureLines = !drawHorizontalLineTargetMeasure
+      ? []
+      : lines.filter(
+          ({ measure }) => measure === drawHorizontalLineTargetMeasure
+        );
 
     for (const line of targetMeasureLines) {
       for (var i = 1; i < lane.division; ++i) {

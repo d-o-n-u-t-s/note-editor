@@ -48,7 +48,7 @@ module.exports = {
         loader: 'ts-loader'
       }]
     }, {
-      test: /\.wav?$/,
+      test: /\.(wav|mp3)?$/,
       use: [{
         loader: 'url-loader'
       }]

@@ -23,7 +23,7 @@ export interface NoteType {
   excludeLanes: string[];
 }
 
-interface CustomNoteLineRenderer {
+export interface CustomNoteLineRenderer {
   target: string;
   renderer: string;
   rendererReference: any;
@@ -43,6 +43,8 @@ interface MusicGameSystem {
   noteTypeMap: Map<string, NoteType>;
 
   customNoteLineRenderers: CustomNoteLineRenderer[];
+
+  customNoteLineRendererMap: Map<string, CustomNoteLineRenderer>;
 }
 
 export function normalizeMusicGameSystem(

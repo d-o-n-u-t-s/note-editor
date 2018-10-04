@@ -29,9 +29,9 @@ export default class BMSImporter {
     console.log("BMS 譜面を読み込みます");
 
     const splitTokens = (source: string) => {
-      var split = source.split("");
+      const split = source.split("");
 
-      var space = source.indexOf(" ");
+      const space = source.indexOf(" ");
 
       split[0] = source.substr(0, space - 1);
       split[1] = source.substr(space).trim();
@@ -40,7 +40,7 @@ export default class BMSImporter {
     };
 
     const headerN = (source: string) => {
-      var tokens = splitTokens(source);
+      const tokens = splitTokens(source);
 
       return tokens[1];
     };
@@ -48,29 +48,29 @@ export default class BMSImporter {
     const notes: any[] = [];
 
     const note = (index: number, id: number, values: string) => {
-      var mc = values.match(/.{2}/g)!;
+      const mc = values.match(/.{2}/g)!;
 
-      var ln = mc.length;
-      var count = 0;
+      const ln = mc.length;
+      let count = 0;
 
-      for (var c of mc) {
-        var b = c;
+      for (const c of mc) {
+        const b = c;
 
-        var index2 = count++;
+        const index2 = count++;
 
         if (b.length == 0) continue;
 
         // xxxXX:[[11223344]]
 
-        var value = parseInt(b, 36);
+        const value = parseInt(b, 36);
 
         // 休符
 
         if (value == 0) continue;
 
-        var soundID = value;
+        const soundID = value;
 
-        var note = { id: -1, laneIndex: 0, position: new Fraction(0, 1) }; //new Note(-1, soundID);
+        const note = { id: -1, laneIndex: 0, position: new Fraction(0, 1) }; //new Note(-1, soundID);
 
         note.laneIndex = index;
 
@@ -93,60 +93,99 @@ export default class BMSImporter {
       }
     };
 
+    const longNotes: any[][] = Array.from({ length: 8 }).map(_ => []);
+
+    const longNote = (index: number, id: number, values: string) => {
+      const mc = values.match(/.{2}/g)!;
+
+      const ln = mc.length;
+      let count = 0;
+
+      for (const c of mc) {
+        const b = c;
+
+        const index2 = count++;
+
+        if (b.length == 0) continue;
+
+        // xxxXX:[[11223344]]
+
+        const value = parseInt(b, 36);
+
+        // 休符
+
+        if (value == 0) continue;
+
+        const soundID = value;
+
+        const note = { id: -1, laneIndex: 0, position: new Fraction(0, 1) }; //new Note(-1, soundID);
+        note.laneIndex = index;
+        note.position = new Fraction(index2, ln);
+
+        note.id = -1;
+        if (id == 56) note.id = 0;
+        if (id == 51) note.id = 1;
+        if (id == 52) note.id = 2;
+        if (id == 53) note.id = 3;
+        if (id == 54) note.id = 4;
+        if (id == 55) note.id = 5;
+        if (id == 58) note.id = 6;
+        if (id == 59) note.id = 7;
+
+        if (note.id === -1) {
+          throw note;
+        }
+
+        longNotes[note.id].push(note);
+      }
+    };
+
     const bpms: any[] = [];
 
     const bpmN = (laneIndex: number, source: string) => {
-      var values = source.match(/.{2}/)!;
+      const values = source.match(/.{2}/)!;
 
-      var denominator = values.length;
-      var count = 0;
+      const denominator = values.length;
+      let count = 0;
 
-      console.log("BPM_N", values);
+      // console.log("BPM_N", values);
 
       for (const value of values) {
-        var index = count++;
+        const index = count++;
 
-        if (value === "00") continue;
+        //if (value === "00") continue;
 
         // 00 ~ FF
-        var bpm = parseInt(value, 16);
+        const bpm = parseInt(value, 16);
 
-        if (bpm == 0) continue;
+        if (bpm === 0) continue;
 
-        console.log("bpm", bpm);
+        // console.log("bpm", bpm);
         bpms.push({
           bpm: bpm,
           laneIndex: laneIndex,
           position: new Fraction(index, denominator)
         });
-        /*
-            BPM bpmObj = new BPM();
-
-            bpmObj.laneIndex = laneIndex;
-            bpmObj.position = new NotePosition(index, denominator);
-
-            bpmObj.value = (float)(bpm);
-*/
       }
     };
 
     const bpmEx = (laneIndex: number, source: string) => {
-      var values = source.match(/".{2}/g)!;
+      const values = source.match(/.{2}/g)!;
+      console.log(values);
 
-      var denominator = values.length;
-      var count = 0;
+      let count = 0;
 
-      for (var value of values) {
-        var index = count++;
+      for (const value of values) {
+        const index = count++;
 
-        if (value.length == 0) continue;
+        if (value === "00") continue;
 
         // 00 ~ FF
-        var bpmIndex = parseInt(value[0], 16);
+        const bpmIndex = parseInt(value[0], 16);
 
         if (bpmIndex == 0) continue;
 
-        console.log("BPM", bpmIndex);
+        // console.log("BPM", bpmIndex);
 
         /*
             BPM bpmObj = new BPM();
@@ -162,7 +201,7 @@ export default class BMSImporter {
       }
     };
     const channel = (index: number, id: number, values: string) => {
-      var laneIndex = index;
+      const laneIndex = index;
 
       // 拡張 BPM
       if (id == 8) {
@@ -180,11 +219,11 @@ export default class BMSImporter {
       // xxx02: tempo
       if (id == 2) {
         // values には 0.125 みたいな文字列が入っている
-        var value = Number(values);
+        const value = Number(values);
 
-        console.log("Tempo", value, laneIndex);
+        // console.log("Tempo", value, laneIndex);
 
-        //    var tempo = new Tempo(laneIndex, value);
+        //    const tempo = new Tempo(laneIndex, value);
 
         return;
       }
@@ -208,32 +247,41 @@ export default class BMSImporter {
 
         return;
       }
+
+      // ロングノート
+      if (51 <= id && id <= 59) {
+        // console.warn("ロングノート", values);
+
+        longNote(index, id, values);
+
+        return;
+      }
     };
 
     const lines = bmsChart.split("\n");
 
     // レーン数を算出する
-    var laneLength = -1;
+    let laneLength = -1;
 
-    for (var line of lines) {
+    for (const line of lines) {
       if (!line.match(/#\d{3}[0-9A-Z]{2}:.+/)) continue;
 
-      var laneIndex = Number(line.substr(1, 3));
+      const laneIndex = Number(line.substr(1, 3));
 
       if (laneIndex > laneLength) laneLength = laneIndex;
     }
 
-    console.log("Lane Length: " + laneLength);
+    // console.log("Lane Length: " + laneLength);
 
-    for (var line of lines) {
+    for (const line of lines) {
       // Debug.Log(line);
 
       try {
         // #xxxXX:....
         if (line.match(/#\d{3}[0-9A-Z]{2}:.+/)) {
-          var index = Number(line.substr(1, 3));
-          var id = Number(line.substr(4, 2));
-          var values = line.substr(7);
+          const index = Number(line.substr(1, 3));
+          const id = Number(line.substr(4, 2));
+          const values = line.substr(7);
 
           channel(index, id, values.trim());
 
@@ -249,7 +297,7 @@ export default class BMSImporter {
                         String[] s = splitTokens(line);         // トークンで分割
 
                         // 
-                        var id_36 = line.Substring(4, 2);
+                        const id_36 = line.Substring(4, 2);
 
                         int id = RadixConvert.ToInt32(line.Substring(4, 2), 36);
 
@@ -269,9 +317,14 @@ export default class BMSImporter {
 
         if (line.match(/#BPM .+/)) {
           const bpm = Number(line.substr(5));
-          const defaultBPM = bpm;
 
           console.log("default bpm", bpm);
+
+          bpms.push({
+            bpm: bpm,
+            laneIndex: 0,
+            position: new Fraction(0, 1)
+          });
 
           continue;
         }
@@ -309,7 +362,39 @@ export default class BMSImporter {
       }
     }
 
-    console.log(notes, bpms);
+    console.log(notes, bpms, longNotes);
+
+    const toNote = (note: any) => ({
+      guid: guid(),
+      horizontalSize: 1,
+      horizontalPosition: {
+        numerator: note.id === -1 ? 8 : note.id,
+        denominator: 9
+      },
+      measureIndex: note.laneIndex,
+      measurePosition: note.position,
+      type: "tap",
+      lane: "60914b20c1205ff1563407fa2d2b233d"
+    });
+
+    const noteLines: any[] = [];
+
+    const notes2: any[] = [];
+
+    for (const longNote of longNotes) {
+      // ノートを 2 個ずつ繋ぐ
+      for (let i = 0; i < longNote.length / 2; ++i) {
+        const head = toNote(longNote[i * 2 + 0]);
+        const tail = toNote(longNote[i * 2 + 1]);
+
+        noteLines.push({
+          head: head.guid,
+          tail: tail.guid
+        });
+
+        notes2.push(head, tail);
+      }
+    }
 
     Chart.fromJSON(
       JSON.stringify({
@@ -337,7 +422,7 @@ export default class BMSImporter {
               }
             },
             {
-              measureIndex: laneLength,
+              measureIndex: laneLength + 1,
               measurePosition: {
                 numerator: 0,
                 denominator: 1
@@ -351,26 +436,8 @@ export default class BMSImporter {
               }
             }
           ],
-          notes: notes.map(note => ({
-            guid: guid(),
-            horizontalSize: 1,
-            horizontalPosition: {
-              numerator: note.id === -1 ? 8 : note.id,
-              denominator: 9
-            },
-            measureIndex: note.laneIndex,
-            measurePosition: note.position,
-            type: "tap",
-            lane: "60914b20c1205ff1563407fa2d2b233d"
-          })),
-          noteLines: [
-            /*
-            {
-              head: "0ee48d556c8f535fe958305bdd441f8c",
-              tail: "469b98721de9beacc68f4329936296fd"
-            }
-            */
-          ],
+          notes: notes.map(toNote).concat(notes2),
+          noteLines: noteLines,
           lanes: [
             {
               guid: "60914b20c1205ff1563407fa2d2b233d",
@@ -386,7 +453,7 @@ export default class BMSImporter {
           noteMap: {}
         },
         name: "新規譜面",
-        audioSource: store.editor.asset.audioAssetPaths[0],
+        audioSource: store.editor.asset.audioAssetPaths[16],
         musicGameSystemName: "BMS",
         musicGameSystemVersion: 0.1
       })

@@ -62,26 +62,24 @@ class NoteLineRenderer implements INoteLineRenderer {
     const measures = Pixi.instance!.measures;
     const {
       lanes,
-      lanePoints
+      lanePoints,
+      lanePointMap,
+      noteMap,
+      laneMap
     } = Pixi.instance!.injected.editor!.currentChart!.timeline;
 
-    let head = notes.find(note => note.guid === noteLine.head)!;
-    let tail = notes.find(note => note.guid === noteLine.tail)!;
-
-    //    return;
+    let head = noteMap.get(noteLine.head)!;
+    let tail = noteMap.get(noteLine.tail)!;
 
     // head, tail をソート
     [head, tail] = [head, tail].sort(sortMeasure);
 
-    const lane = lanes.find(l => l.guid === head.lane)!;
+    const lane = laneMap.get(head.lane)!;
+
+    if (!lane) console.error(laneMap);
 
     const headPos = head.measureIndex + head.measurePosition.to01Number();
     const tailPos = tail.measureIndex + tail.measurePosition.to01Number();
-
-    // console.log("head", head.guid);
-
-    // console.log("headPos", headPos);
-    //  console.log("tailPos", tailPos);
 
     const length = tailPos - headPos;
 
@@ -101,7 +99,7 @@ class NoteLineRenderer implements INoteLineRenderer {
 
     const tailBounds = NoteRenderer.getBounds(
       tail,
-      lanes.find(l => l.guid === tail.lane)!,
+      laneMap.get(tail.lane)!,
       measures[tail.measureIndex]
     );
 
@@ -110,7 +108,7 @@ class NoteLineRenderer implements INoteLineRenderer {
 
     // 先頭ノートと末尾ノートの間にあるレーン中間ポイントを取得する
     let lps = lane.points
-      .map(guid => lanePoints.find(lp => lp.guid === guid)!)
+      .map(guid => lanePointMap.get(guid)!)
       .filter(lp => {
         const n = lp.measureIndex + lp.measurePosition.to01Number();
 
@@ -144,8 +142,6 @@ class NoteLineRenderer implements INoteLineRenderer {
 
         // 現在の位置
         const pp = s / length;
-
-        const measure = measures[lp.measureIndex];
 
         // 先頭ノートが配置してある位置のレーンの横幅
         const headNoteLaneWidth =

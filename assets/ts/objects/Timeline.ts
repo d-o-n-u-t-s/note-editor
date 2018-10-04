@@ -3,7 +3,7 @@ import LanePoint from "./LanePoint";
 import BPMChange from "./BPMChange";
 import Note from "./Note";
 import NoteLine from "./NoteLine";
-import { observable, observe, action, computed } from "mobx";
+import { observable, observe, action, computed, IObservableArray } from "mobx";
 import { sortMeasure } from "./Measure";
 
 export default class Timeline {
@@ -16,6 +16,16 @@ export default class Timeline {
       }
 
       console.log("NoteMap を更新しました");
+    });
+
+    observe(this.lanes, () => {
+      console.warn("lane が更新されました", this.lanes);
+
+      this.laneMap.clear();
+      for (const lane of this.lanes) {
+        this.laneMap.set(lane.guid, lane);
+      }
+      console.log("LaneMap を更新しました");
     });
 
     observe(this.lanePoints, () => {
@@ -69,11 +79,14 @@ export default class Timeline {
   /**
    * レーン
    */
-  @observable
-  lanes: Lane[] = [];
+  lanes: IObservableArray<Lane> = observable([]);
+
+  laneMap = new Map<string, Lane>();
 
   @action
-  setLanes = (lanes: Lane[]) => (this.lanes = lanes);
+  setLanes = (lanes: Lane[]) => {
+    this.lanes.replace(lanes); // = lanes);
+  };
 
   @action
   addLane = (lane: Lane) => this.lanes.push(lane);
@@ -146,7 +159,9 @@ export default class Timeline {
           const nextLaneIndex = this.lanes.findIndex(l => l === nextLane);
           lane.points.push(...nextLane.points.slice(1));
 
-          this.lanes = this.lanes.filter((l, index) => index !== nextLaneIndex);
+          this.setLanes(
+            this.lanes.filter((l, index) => index !== nextLaneIndex)
+          );
           f = true;
           break;
         }

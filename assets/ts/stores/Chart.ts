@@ -59,7 +59,7 @@ export default class Chart implements IStore {
   @action
   load(json: string) {
     const chart = JSON.parse(json);
-    console.log("Load!", chart);
+    console.log("譜面を読み込みます", chart);
     transaction(() => {
       for (const lanePoint of chart.timeline.lanePoints) {
         lanePoint.measurePosition = new Fraction(
@@ -99,20 +99,11 @@ export default class Chart implements IStore {
         this.timeline.addNoteLine(noteLine);
       }
 
-      for (const lane of chart.timeline.lanes) {
-        /*
-      lane.measurePosition = new Fraction(
-        lane.measurePosition.numerator,
-        lane.measurePosition.denominator
-      );
-      /*
-      lane.horizontalPosition = new Fraction(
-        lane.horizontalPosition.numerator,
-        lane.horizontalPosition.denominator
-      );
-      */
-      }
       this.timeline.setLanes(chart.timeline.lanes);
+
+      for (const bpmChange of chart.timeline.bpmChanges) {
+        this.timeline.addBPMChange(bpmChange);
+      }
     });
   }
 
@@ -122,46 +113,7 @@ export default class Chart implements IStore {
     this.setMusicGameSystem(musicGameSystem);
     this.setAudioFromSource(audioSource);
 
-    console.log("newChart", musicGameSystem, audioSource);
-
-    /*
-    {
-      const bpmChange = {
-        bpm: 120,
-        measureIndex: 0,
-        measurePosition: new Fraction(0, 1)
-      } as BPMChange;
-
-      bpmChange.renderer = new BPMRenderer(bpmChange);
-
-      this.timeline.bpmChanges.push(bpmChange);
-    }
-
-    {
-      /*
-      const aa = {
-        measureIndex: 1,
-        measurePosition: math.fraction(0, 1) as math.Fraction
-      } as LanePoint;
-
-      aa.renderer = new LanePointRenderer(aa);
-
-      this.timeline.lanePoints.push(aa);
-      
-    }
-
-    {
-      const bpmChange = {
-        bpm: 240,
-        measureIndex: 4,
-        measurePosition: new Fraction(0, 1)
-      } as BPMChange;
-
-      bpmChange.renderer = new BPMRenderer(bpmChange);
-
-      this.timeline.bpmChanges.push(bpmChange);
-    }
-    */
+    console.log("譜面を生成しました", musicGameSystem, audioSource);
   }
 
   @observable
@@ -338,7 +290,7 @@ export default class Chart implements IStore {
 
       const lanePoints = Array.from({ length: 2 }).map((_, index) => {
         const newLanePoint = {
-          measureIndex: index * 50,
+          measureIndex: index * 300,
           measurePosition: new Fraction(0, 1),
           guid: guid(),
           color: Number(laneTemplate.color),
@@ -384,9 +336,11 @@ export default class Chart implements IStore {
 
     const tl = (chart.timeline = Object.assign({}, chart.timeline));
 
+    console.log(tl);
+
     tl.bpmChanges = chart.timeline.bpmChanges.map(t => Object.assign({}, t));
     tl.lanePoints = chart.timeline.lanePoints.map(t => Object.assign({}, t));
-    tl.lanes = chart.timeline.lanes.map(t => Object.assign({}, t));
+    (tl as any).lanes = chart.timeline.lanes.map(t => Object.assign({}, t));
     tl.notes = chart.timeline.notes.map(t => {
       const note = Object.assign({}, t);
       delete note.color;
