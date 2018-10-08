@@ -168,7 +168,7 @@ export default class Pixi extends InjectedComponent {
     if (!this.app) return;
     if (!this.injected.editor.currentChart) return;
 
-    console.log("renderCanvas");
+    // console.log("renderCanvas");
 
     CustomRendererUtility.update();
 
@@ -196,6 +196,98 @@ export default class Pixi extends InjectedComponent {
 
     graphics.clear();
 
+    // BPM が 1 つも存在しなかったら仮 BPM を先頭に配置する
+    if (!chart.timeline.bpmChanges.length) {
+      chart.timeline.addBPMChange({
+        guid: guid(),
+        measureIndex: 0,
+        measurePosition: new Fraction(0, 1),
+        bpm: 120
+      });
+    }
+
+    // 小節位置でソートした BPM 変更オブジェクト
+    var sortedBpmChanges = chart.timeline.bpmChanges.slice().sort(sortMeasure);
+
+    sortedBpmChanges.push({
+      guid: guid(),
+      measureIndex: 999,
+      measurePosition: new Fraction(0, 1),
+      bpm: sortedBpmChanges[sortedBpmChanges.length - 1].bpm
+    });
+
+    class BPMRange {
+      // 開始時刻
+      BeginTime: number = 0;
+
+      // 開始小節
+      BeginPosition: number = 0;
+
+      // 終了小節
+      public EndPosition = 0;
+
+      // 区間の秒数
+      public Duration = 0;
+
+      public Between(value: number): boolean {
+        return value >= this.BeginPosition && value < this.EndPosition;
+      }
+
+      /// <summary>
+      /// 判定時間を取得する
+      /// </summary>
+      /// <param name="measurePosition">小節位置</param>
+      /// <returns>判定時間</returns>
+      public GetJudgeTime(measurePosition: number) {
+        return (
+          this.BeginTime +
+          ((measurePosition - this.BeginPosition) /
+            (this.EndPosition - this.BeginPosition)) *
+            this.Duration
+        );
+      }
+    }
+
+    const measureTimeInfo = new Map<number, BPMRange>();
+    var bpmChanges: BPMRange[] = [];
+    // BPM の区間を計算する
+    var beginTime = 0;
+    for (let i = 0; i < sortedBpmChanges.length - 1; i++) {
+      var begin = sortedBpmChanges[i];
+      var end = sortedBpmChanges[i + 1];
+
+      // 1 小節の時間
+      var unitTime2 = (60 / begin.bpm) * 4;
+
+      var beginMeasureIndex =
+        Math.floor(begin.measureIndex + begin.measurePosition.to01Number()) | 0;
+      var endMeasureIndex =
+        Math.floor(end.measureIndex + end.measurePosition.to01Number()) | 0;
+
+      for (
+        var measureIndex = beginMeasureIndex;
+        measureIndex < endMeasureIndex;
+        measureIndex++
+      ) {
+        // TODO: 小節に拍情報を追加する
+        var tempo = 1.0;
+
+        // 区間の秒数
+        var time = unitTime2 * tempo;
+
+        var bpmRange = new BPMRange();
+        bpmRange.BeginPosition = measureIndex;
+        bpmRange.EndPosition = measureIndex + 1;
+        bpmRange.BeginTime = beginTime;
+        bpmRange.Duration = time;
+        bpmChanges.push(bpmRange);
+
+        measureTimeInfo.set(bpmRange.BeginPosition, bpmRange);
+
+        beginTime += time;
+      }
+    }
+
     var mousePosition = this.app!.renderer.plugins.interaction.mouse.global;
 
     // this.app!.renderer.plugins.interaction.mouse.
@@ -213,10 +305,6 @@ export default class Pixi extends InjectedComponent {
 
     const currentTime = this.injected.editor.currentChart!.time;
     //console.log(currentTime);
-
-    const bpm = 120;
-
-    const unitTime = (60 / bpm) * 4;
 
     // while (graphics.children[0]) graphics.removeChild(graphics.children[0]);
 
@@ -251,8 +339,8 @@ export default class Pixi extends InjectedComponent {
         graphics.drawRect(x, y, laneWidth, hh);
 
         // 小節の開始時刻、終了時刻
-        var b = unitTime * index;
-        var e = unitTime * (index + 1);
+        var b = measureTimeInfo.get(index + 0)!.BeginTime; // 0;// unitTime * index;
+        var e = measureTimeInfo.get(index + 1)!.BeginTime; //0;//unitTime * (index + 1);
 
         if (this.renderedAudioBuffer && 0.4 > 1) {
           // TODO: ステレオ判定
@@ -518,9 +606,10 @@ export default class Pixi extends InjectedComponent {
       );
     }
 
-    // ノート選択
+    // ノート選択 or 削除
     if (
-      setting.editMode === EditMode.Select &&
+      (setting.editMode === EditMode.Select ||
+        setting.editMode === EditMode.Delete) &&
       setting.editObjectCategory === ObjectCategory.Note
     ) {
       for (const note of chart.timeline.notes) {
@@ -533,14 +622,49 @@ export default class Pixi extends InjectedComponent {
         if (bounds.contains(mousePosition.x - graphics.x, mousePosition.y)) {
           graphics
             .lineStyle(2, 0xff9900)
-            //.beginFill(0x0099ff, 0.3)
             .drawRect(
               bounds.x - 2,
               bounds.y - 2,
               bounds.width + 4,
               bounds.height + 4
             );
-          //.endFill();
+
+          if (isClick) {
+            if (setting.editMode === EditMode.Delete) {
+              chart.timeline.removeNote(note);
+            }
+            if (setting.editMode === EditMode.Select) {
+              console.log("ノートを選択しました", note);
+            }
+          }
+        }
+      }
+    }
+
+    // BPM 削除
+    if (
+      setting.editMode === EditMode.Delete &&
+      setting.editObjectCategory === ObjectCategory.Other
+    ) {
+      for (const bpmChange of chart.timeline.bpmChanges) {
+        const bounds = BPMRenderer.getBounds(
+          bpmChange,
+          this.measures[bpmChange.measureIndex]
+        );
+
+        if (bounds.contains(mousePosition.x - graphics.x, mousePosition.y)) {
+          graphics
+            .lineStyle(2, 0xff9900)
+            .drawRect(
+              bounds.x - 2,
+              bounds.y - 2,
+              bounds.width + 4,
+              bounds.height + 4
+            );
+
+          if (isClick) {
+            chart.timeline.removeBpmChange(bpmChange);
+          }
         }
       }
     }
@@ -680,29 +804,9 @@ export default class Pixi extends InjectedComponent {
       }
     }
 
-    // ノート選択
-    if (
-      setting.editMode === EditMode.Select &&
-      setting.editObjectCategory === ObjectCategory.Note
-    ) {
-      for (const note of chart.timeline.notes) {
-        const bounds = NoteRendererResolver.resolve(note)!.getBounds(
-          note,
-          getLane(note),
-          getMeasure(note)
-        );
-
-        if (bounds.contains(mousePosition.x - graphics.x, mousePosition.y)) {
-          graphics
-            .lineStyle(0)
-            .beginFill(0x0099ff, 0.3)
-            .drawRect(bounds.x, bounds.y, bounds.width, bounds.height)
-            .endFill();
-          if (isClick) {
-            console.log(note);
-          }
-        }
-      }
+    // 接続中のノートが削除されたら後始末
+    if (!chart.timeline.notes.find(note => note === this.connectTargetNote)) {
+      this.connectTargetNote = null;
     }
 
     // ノート接続

@@ -44,11 +44,16 @@ export default class Timeline {
   horizontalLaneDivision: number = 16;
 
   @observable
-  bpmChanges: BPMChange[] = [];
+  bpmChanges: IObservableArray<BPMChange> = observable([]);
 
   @action
   addBPMChange(value: BPMChange) {
     this.bpmChanges.push(value);
+  }
+
+  @action
+  removeBpmChange(bpmChange: BPMChange) {
+    this.bpmChanges.remove(bpmChange);
   }
 
   @observable
@@ -57,15 +62,32 @@ export default class Timeline {
   lanePointMap = new Map<string, LanePoint>();
 
   @observable
-  notes: Note[] = [];
+  notes: IObservableArray<Note> = observable([]);
 
   noteMap = new Map<string, Note>();
 
   @observable
-  noteLines: NoteLine[] = [];
+  noteLines: IObservableArray<NoteLine> = observable([]);
 
   @action
   addNote = (note: Note) => this.notes.push(note);
+
+  @action
+  removeNote(note: Note) {
+    // ノートを参照しているノートラインを削除する
+    for (const noteLine of this.noteLines.filter(
+      noteLine => noteLine.head === note.guid || noteLine.tail === note.guid
+    )) {
+      this.removeNoteLine(noteLine);
+    }
+
+    this.notes.remove(note);
+  }
+
+  @action
+  removeNoteLine(noteLine: NoteLine) {
+    this.noteLines.remove(noteLine);
+  }
 
   @action
   addNotes = (notes: Note[]) => this.notes.push(...notes);
@@ -75,6 +97,14 @@ export default class Timeline {
 
   @action
   addLanePoint = (value: LanePoint) => this.lanePoints.push(value);
+
+  @observable
+  tempos: { laneIndex: number; tempo: number }[] = [];
+
+  @action
+  setTempos(tempos: { laneIndex: number; tempo: number }[]) {
+    this.tempos = tempos;
+  }
 
   /**
    * レーン

@@ -12,8 +12,8 @@ export default class BMSImporter {
   public static import() {
     dialog.showOpenDialog(
       {
-        properties: ["openFile", "multiSelections"],
-        filters: [{ name: "BMS 譜面データ", extensions: ["bms", "bme"] }]
+        properties: ["openFile", "multiSelections"]
+        // filters: [{ name: "BMS 譜面データ", extensions: ["bms", "bme"] }]
       },
       async (filenames: string[]) => {
         for (const filename of filenames) {
@@ -46,6 +46,8 @@ export default class BMSImporter {
     };
 
     const notes: any[] = [];
+
+    const tempos: any[] = [];
 
     const note = (index: number, id: number, values: string) => {
       const mc = values.match(/.{2}/g)!;
@@ -221,10 +223,12 @@ export default class BMSImporter {
         // values には 0.125 みたいな文字列が入っている
         const value = Number(values);
 
+        tempos.push({
+          tempo: value,
+          laneIndex
+        });
+
         // console.log("Tempo", value, laneIndex);
-
-        //    const tempo = new Tempo(laneIndex, value);
-
         return;
       }
 
@@ -449,6 +453,7 @@ export default class BMSImporter {
               ]
             }
           ],
+          tempos,
           lanePointMap: {},
           noteMap: {}
         },

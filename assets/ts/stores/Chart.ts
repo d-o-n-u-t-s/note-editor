@@ -60,6 +60,9 @@ export default class Chart implements IStore {
   load(json: string) {
     const chart = JSON.parse(json);
     console.log("譜面を読み込みます", chart);
+
+    this.setName(chart.name);
+    this.setStartTime(chart.startTime);
     transaction(() => {
       for (const lanePoint of chart.timeline.lanePoints) {
         lanePoint.measurePosition = new Fraction(
@@ -102,8 +105,14 @@ export default class Chart implements IStore {
       this.timeline.setLanes(chart.timeline.lanes);
 
       for (const bpmChange of chart.timeline.bpmChanges) {
+        bpmChange.measurePosition = new Fraction(
+          bpmChange.measurePosition.numerator,
+          bpmChange.measurePosition.denominator
+        );
         this.timeline.addBPMChange(bpmChange);
       }
+
+      this.timeline.setTempos(chart.timeline.tempos);
     });
   }
 
@@ -140,6 +149,14 @@ export default class Chart implements IStore {
 
   @observable
   volume: number = 1.0;
+
+  @observable
+  startTime: number = 0.0;
+
+  @action
+  setStartTime(startTime: number) {
+    this.startTime = startTime;
+  }
 
   @action
   setVolume(value: number) {
@@ -338,14 +355,18 @@ export default class Chart implements IStore {
 
     console.log(tl);
 
-    tl.bpmChanges = chart.timeline.bpmChanges.map(t => Object.assign({}, t));
+    tl.bpmChanges.replace(
+      chart.timeline.bpmChanges.map(t => Object.assign({}, t))
+    );
     tl.lanePoints = chart.timeline.lanePoints.map(t => Object.assign({}, t));
     (tl as any).lanes = chart.timeline.lanes.map(t => Object.assign({}, t));
-    tl.notes = chart.timeline.notes.map(t => {
-      const note = Object.assign({}, t);
-      delete note.color;
-      return note;
-    });
+    tl.notes.replace(
+      chart.timeline.notes.map(t => {
+        const note = Object.assign({}, t);
+        delete note.color;
+        return note;
+      })
+    );
 
     //  for (const e of tl.bpmChanges) delete e.renderer;
     // for (const e of tl.notes) delete e.renderer;

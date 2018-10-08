@@ -92,6 +92,17 @@ class ChartSetting extends React.Component<Props, {}> {
           onChange={this.handleAudioChange}
         />
 
+        <TextField
+          id="name"
+          label="開始時間"
+          value={editor.currentChart.startTime}
+          onChange={(e: any) =>
+            editor.currentChart!.setStartTime(parseFloat(e.target.value))
+          }
+          margin="normal"
+          type="number"
+        />
+
         <MusicGameSystemSelect
           value={editor.asset.musicGameSystems.findIndex(
             path => path === editor.currentChart!.musicGameSystem

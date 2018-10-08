@@ -120,11 +120,13 @@ export default class Editor implements IStore {
     ipcRenderer.on("importBMS", () => BMSImporter.import());
 
     // テスト処理
+    /*
     if (localStorage.getItem("_test_bms_chart")) {
       setTimeout(() => {
         BMSImporter.importImplement(localStorage.getItem("_test_bms_chart")!);
       }, 1000);
     }
+    */
 
     Editor.instance = this;
 
