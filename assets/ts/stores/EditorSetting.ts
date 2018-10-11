@@ -25,7 +25,7 @@ export enum ObjectCategory {
 export enum OtherObjectType {
   BPM = 1,
   Stop,
-  Speed,
+  Speed = 3,
   BarLine
 }
 

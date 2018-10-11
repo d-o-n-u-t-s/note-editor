@@ -1,6 +1,7 @@
 import Lane from "./Lane";
 import LanePoint from "./LanePoint";
 import BPMChange from "./BPMChange";
+import SpeedChange from "./SpeedChange";
 import Note from "./Note";
 import NoteLine from "./NoteLine";
 import { observable, observe, action, computed, IObservableArray } from "mobx";
@@ -54,6 +55,22 @@ export default class Timeline {
   @action
   removeBpmChange(bpmChange: BPMChange) {
     this.bpmChanges.remove(bpmChange);
+  }
+
+  /**
+   * 速度変更
+   */
+  @observable
+  speedChanges: IObservableArray<SpeedChange> = observable([]);
+
+  @action
+  addSpeedChange(speedChange: SpeedChange) {
+    this.speedChanges.push(speedChange);
+  }
+
+  @action
+  removeSpeedChange(speedChange: SpeedChange) {
+    this.speedChanges.remove(speedChange);
   }
 
   @observable

@@ -21,6 +21,20 @@ export default class Editor implements IStore {
   readonly debugMode: boolean = true;
 
   @observable
+  inspectorTarget: any = {
+    message: "Hello World２",
+    displayOutline: false,
+    maxSize: 6.0,
+    scale: 5,
+    aaa: "[1, 2, 3]"
+  };
+
+  @action
+  setInspectorTarget(target: any) {
+    this.inspectorTarget = target;
+  }
+
+  @observable
   currentChart?: Chart;
 
   @observable

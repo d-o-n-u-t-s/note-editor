@@ -112,6 +112,14 @@ export default class Chart implements IStore {
         this.timeline.addBPMChange(bpmChange);
       }
 
+      for (const speedChange of chart.timeline.speedChanges) {
+        speedChange.measurePosition = new Fraction(
+          speedChange.measurePosition.numerator,
+          speedChange.measurePosition.denominator
+        );
+        this.timeline.addSpeedChange(speedChange);
+      }
+
       this.timeline.setTempos(chart.timeline.tempos);
     });
   }
