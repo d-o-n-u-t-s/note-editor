@@ -3,17 +3,17 @@ import TimelineObject from "./TimelineObject";
 import { GUID, guid } from "../util";
 import { sortQuadPoint, sortQuadPointFromQuad } from "../utils/drawQuad";
 import Measure from "./Measure";
-import Note from "./Note";
+import INote from "./Note";
 import Pixi from "../Pixi";
 import Lane, { LinePointInfo, LineInfo } from "./Lane";
 
 import LaneRendererResolver from "./LaneRendererResolver";
 
 export interface INoteRenderer {
-  getBounds(note: Note, lane: Lane, measure: Measure): PIXI.Rectangle;
+  getBounds(note: INote, lane: Lane, measure: Measure): PIXI.Rectangle;
 
   render(
-    target: Note,
+    target: INote,
     graphics: PIXI.Graphics,
     lane: Lane,
     measure: Measure
@@ -21,7 +21,7 @@ export interface INoteRenderer {
 }
 
 class NoteRenderer implements INoteRenderer {
-  getBounds(note: Note, lane: Lane, measure: Measure): PIXI.Rectangle {
+  getBounds(note: INote, lane: Lane, measure: Measure): PIXI.Rectangle {
     const q = LaneRendererResolver.resolve(lane).getQuad(
       lane,
       measure,
@@ -37,7 +37,7 @@ class NoteRenderer implements INoteRenderer {
     );
   }
 
-  customRender(graphics: PIXI.Graphics, note: Note, area: LinePointInfo) {
+  customRender(graphics: PIXI.Graphics, note: INote, area: LinePointInfo) {
     const q = area;
 
     graphics
@@ -47,7 +47,7 @@ class NoteRenderer implements INoteRenderer {
       .lineTo(q.point.x + q.width / 2, q.point.y);
   }
 
-  render(note: Note, graphics: PIXI.Graphics, lane: Lane, measure: Measure) {
+  render(note: INote, graphics: PIXI.Graphics, lane: Lane, measure: Measure) {
     const renderArea = Pixi.instance!.getRenderArea();
     const measureBounds = measure.getBounds();
 

@@ -19,6 +19,7 @@ import Editor from "./EditorStore";
 import Lane from "../objects/Lane";
 import LanePoint from "../objects/LanePoint";
 import { guid } from "../util";
+import INote from "../objects/Note";
 
 export default class Chart implements IStore {
   @observable
@@ -79,11 +80,10 @@ export default class Chart implements IStore {
 
       const notes: any[] = [];
 
-      for (const note of chart.timeline.notes) {
-        note.color = this.musicGameSystem!.noteTypes.find(
+      for (const note of chart.timeline.notes as INote[]) {
+        (note as any).color = this.musicGameSystem!.noteTypes.find(
           nt => nt.name === note.type
         )!.color;
-
         note.measurePosition = new Fraction(
           note.measurePosition.numerator,
           note.measurePosition.denominator
@@ -92,6 +92,28 @@ export default class Chart implements IStore {
           note.horizontalPosition.numerator,
           note.horizontalPosition.denominator
         );
+
+        //  console.log(note);
+
+        //     note.customProperties = {};
+        /*
+        for (const i of note.customProperties) {
+          //    if (!i) continue;
+          console.log(i);
+          // note.customProperties[i.key] = 0;
+          /*
+          "customProperties": [{
+            "key": "prop1",
+            "type": "number"
+        }, {
+            "key": "prop2",
+            "type": "boolean"
+        }, {
+            "key": "prop3",
+            "type": "color"
+        }]
+        }
+        */
 
         //  note.renderer = new NoteRenderer(note);
         notes.push(note);

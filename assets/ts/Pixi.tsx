@@ -7,7 +7,7 @@ import LanePoint from "./objects/LanePoint";
 import LanePointRenderer from "./objects/LanePointRenderer";
 import { observer } from "mobx-react";
 import Lane from "./objects/Lane";
-import Note from "./objects/Note";
+import INote from "./objects/Note";
 import { NoteType } from "./stores/MusicGameSystem";
 import Measure from "./objects/Measure";
 import { guid } from "./util";
@@ -160,7 +160,7 @@ export default class Pixi extends InjectedComponent {
 
   prev: number = 0;
 
-  connectTargetNote: Note | null = null;
+  connectTargetNote: INote | null = null;
   connectTargetLanePoint: LanePoint | null = null;
 
   /**
@@ -463,10 +463,10 @@ export default class Pixi extends InjectedComponent {
       measure.containsPoint(mousePosition)
     );
 
-    const getLane = (note: Note) => {
+    const getLane = (note: INote) => {
       return chart.timeline.lanes.find(lane => lane.guid === note.lane)!;
     };
-    const getMeasure = (note: Note) => this.measures[note.measureIndex];
+    const getMeasure = (note: INote) => this.measures[note.measureIndex];
 
     const getLanePointRenderer = (lanePoint: LanePoint) => LanePointRenderer;
 
@@ -736,7 +736,7 @@ export default class Pixi extends InjectedComponent {
         setting.editNoteTypeIndex
       ];
 
-      const newNote = {
+      const newNote: INote = {
         guid: guid(),
         horizontalSize: editor.setting!.objectSize,
         horizontalPosition: new Fraction(
@@ -750,9 +750,9 @@ export default class Pixi extends InjectedComponent {
         ),
         color: getNoteColor(newNoteType),
         type: newNoteType.name,
-        lane: targetLane.guid,
-        connectable: true
-      } as Note;
+        lane: targetLane.guid
+        //connectable: true
+      } as INote;
       // note.renderer = new NoteRenderer(note);
 
       if (isClick) {

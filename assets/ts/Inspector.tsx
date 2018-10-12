@@ -7,6 +7,25 @@ interface IMainState {}
 
 import { GUI, GUIController } from "dat-gui";
 
+Object.defineProperty(GUI.prototype, "removeFolder", {
+  value(_folder: GUI) {
+    const name = _folder.name;
+    var folder = this.__folders[name];
+    console.warn(folder);
+    if (!folder) {
+      return;
+    }
+    folder.close();
+    this.__ul.removeChild(folder.domElement.parentNode);
+    delete this.__folders[name];
+
+    // this.__folders = [];
+
+    console.warn("削除しました", name, this, this.__folders);
+    this.onResize();
+  }
+});
+
 import config from "./config";
 import { observable } from "mobx";
 import { inject, InjectedComponent } from "./stores/inject";
@@ -43,38 +62,75 @@ export default class Inspector extends InjectedComponent<IMainProps> {
 
   controllers: GUIController[] = [];
 
+  removeGuis: GUI[] = [];
+
   bind = (target: any) => {
-    let obj = target;
+    console.log("いんすぺくた更新");
+    let obj = JSON.parse(JSON.stringify(target));
 
     //    this.gui.
 
     for (const a of this.controllers) {
       this.gui.remove(a);
     }
+
+    for (const a of this.removeGuis) (this.gui as any).removeFolder(a);
     this.controllers = [];
+    this.removeGuis = [];
 
-    for (const key of Object.keys(obj)) {
-      console.log(key, obj[key]);
+    var add = (gui: GUI, obj: any) => {
+      for (const key of Object.keys(obj)) {
+        console.log(key, obj[key]);
 
-      if (obj[key] instanceof Fraction) {
-        continue;
-      }
+        if (obj[key] instanceof Object) {
+          var f2 = gui.addFolder(key);
 
-      var n: any = null;
+          this.removeGuis.push(f2);
 
-      // if (key === "color") {
-      //n = this.gui.addColor(obj, "color");
-      //} else
-      n = this.gui.add(obj, key);
+          add(f2, obj[key]);
 
-      n.onChange((a: any) => {
-        if (key === "scale") {
-          //  scale = a;
+          //var n2 = f2.add({ a: 1 }, "a");
+          // this.controllers.push(n2);
+          /*
+  f2.add(obj[key], 'growthSpeed');
+  f2.add(text, 'maxSize');
+  f2.add(obj[key], 'message');
+  
+  */
+
+          continue;
         }
-        //  console.log(key, a);
-      });
-      this.controllers.push(n);
-    }
+
+        var n: any = null;
+
+        if (key.toLowerCase().includes("color")) {
+          obj[key] = obj[key].replace("0x", "#");
+
+          n = gui.addColor(obj, key);
+          //       continue;
+        } else {
+          // if (key === "color") {
+          //n = this.gui.addColor(obj, "color");
+          //} else
+          n = gui.add(obj, key);
+        }
+
+        n.onChange((a: any) => {
+          if (key === "scale") {
+            //  scale = a;
+          }
+          //  console.log(key, a);
+        });
+
+        if (gui === this.gui) {
+          this.controllers.push(n);
+        }
+      }
+    };
+
+    add(this.gui, obj);
+
+    //  this.gui.add
 
     //  this.componentDidMount();
   };

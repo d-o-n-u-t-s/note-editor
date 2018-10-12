@@ -5,7 +5,9 @@ import Lane from "./Lane";
 import { sortQuadPoint, sortQuadPointFromQuad } from "../utils/drawQuad";
 import Measure from "./Measure";
 
-export default interface Note extends TimelineObject {
+class Note {}
+
+export default interface INote extends TimelineObject {
   horizontalSize: number;
   horizontalPosition: Fraction;
 
@@ -22,4 +24,6 @@ export default interface Note extends TimelineObject {
    * 接続可能ノートか
    */
   connectable: boolean;
+
+  customProperties: any;
 }

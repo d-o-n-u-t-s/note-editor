@@ -2,7 +2,7 @@ import Lane from "./Lane";
 import LanePoint from "./LanePoint";
 import BPMChange from "./BPMChange";
 import SpeedChange from "./SpeedChange";
-import Note from "./Note";
+import INote from "./Note";
 import NoteLine from "./NoteLine";
 import { observable, observe, action, computed, IObservableArray } from "mobx";
 import { sortMeasure } from "./Measure";
@@ -79,18 +79,18 @@ export default class Timeline {
   lanePointMap = new Map<string, LanePoint>();
 
   @observable
-  notes: IObservableArray<Note> = observable([]);
+  notes: IObservableArray<INote> = observable([]);
 
-  noteMap = new Map<string, Note>();
+  noteMap = new Map<string, INote>();
 
   @observable
   noteLines: IObservableArray<NoteLine> = observable([]);
 
   @action
-  addNote = (note: Note) => this.notes.push(note);
+  addNote = (note: INote) => this.notes.push(note);
 
   @action
-  removeNote(note: Note) {
+  removeNote(note: INote) {
     // ノートを参照しているノートラインを削除する
     for (const noteLine of this.noteLines.filter(
       noteLine => noteLine.head === note.guid || noteLine.tail === note.guid
@@ -107,7 +107,7 @@ export default class Timeline {
   }
 
   @action
-  addNotes = (notes: Note[]) => this.notes.push(...notes);
+  addNotes = (notes: INote[]) => this.notes.push(...notes);
 
   @action
   addNoteLine = (noteLine: NoteLine) => this.noteLines.push(noteLine);

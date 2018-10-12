@@ -8,7 +8,7 @@ import {
   drawQuad
 } from "../utils/drawQuad";
 import Measure, { sortMeasure } from "./Measure";
-import Note from "./Note";
+import INote from "./Note";
 import NoteRenderer from "./NoteRenderer";
 import NoteLine from "./NoteLine";
 import Pixi from "../Pixi";
@@ -17,11 +17,11 @@ export interface INoteLineRenderer {
   customRender(
     graphics: PIXI.Graphics,
     lines: LineInfo[],
-    head: Note,
-    tail: Note
+    head: INote,
+    tail: INote
   ): void;
 
-  render(noteLine: NoteLine, graphics: PIXI.Graphics, notes: Note[]): void;
+  render(noteLine: NoteLine, graphics: PIXI.Graphics, notes: INote[]): void;
 }
 
 import { getLines } from "./LaneRenderer";
@@ -32,8 +32,8 @@ class NoteLineRenderer implements INoteLineRenderer {
   customRender(
     graphics: PIXI.Graphics,
     lines: LineInfo[],
-    head: Note,
-    tail: Note
+    head: INote,
+    tail: INote
   ) {
     for (const line of lines) {
       drawQuad(
@@ -58,7 +58,7 @@ class NoteLineRenderer implements INoteLineRenderer {
     }
   }
 
-  render(noteLine: NoteLine, graphics: PIXI.Graphics, notes: Note[]) {
+  render(noteLine: NoteLine, graphics: PIXI.Graphics, notes: INote[]) {
     const measures = Pixi.instance!.measures;
     const {
       lanes,
@@ -200,7 +200,7 @@ class NoteLineRenderer implements INoteLineRenderer {
       });
     // console.log(head, tail);
 
-    const noteToLanePoint = (note: Note, noteBounds: PIXI.Rectangle) => {
+    const noteToLanePoint = (note: INote, noteBounds: PIXI.Rectangle) => {
       return {
         horizontalSize: noteBounds.width,
         horizontalPosition: new Fraction(
