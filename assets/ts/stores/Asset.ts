@@ -78,11 +78,10 @@ export default class Asset implements IStore {
       );
 
       for (const directory of directories) {
-        // console.log(directory);
+        const dirPath = path.join(urlParams.mgsp, directory);
+        if (!fs.statSync(dirPath).isDirectory()) continue;
 
-        const files = (await util.promisify(fs.readdir)(
-          path.join(urlParams.mgsp, directory)
-        )) as any[];
+        const files = (await util.promisify(fs.readdir)(dirPath)) as any[];
 
         var fileList = files.filter(file => file.endsWith(".json"));
         console.log("MusicGameSystem を読み込みます", fileList);
