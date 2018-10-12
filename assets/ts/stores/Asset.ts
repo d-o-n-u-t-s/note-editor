@@ -116,7 +116,7 @@ export default class Asset implements IStore {
             const renderers = [
               ...new Set(
                 musicGameSystems.laneTemplates
-                  .map(lt => ({ renderer: lt.renderer, lanteTemplate: lt }))
+                  .map(lt => ({ renderer: lt.renderer, laneTemplate: lt }))
                   .filter(r => r.renderer !== "default")
               )
             ];
@@ -138,7 +138,7 @@ export default class Asset implements IStore {
 
               eval(source);
 
-              renderer.lanteTemplate.rendererReference = (window as any)[key];
+              renderer.laneTemplate.rendererReference = (window as any)[key];
             }
           }
 
