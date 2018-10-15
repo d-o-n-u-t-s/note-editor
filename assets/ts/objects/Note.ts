@@ -13,8 +13,6 @@ export default interface INote extends TimelineObject {
 
   type: string;
 
-  color: number; // = 0xffffff;
-
   /**
    * 所属レーンの GUID
    */
@@ -25,5 +23,9 @@ export default interface INote extends TimelineObject {
    */
   connectable: boolean;
 
-  customProperties: any;
+  editorProps: {
+    color: number;
+  };
+
+  customProps: any;
 }

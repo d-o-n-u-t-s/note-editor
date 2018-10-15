@@ -93,29 +93,9 @@ export default class Chart implements IStore {
           note.horizontalPosition.denominator
         );
 
-        //  console.log(note);
+        // HACK: 一時的な対処
+        if (!note.editorProps) note.editorProps = { color: 0xffffff };
 
-        //     note.customProperties = {};
-        /*
-        for (const i of note.customProperties) {
-          //    if (!i) continue;
-          console.log(i);
-          // note.customProperties[i.key] = 0;
-          /*
-          "customProperties": [{
-            "key": "prop1",
-            "type": "number"
-        }, {
-            "key": "prop2",
-            "type": "boolean"
-        }, {
-            "key": "prop3",
-            "type": "color"
-        }]
-        }
-        */
-
-        //  note.renderer = new NoteRenderer(note);
         notes.push(note);
       }
       this.timeline.addNotes(notes);
@@ -393,7 +373,7 @@ export default class Chart implements IStore {
     tl.notes.replace(
       chart.timeline.notes.map(t => {
         const note = Object.assign({}, t);
-        delete note.color;
+        delete note.editorProps;
         return note;
       })
     );

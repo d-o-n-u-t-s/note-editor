@@ -44,15 +44,15 @@ class NoteLineRenderer implements INoteLineRenderer {
         Vector2.sub(line.end.point, new Vector2(line.end.width / 2, 0)),
         Vector2.sub(line.end.point, new Vector2(-line.end.width / 2, 0)),
 
-        head.color
+        head.editorProps.color
       );
 
       graphics
-        .lineStyle(1, head.color, 1)
+        .lineStyle(1, head.editorProps.color, 1)
         .moveTo(line.start.point.x - line.start.width / 2, line.start.point.y)
         .lineTo(line.end.point.x - line.start.width / 2, line.end.point.y);
       graphics
-        .lineStyle(1, head.color, 1)
+        .lineStyle(1, head.editorProps.color, 1)
         .moveTo(line.start.point.x + line.start.width / 2, line.start.point.y)
         .lineTo(line.end.point.x + line.start.width / 2, line.end.point.y);
     }

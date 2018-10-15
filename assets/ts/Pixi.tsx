@@ -786,25 +786,29 @@ export default class Pixi extends InjectedComponent {
           setting.measureDivision - 1 - targetLaneVerticalIndex!,
           setting.measureDivision
         ),
-        color: getNoteColor(newNoteType),
         type: newNoteType.name,
-        lane: targetLane.guid
-        //connectable: true
+        lane: targetLane.guid,
+        editorProps: {
+          color: getNoteColor(newNoteType)
+        },
+        customProps: newNoteType.customProps.reduce(
+          (object: any, b: { key: string; defaultValue: any }) => {
+            object[b.key] = b.defaultValue;
+            return object;
+          },
+          {}
+        )
       } as INote;
-      // note.renderer = new NoteRenderer(note);
 
       if (isClick) {
         chart.timeline.addNote(newNote);
       } else {
-        // graphics.addChild(note.renderer);
-
         NoteRendererResolver.resolve(newNote).render(
           newNote,
           graphics,
           targetLane,
           this.measures[newNote.measureIndex]
         );
-        //graphics.removeChild(note.renderer);
       }
     }
 

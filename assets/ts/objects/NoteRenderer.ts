@@ -42,7 +42,7 @@ class NoteRenderer implements INoteRenderer {
 
     graphics
       // .lineStyle(4, note.color)
-      .lineStyle(6, note.color)
+      .lineStyle(6, note.editorProps.color)
       .moveTo(q.point.x - q.width / 2, q.point.y)
       .lineTo(q.point.x + q.width / 2, q.point.y);
   }
