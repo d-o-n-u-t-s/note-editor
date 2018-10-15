@@ -78,11 +78,10 @@ export default class Asset implements IStore {
       );
 
       for (const directory of directories) {
-        // console.log(directory);
+        const dirPath = path.join(urlParams.mgsp, directory);
+        if (!fs.statSync(dirPath).isDirectory()) continue;
 
-        const files = (await util.promisify(fs.readdir)(
-          path.join(urlParams.mgsp, directory)
-        )) as any[];
+        const files = (await util.promisify(fs.readdir)(dirPath)) as any[];
 
         var fileList = files.filter(file => file.endsWith(".json"));
         console.log("MusicGameSystem を読み込みます", fileList);
@@ -117,7 +116,7 @@ export default class Asset implements IStore {
             const renderers = [
               ...new Set(
                 musicGameSystems.laneTemplates
-                  .map(lt => ({ renderer: lt.renderer, lanteTemplate: lt }))
+                  .map(lt => ({ renderer: lt.renderer, laneTemplate: lt }))
                   .filter(r => r.renderer !== "default")
               )
             ];
@@ -139,7 +138,7 @@ export default class Asset implements IStore {
 
               eval(source);
 
-              renderer.lanteTemplate.rendererReference = (window as any)[key];
+              renderer.laneTemplate.rendererReference = (window as any)[key];
             }
           }
 
