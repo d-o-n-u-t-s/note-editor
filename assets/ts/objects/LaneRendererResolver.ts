@@ -15,7 +15,7 @@ export default class LaneRendererResolver {
       //  console.log(laneTemplate.rendererReference);
 
       return {
-        getQuad: LaneRenderer.getQuad,
+        getNotePointInfo: LaneRenderer.getNotePointInfo,
         defaultRender: laneTemplate.rendererReference as any,
         render: LaneRenderer.render
       };
