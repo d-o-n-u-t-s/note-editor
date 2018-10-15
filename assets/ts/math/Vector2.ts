@@ -1,3 +1,5 @@
+import { lerp } from "../math";
+
 class Vector2 {
   constructor(public x: number, public y: number) {}
 
@@ -20,12 +22,26 @@ class Vector2 {
     return this.multiplyScalar(1 / scalar);
   }
 
+  distanceTo(v: Vector2) {
+    return Math.sqrt(this.distanceToSquared(v));
+  }
+
+  distanceToSquared(v: Vector2) {
+    const dx = this.x - v.x,
+      dy = this.y - v.y;
+    return dx * dx + dy * dy;
+  }
+
   static add(a: Vector2, b: Vector2) {
     return new Vector2(a.x + b.x, a.y + b.y);
   }
 
-  public static sub(a: Vector2, b: Vector2) {
+  static sub(a: Vector2, b: Vector2) {
     return new Vector2(a.x - b.x, a.y - b.y);
+  }
+
+  static lerp(a: Vector2, b: Vector2, t: number) {
+    return new Vector2(lerp(a.x, b.x, t), lerp(a.y, b.y, t));
   }
 }
 

@@ -1,3 +1,5 @@
+import { drawQuad } from "./drawQuad";
+
 const __require = (window as any).require;
 
 const fs = __require("fs");
@@ -7,6 +9,7 @@ import * as PIXI from "pixi.js";
 import Pixi from "../Pixi";
 
 import { getUrlParams } from "./url";
+import { Vector2, lerp } from "../math";
 
 const textures = new Map<string, PIXI.Texture>();
 
@@ -41,6 +44,10 @@ class CustomRendererUtility {
   update() {
     for (const sprite of sprites) sprite.visible = false;
   }
+
+  drawQuad = drawQuad;
+  Vector2 = Vector2;
+  lerp = lerp;
 
   getSprite(target: any, imagePath: string): PIXI.Sprite | null {
     getImage(imagePath);

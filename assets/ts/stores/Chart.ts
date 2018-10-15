@@ -81,9 +81,6 @@ export default class Chart implements IStore {
       const notes: any[] = [];
 
       for (const note of chart.timeline.notes as INote[]) {
-        (note as any).color = this.musicGameSystem!.noteTypes.find(
-          nt => nt.name === note.type
-        )!.color;
         note.measurePosition = new Fraction(
           note.measurePosition.numerator,
           note.measurePosition.denominator
@@ -344,6 +341,7 @@ export default class Chart implements IStore {
     }
   }
 
+  @action
   toJSON(): string {
     if (!this.musicGameSystem) return "{}";
 
