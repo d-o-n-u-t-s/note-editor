@@ -1,7 +1,7 @@
 import TimelineObject from "./TimelineObject";
 import LanePoint from "./LanePoint";
 import Measure from "./Measure";
-import { Fraction, Vector2 } from "../math";
+import { Fraction, Vector2, lerp, inverseLerp } from "../math";
 import { GUID } from "../util";
 import Lane, { LinePointInfo, LineInfo } from "./Lane";
 import { Line, lineIntersect } from "../shapes/Line";
@@ -205,7 +205,7 @@ export function getLines(points: LinePoint[], measures: Measure[]): LineInfo[] {
 const linesCache = new WeakMap<Lane, LineInfo[]>();
 
 export interface ILaneRenderer {
-  getQuad(
+  getNotePointInfo(
     lane: Lane,
     measure: Measure,
     horizontal: Fraction,
@@ -276,134 +276,45 @@ class LaneRenderer implements ILaneRenderer {
   }
 
   /**
-   * 小節番号からレーンの矩形を取得する
+   * 小節番号からノーツの位置とサイズを取得する
    * @param lane
    * @param measure
    * @param horizontal
    * @param vertical
    */
-  getQuad(
+  getNotePointInfo(
     lane: Lane,
     measure: Measure,
     horizontal: Fraction,
     vertical: Fraction
   ): LinePointInfo | null {
-    // 選択中の小節に乗っているレーン
-    const targetMeasureLines = (linesCache.get(lane) || []).filter(
-      ({ measure: _measure }) => _measure === measure
+    // y座標
+    const y = measure.y + measure.height * (1 - vertical.to01Number());
+
+    // y座標が含まれるライン
+    const targetLine = (linesCache.get(lane) || []).find(
+      line =>
+        line.measure === measure &&
+        line.start.point.y >= y &&
+        line.end.point.y <= y
     );
 
-    // y 軸のライン
-    // const yLines: Line[] = [];
-    // x 軸のライン
-    const xLines: Line[][] = [];
+    // ライン上でのy座標の位置
+    const start = targetLine!.start;
+    const end = targetLine!.end;
+    const rate = inverseLerp(end.point.y, start.point.y, y);
 
-    // console.log(targetMeasureLines);
-    // 縦
-    // {
-    //for (var i = 0; i < 1; ++i) {
-    const y =
-      measure.y +
-      measure.height -
-      (measure.height / vertical.denominator) * vertical.numerator;
+    // x座標を補完で求める
+    const getX = (info: LinePointInfo, i: number) =>
+      info.point.x +
+      info.width * (horizontal.to01Number() - 0.5 + i / horizontal.denominator);
+    const left = lerp(getX(end, 0), getX(start, 0), rate);
+    const right = lerp(getX(end, 1), getX(start, 1), rate);
 
-    const measureLine: Line = {
-      start: new Vector2(measure!.x, y),
-      end: new Vector2(measure!.x + measure!.width, y)
+    return {
+      point: new Vector2((left + right) / 2, y),
+      width: right - left
     };
-
-    // 横
-    for (var i = 0; i < 2; ++i) {
-      xLines[i] = [];
-
-      for (const line of targetMeasureLines) {
-        const linee: Line = {
-          start: new Vector2(
-            line.start.point.x -
-              line.start.width / 2 +
-              (line.start.width / horizontal.denominator) *
-                (horizontal.numerator + i),
-            line.start.point.y
-          ),
-          end: new Vector2(
-            line.end.point.x -
-              line.end.width / 2 +
-              (line.end.width / horizontal.denominator) *
-                (horizontal.numerator + i),
-            line.end.point.y
-          )
-        };
-        /*
-          Pixi.debugGraphics!.lineStyle(4, 0xff00ff)
-            .moveTo(linee.start.x, linee.start.y)
-            .lineTo(linee.end.x, linee.end.y);
-  */
-        xLines[i].push(linee);
-      }
-    }
-
-    //  return null;
-
-    // 横
-    for (let j = 0; j < xLines[0].length; ++j) {
-      const xLine1 = xLines[0][j];
-      const xLine2 = xLines[1][j];
-
-      const xll1 = xLine1;
-      const xll2 = xLine2;
-
-      var ret1 = lineIntersect(xll1, measureLine);
-      var ret2 = lineIntersect(xll2, measureLine);
-
-      /*
-        Pixi.debugGraphics!.lineStyle(8, 0xff00ff, 0.2)
-          .moveTo(measureLine.start.x, measureLine.start.y)
-          .lineTo(measureLine.end.x, measureLine.end.y);
-        /*
-  
-        Pixi.debugGraphics!.lineStyle(8, 0xffffff, 0.2)
-          .moveTo(yLines[1].start.x, yLines[1].start.y)
-          .lineTo(yLines[1].end.x, yLines[1].end.y);
-          */
-      /*
-        Pixi.debugGraphics!.lineStyle(4, 0xff00ff)
-          .moveTo(xll1.start.x, xll1.start.y)
-          .lineTo(xll1.end.x, xll1.end.y);
-  
-        Pixi.debugGraphics!.lineStyle(4, 0xff00ff)
-          .moveTo(xll2.start.x, xll2.start.y)
-          .lineTo(xll2.end.x, xll2.end.y);
-  
-        /*
-  
-        if (ret1) Pixi.instance!.drawTempText("1", ret1.x, ret1.y);
-        if (ret2) Pixi.instance!.drawTempText("2", ret2.x, ret2.y);
-        if (ret3) Pixi.instance!.drawTempText("3", ret3.x, ret3.y);
-        if (ret4) Pixi.instance!.drawTempText("4", ret4.x, ret4.y);
-        */
-      // console.log(ret1, ret2);
-      if (ret1 && ret2) {
-        return {
-          point: Vector2.add(ret1, ret2).multiplyScalar(0.5),
-          width: ret2.x - ret1.x
-        };
-      } else {
-        console.error(
-          "レーンの領域を計算できませんでした",
-          measure.index,
-          lane,
-          ret1,
-          ret2
-        );
-
-        return {
-          point: new Vector2(-100, -100),
-          width: 1
-        };
-      }
-    }
-
-    return null;
   }
 
   // private linesCache: LineInfo[] = [];

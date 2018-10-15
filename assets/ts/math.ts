@@ -19,3 +19,9 @@ export class Fraction {
 }
 
 export { default as Vector2 } from "./math/Vector2";
+
+export const lerp = (from: number, to: number, t: number) =>
+  from + (to - from) * t;
+
+export const inverseLerp = (from: number, to: number, value: number) =>
+  (value - from) / (to - from);

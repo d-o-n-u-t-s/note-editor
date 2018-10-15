@@ -22,7 +22,7 @@ export interface INoteRenderer {
 
 class NoteRenderer implements INoteRenderer {
   getBounds(note: INote, lane: Lane, measure: Measure): PIXI.Rectangle {
-    const q = LaneRendererResolver.resolve(lane).getQuad(
+    const q = LaneRendererResolver.resolve(lane).getNotePointInfo(
       lane,
       measure,
       note.horizontalPosition,
@@ -72,7 +72,7 @@ class NoteRenderer implements INoteRenderer {
     if (measureBounds.x + measureBounds.width < 0) return;
     if (measureBounds.x > Pixi.instance!.getRenderAreaSize().x) return;
 
-    const q = LaneRendererResolver.resolve(lane).getQuad(
+    const q = LaneRendererResolver.resolve(lane).getNotePointInfo(
       lane,
       measure,
       note.horizontalPosition,
