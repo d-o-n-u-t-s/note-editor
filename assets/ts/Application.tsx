@@ -169,7 +169,7 @@ class Application extends React.Component<Props, {}> {
             >
               <Settings />
               <Sidebar />
-              <Inspector target={{ a: 0, b: "b" }} />
+              <Inspector />
 
               <Button
                 color="primary"

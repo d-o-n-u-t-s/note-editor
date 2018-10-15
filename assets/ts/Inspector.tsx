@@ -1,149 +1,118 @@
 import * as React from "react";
-
-interface IMainProps {
-  target: any;
-}
-interface IMainState {}
-
 import { GUI, GUIController } from "dat-gui";
 
+/**
+ * フォルダを削除する GUI#removeFolder を定義
+ */
 Object.defineProperty(GUI.prototype, "removeFolder", {
-  value(_folder: GUI) {
-    const name = _folder.name;
-    var folder = this.__folders[name];
-    console.warn(folder);
-    if (!folder) {
-      return;
-    }
+  value(targetFolder: GUI) {
+    const { name } = targetFolder;
+    const folder = this.__folders[name];
+    if (!folder) return;
     folder.close();
     this.__ul.removeChild(folder.domElement.parentNode);
     delete this.__folders[name];
-
-    // this.__folders = [];
-
-    console.warn("削除しました", name, this, this.__folders);
     this.onResize();
   }
 });
 
 import config from "./config";
-import { observable } from "mobx";
+import { runInAction } from "mobx";
 import { inject, InjectedComponent } from "./stores/inject";
 import { observer } from "mobx-react";
-import { Fraction } from "./math";
-
-class Timeline {
-  render() {}
-}
 
 /**
- * HotReload に対応した setInterval
- * @param symbol
- * @param callback
- * @param ms
+ * インスペクタコンポーネント
  */
-function setInterval2(
-  symbol: string,
-  callback: (...args: any[]) => void,
-  ms: number
-) {
-  if ((window as any)[symbol]) {
-    clearInterval((window as any)[symbol]);
-  }
-  (window as any)[symbol] = setInterval(callback, ms);
-}
-
 @inject
 @observer
-export default class Inspector extends InjectedComponent<IMainProps> {
+export default class Inspector extends InjectedComponent {
   gameCanvas?: HTMLDivElement;
 
   gui = new GUI({ autoPlace: false });
-
+  folders: GUI[] = [];
   controllers: GUIController[] = [];
 
-  removeGuis: GUI[] = [];
+  /**
+   * 前回の対象オブジェクト
+   */
+  previousTarget: any | null | null;
 
+  /**
+   * オブジェクトをインスペクタにバインドする
+   */
   bind = (target: any) => {
-    console.log("いんすぺくた更新");
-    let obj = JSON.parse(JSON.stringify(target));
+    if (this.previousTarget === target) return;
+    this.previousTarget = target;
 
-    //    this.gui.
+    console.log("update inspector");
 
-    for (const a of this.controllers) {
-      this.gui.remove(a);
+    const obj = JSON.parse(JSON.stringify(target));
+
+    // 既存のコントローラーを削除する
+    for (const controller of this.controllers) {
+      this.gui.remove(controller);
     }
 
-    for (const a of this.removeGuis) (this.gui as any).removeFolder(a);
+    // 既存のフォルダを削除する
+    for (const folder of this.folders) (this.gui as any).removeFolder(folder);
+
     this.controllers = [];
-    this.removeGuis = [];
+    this.folders = [];
 
-    var add = (gui: GUI, obj: any) => {
+    // プロパティを追加する
+    const add = (gui: GUI, obj: any, parent: any) => {
       for (const key of Object.keys(obj)) {
-        console.log(key, obj[key]);
-
+        // オブジェクトなら再帰
         if (obj[key] instanceof Object) {
-          var f2 = gui.addFolder(key);
-
-          this.removeGuis.push(f2);
-
-          add(f2, obj[key]);
-
-          //var n2 = f2.add({ a: 1 }, "a");
-          // this.controllers.push(n2);
-          /*
-  f2.add(obj[key], 'growthSpeed');
-  f2.add(text, 'maxSize');
-  f2.add(obj[key], 'message');
-  
-  */
-
+          const folder = gui.addFolder(key);
+          this.folders.push(folder);
+          add(folder, obj[key], parent[key]);
           continue;
         }
 
-        var n: any = null;
+        let newController: GUIController | null = null;
 
-        if (key.toLowerCase().includes("color")) {
-          obj[key] = obj[key].replace("0x", "#");
+        const isColor = key.toLowerCase().includes("color");
 
-          n = gui.addColor(obj, key);
-          //       continue;
+        if (isColor) {
+          // 数値形式なら #nnnnnn 形式の文字列にする
+          if (typeof obj[key] === "number") {
+            obj[key] = "#" + obj[key].toString(16).padStart(6, "0");
+          } else {
+            obj[key] = obj[key].replace("0x", "#");
+          }
+
+          newController = gui.addColor(obj, key);
         } else {
-          // if (key === "color") {
-          //n = this.gui.addColor(obj, "color");
-          //} else
-          n = gui.add(obj, key);
+          newController = gui.add(obj, key);
         }
 
-        n.onChange((a: any) => {
-          if (key === "scale") {
-            //  scale = a;
+        newController.onChange((value: any) => {
+          // 色なら文字列から数値に変換する
+          if (isColor) {
+            value = parseInt(value.substr(1), 16);
           }
-          //  console.log(key, a);
+          runInAction("inspectorUpdateValue", () => {
+            parent[key] = value;
+          });
         });
 
         if (gui === this.gui) {
-          this.controllers.push(n);
+          this.controllers.push(newController);
         }
       }
     };
 
-    add(this.gui, obj);
-
-    //  this.gui.add
-
-    //  this.componentDidMount();
+    add(this.gui, obj, target);
   };
+
+  guiScale = 1.2;
 
   componentDidMount() {
     const gui = this.gui;
-    var size = config.sidebarWidth;
-
-    var scale = 1.2;
-
-    console.log(this.props.target);
-
-    //gui.updateDisplay();
+    const size = config.sidebarWidth;
+    const scale = this.guiScale;
 
     gui.domElement.querySelector(".close-button")!.remove();
 
@@ -164,10 +133,7 @@ export default class Inspector extends InjectedComponent<IMainProps> {
     this.gameCanvas!.appendChild(gui.domElement);
   }
 
-  componentWillUnmount() {}
-
   render() {
-    console.log("INspector 再描画");
     this.bind(this.injected.editor.inspectorTarget);
 
     let component = this;
