@@ -185,6 +185,7 @@ export default class Pixi extends InjectedComponent {
 
     const { editor } = this.injected;
     const { setting } = editor;
+    const { theme } = setting;
 
     const chart = editor.currentChart!;
 
@@ -496,21 +497,32 @@ export default class Pixi extends InjectedComponent {
 
     const getLanePointRenderer = (lanePoint: LanePoint) => LanePointRenderer;
 
-    // 小節の分割線を描画
     if (targetMeasure) {
+      // ターゲット小節の枠を描画
+      graphics
+        .lineStyle(
+          theme.targetMeasureBorderWidth,
+          theme.targetMeasureBorderColor,
+          theme.targetMeasureBorderAlpha
+        )
+        .drawRect(
+          targetMeasure.x,
+          targetMeasure.y,
+          targetMeasure.width,
+          targetMeasure.height
+        );
+
       const s = targetMeasure;
 
+      // ターゲット小節の分割線を描画
       for (var i = 1; i < this.injected.editor.setting!.measureDivision; ++i) {
         const y =
           s.y + (s.height / this.injected.editor.setting!.measureDivision) * i;
-
         graphics
           .lineStyle(2, 0xffffff, 0.8)
           .moveTo(s.x, y)
           .lineTo(s.x + laneWidth, y);
       }
-
-      // if (this.injected.editor.setting!.editMode === EditMode )
 
       // レーン追加モードなら小節の横分割線を描画
       if (

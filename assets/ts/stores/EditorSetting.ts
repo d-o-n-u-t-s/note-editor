@@ -34,6 +34,20 @@ export interface ObjectVisibility {
 }
 
 export default class EditorSetting {
+  /**
+   * テーマ（仮）
+   * TODO: 専用クラスを作る
+   */
+  theme: {
+    targetMeasureBorderWidth: number;
+    targetMeasureBorderColor: number;
+    targetMeasureBorderAlpha: number;
+  } = {
+    targetMeasureBorderWidth: 4,
+    targetMeasureBorderColor: 0x00ff00,
+    targetMeasureBorderAlpha: 0.5
+  };
+
   @observable
   editMode = EditMode.Select;
   @action
