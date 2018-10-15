@@ -21,6 +21,18 @@ export interface NoteType {
   renderer: string;
   rendererReference: any;
   excludeLanes: string[];
+
+  /**
+   * カスタムプロパティ
+   */
+  customProps: { key: string; defaultValue: any }[];
+
+  /**
+   * エディタプロパティ
+   */
+  editorProps: {
+    color: string;
+  };
 }
 
 export interface CustomNoteLineRenderer {
@@ -46,18 +58,35 @@ interface MusicGameSystem {
 
   customNoteLineRendererMap: Map<string, CustomNoteLineRenderer>;
 }
-
+/**
+ * 音ゲーシステムを正規化して不正な値を修正する
+ * @param musicGameSystem システム
+ */
 export function normalizeMusicGameSystem(
   musicGameSystem: any
 ): MusicGameSystem {
-  return Object.assign(
+  const system: MusicGameSystem = Object.assign(
     {
       initialLanes: [],
       laneTemplates: [],
-      customNoteLineRenderers: []
+      customNoteLineRenderers: [],
+      customProps: [],
+      editorProps: [],
+      noteTypes: []
     },
     musicGameSystem
   );
+
+  for (const noteType of system.noteTypes) {
+    noteType.editorProps = Object.assign(
+      {
+        color: "0xffffff"
+      },
+      noteType.editorProps
+    );
+  }
+
+  return system;
 }
 
 export default MusicGameSystem;
