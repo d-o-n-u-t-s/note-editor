@@ -344,8 +344,13 @@ export default class Pixi extends InjectedComponent {
         const x = padding + $x * (laneWidth + padding);
         const y = padding + hh * i;
 
+        const measure = this.measures[index];
+
+        // 画面内に表示されているか
+        measure.isVisible = x + laneWidth > -graphics.x && x < -graphics.x + w;
+
         // 画面内なら小節を描画する
-        if (x + laneWidth > -graphics.x && x < -graphics.x + w) {
+        if (measure.isVisible) {
           graphics
             .lineStyle(2, 0xffffff)
             .beginFill(0x333333)
@@ -1113,7 +1118,8 @@ export default class Pixi extends InjectedComponent {
       if (currentTime < this.previousTime && currentTime < judgeTime) {
         runInAction(() => (note.editorProps.sePlayed = false));
       }
-      if (note.editorProps.sePlayed) continue;
+
+      if (!chart.isPlaying || note.editorProps.sePlayed) continue;
 
       if (currentTime >= judgeTime) {
         // SE を鳴らす
