@@ -23,6 +23,7 @@ import { inject, InjectedComponent } from "./stores/inject";
 import BPMChange, { BPMRenderer } from "./objects/BPMChange";
 import SpeedChange, { SpeedRenderer } from "./objects/SpeedChange";
 import { NotePointInfo } from "./objects/LaneRenderer";
+import { runInAction } from "mobx";
 
 @inject
 @observer
@@ -1110,7 +1111,7 @@ export default class Pixi extends InjectedComponent {
 
       // 時間が巻き戻っていたら SE 再生済みフラグをリセットする
       if (currentTime < this.previousTime && currentTime < judgeTime) {
-        note.editorProps.sePlayed = false;
+        runInAction(() => (note.editorProps.sePlayed = false));
       }
       if (note.editorProps.sePlayed) continue;
 
@@ -1119,7 +1120,7 @@ export default class Pixi extends InjectedComponent {
         if (musicGameSystem.seMap.has(note.type)) {
           musicGameSystem.seMap.get(note.type)!.play();
         }
-        note.editorProps.sePlayed = true;
+        runInAction(() => (note.editorProps.sePlayed = true));
       }
     }
 
