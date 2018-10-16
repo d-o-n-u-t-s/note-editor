@@ -1,11 +1,7 @@
-import { Fraction, Vector2 } from "../math";
-import TimelineObject from "./TimelineObject";
-import { GUID, guid } from "../util";
-import { sortQuadPoint, sortQuadPointFromQuad } from "../utils/drawQuad";
 import Measure from "./Measure";
 import INote from "./Note";
 import Pixi from "../Pixi";
-import Lane, { LinePointInfo, LineInfo } from "./Lane";
+import Lane, { LinePointInfo } from "./Lane";
 
 import LaneRendererResolver from "./LaneRendererResolver";
 
@@ -48,7 +44,6 @@ class NoteRenderer implements INoteRenderer {
   }
 
   render(note: INote, graphics: PIXI.Graphics, lane: Lane, measure: Measure) {
-    const renderArea = Pixi.instance!.getRenderArea();
     const measureBounds = measure.getBounds();
 
     /*

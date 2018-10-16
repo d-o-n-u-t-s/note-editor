@@ -1,6 +1,5 @@
 import * as React from "react";
 import * as PIXI from "pixi.js";
-import Editor from "./stores/EditorStore";
 import { Fraction } from "./math";
 import { EditMode, ObjectCategory } from "./stores/EditorSetting";
 import LanePoint from "./objects/LanePoint";
@@ -11,11 +10,8 @@ import INote from "./objects/Note";
 import { NoteType } from "./stores/MusicGameSystem";
 import Measure from "./objects/Measure";
 import { guid } from "./util";
-import { containsQuad } from "./utils/contains";
-import { drawQuad, sortQuadPoint } from "./utils/drawQuad";
 import Vector2 from "./math/Vector2";
 import NoteLine from "./objects/NoteLine";
-import NoteLineRenderer from "./objects/NoteLineRenderer";
 import LaneRendererResolver from "./objects/LaneRendererResolver";
 import NoteRendererResolver from "./objects/NoteRendererResolver";
 import NoteLineRendererResolver from "./objects/NoteLineRendererResolver";
@@ -26,7 +22,7 @@ import { OtherObjectType } from "./stores/EditorSetting";
 import { inject, InjectedComponent } from "./stores/inject";
 import BPMChange, { BPMRenderer } from "./objects/BPMChange";
 import SpeedChange, { SpeedRenderer } from "./objects/SpeedChange";
-import LaneRenderer, { NotePointInfo } from "./objects/LaneRenderer";
+import { NotePointInfo } from "./objects/LaneRenderer";
 
 @inject
 @observer
@@ -447,8 +443,6 @@ export default class Pixi extends InjectedComponent {
         sprite.width = laneWidth;
         sprite.height = hh;
         sprite.updateTransform();
-
-        const nn = index;
 
         ++index;
       }
@@ -1030,7 +1024,7 @@ export default class Pixi extends InjectedComponent {
       setting.editObjectCategory === ObjectCategory.Other &&
       setting.editOtherTypeIndex === (OtherObjectType.BPM as number) - 1
     ) {
-      const [_, ny] = normalizeContainsPoint(targetMeasure, mousePosition);
+      const [, ny] = normalizeContainsPoint(targetMeasure, mousePosition);
 
       const vlDiv = this.injected.editor.setting!.measureDivision;
 
@@ -1067,7 +1061,7 @@ export default class Pixi extends InjectedComponent {
       setting.editOtherTypeIndex === (OtherObjectType.Speed as number) - 1
     ) {
       console.log("速度変更はいち");
-      const [_, ny] = normalizeContainsPoint(targetMeasure, mousePosition);
+      const [, ny] = normalizeContainsPoint(targetMeasure, mousePosition);
 
       const vlDiv = this.injected.editor.setting!.measureDivision;
 

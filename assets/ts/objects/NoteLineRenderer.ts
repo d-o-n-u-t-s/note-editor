@@ -1,13 +1,7 @@
 import { Fraction } from "../math";
-import TimelineObject from "./TimelineObject";
-import { GUID, guid } from "../util";
-import Lane, { LineInfo } from "./Lane";
-import {
-  sortQuadPoint,
-  sortQuadPointFromQuad,
-  drawQuad
-} from "../utils/drawQuad";
-import Measure, { sortMeasure } from "./Measure";
+import { LineInfo } from "./Lane";
+import { drawQuad } from "../utils/drawQuad";
+import { sortMeasure } from "./Measure";
 import INote from "./Note";
 import NoteRenderer from "./NoteRenderer";
 import NoteLine from "./NoteLine";
@@ -61,8 +55,6 @@ class NoteLineRenderer implements INoteLineRenderer {
   render(noteLine: NoteLine, graphics: PIXI.Graphics, notes: INote[]) {
     const measures = Pixi.instance!.measures;
     const {
-      lanes,
-      lanePoints,
       lanePointMap,
       noteMap,
       laneMap
@@ -103,7 +95,6 @@ class NoteLineRenderer implements INoteLineRenderer {
       measures[tail.measureIndex]
     );
 
-    let prevPos = headPos;
     // let prevBounds = headBounds;
 
     // 先頭ノートと末尾ノートの間にあるレーン中間ポイントを取得する

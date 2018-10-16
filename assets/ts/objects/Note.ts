@@ -1,11 +1,6 @@
 import { Fraction } from "../math";
 import TimelineObject from "./TimelineObject";
-import { GUID, guid } from "../util";
-import Lane from "./Lane";
-import { sortQuadPoint, sortQuadPointFromQuad } from "../utils/drawQuad";
-import Measure from "./Measure";
-
-class Note {}
+import { GUID } from "../util";
 
 export default interface INote extends TimelineObject {
   horizontalSize: number;

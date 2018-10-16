@@ -1,16 +1,12 @@
-import TimelineObject from "./TimelineObject";
 import LanePoint from "./LanePoint";
 import Measure from "./Measure";
 import { Fraction, Vector2, lerp, inverseLerp } from "../math";
-import { GUID } from "../util";
 import Lane, { LinePointInfo, LineInfo } from "./Lane";
-import { Line, lineIntersect } from "../shapes/Line";
 
 import { sortMeasure } from "../objects/Measure";
 
 import Pixi from "../Pixi";
 
-import { Quad } from "../shapes/Quad";
 import { LaneTemplate } from "../stores/MusicGameSystem";
 import { drawQuad } from "../utils/drawQuad";
 
