@@ -343,10 +343,14 @@ export default class Pixi extends InjectedComponent {
         const x = padding + $x * (laneWidth + padding);
         const y = padding + hh * i;
 
-        graphics.lineStyle(2, 0xffffff, 1);
-
-        graphics.beginFill(0x333333);
-        graphics.drawRect(x, y, laneWidth, hh);
+        // 画面内なら小節を描画する
+        if (x + laneWidth > -graphics.x && x < -graphics.x + w) {
+          graphics
+            .lineStyle(2, 0xffffff)
+            .beginFill(0x333333)
+            .drawRect(x, y, laneWidth, hh)
+            .endFill();
+        }
 
         // 小節の開始時刻、終了時刻
         var b = measureTimeInfo.get(index + 0)!.BeginTime; // 0;// unitTime * index;
