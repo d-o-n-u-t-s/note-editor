@@ -161,6 +161,11 @@ export default class Pixi extends InjectedComponent {
   connectTargetLanePoint: LanePoint | null = null;
 
   /**
+   * 前フレームの再生時間
+   */
+  previousTime = 0.0;
+
+  /**
    * canvas を再描画する
    */
   private renderCanvas() {
@@ -1095,6 +1100,30 @@ export default class Pixi extends InjectedComponent {
         );
       }
     }
+
+    // 再生時間がノートの判定時間を超えたら SE を鳴らす
+    for (const note of chart.timeline.notes) {
+      // 判定時間
+      const judgeTime = measureTimeInfo
+        .get(note.measureIndex)!
+        .GetJudgeTime(note.measureIndex + note.measurePosition.to01Number());
+
+      // 時間が巻き戻っていたら SE 再生済みフラグをリセットする
+      if (currentTime < this.previousTime && currentTime < judgeTime) {
+        note.editorProps.sePlayed = false;
+      }
+      if (note.editorProps.sePlayed) continue;
+
+      if (currentTime >= judgeTime) {
+        // SE を鳴らす
+        if (musicGameSystem.seMap.has(note.type)) {
+          musicGameSystem.seMap.get(note.type)!.play();
+        }
+        note.editorProps.sePlayed = true;
+      }
+    }
+
+    this.previousTime = currentTime;
   }
 
   /**

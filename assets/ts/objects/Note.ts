@@ -13,13 +13,9 @@ export default interface INote extends TimelineObject {
    */
   lane: GUID;
 
-  /**
-   * 接続可能ノートか
-   */
-  connectable: boolean;
-
   editorProps: {
     color: number;
+    sePlayed: boolean;
   };
 
   customProps: any;

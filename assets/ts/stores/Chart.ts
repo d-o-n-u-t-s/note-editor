@@ -90,8 +90,12 @@ export default class Chart implements IStore {
           note.horizontalPosition.denominator
         );
 
-        // HACK: 一時的な対処
-        if (!note.editorProps) note.editorProps = { color: 0xffffff };
+        note.editorProps = {
+          color: Number(
+            this.musicGameSystem!.noteTypeMap.get(note.type)!.editorProps.color
+          ),
+          sePlayed: false
+        };
 
         notes.push(note);
       }

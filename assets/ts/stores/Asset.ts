@@ -1,33 +1,25 @@
 import { action, observable } from "mobx";
-import Editor from "./EditorStore";
 import { guid } from "../util";
-import Lane from "../objects/Lane";
-import LanePoint from "../objects/LanePoint";
 import { CustomNoteLineRenderer } from "../stores/MusicGameSystem";
 
 import * as Electrom from "electron";
 
 import { __require } from "../utils/node";
 
-var fs = (window as any).require("fs");
-
+const fs = (window as any).require("fs");
 const util = __require("util");
 const path = __require("path");
 
 import { getUrlParams } from "../utils/url";
 
-//console.log("fs", fs);
 const electron = (window as any).require("electron");
 const remote = electron.remote as Electrom.Remote;
-const BrowserWindow = remote.BrowserWindow;
 
 import {
   normalizeMusicGameSystem,
   LaneTemplate,
   NoteType
 } from "../stores/MusicGameSystem";
-
-// import * as config from "config";
 
 function parseJSON(text: string) {
   try {
@@ -42,7 +34,6 @@ interface IStore {}
 import CustomRendererUtility from "../utils/CustomRendererUtility";
 
 import MusicGameSystem from "./MusicGameSystem";
-import { Fraction } from "../math";
 import Chart from "./Chart";
 
 export default class Asset implements IStore {
@@ -91,131 +82,145 @@ export default class Asset implements IStore {
           );
 
           const json = parseJSON(buffer.toString());
-
-          const musicGameSystems = normalizeMusicGameSystem(json);
-
-          // 名前をキーにしたレーンテンプレートのマップを生成する
-          musicGameSystems.laneTemplateMap = new Map<string, LaneTemplate>();
-          for (const laneTemplate of musicGameSystems.laneTemplates) {
-            musicGameSystems.laneTemplateMap.set(
-              laneTemplate.name,
-              laneTemplate
-            );
-          }
-
-          // 名前をキーにしたノートタイプのマップを生成する
-          musicGameSystems.noteTypeMap = new Map<string, NoteType>();
-          for (const noteType of musicGameSystems.noteTypes || []) {
-            musicGameSystems.noteTypeMap.set(noteType.name, noteType);
-          }
-
-          (window as any).CustomRendererUtility = CustomRendererUtility;
-
-          // レーンのカスタムレンダラーを読み込む
-          {
-            const renderers = [
-              ...new Set(
-                musicGameSystems.laneTemplates
-                  .map(lt => ({ renderer: lt.renderer, laneTemplate: lt }))
-                  .filter(r => r.renderer !== "default")
-              )
-            ];
-
-            for (const renderer of renderers) {
-              const _path = path.join(
-                urlParams.mgsp,
-                directory,
-                renderer.renderer
-              );
-
-              const buffer: Buffer = await util.promisify(fs.readFile)(_path);
-
-              const key = guid();
-
-              const source = buffer
-                .toString()
-                .replace("export default", `window["${key}"] = `);
-
-              eval(source);
-
-              renderer.laneTemplate.rendererReference = (window as any)[key];
-            }
-          }
-
-          // ノートのカスタムレンダラーを読み込む
-          {
-            const renderers = [
-              ...new Set(
-                (musicGameSystems.noteTypes || [])
-                  .map(lt => ({ renderer: lt.renderer, noteTemplate: lt }))
-                  .filter(r => r.renderer !== "default")
-              )
-            ];
-
-            for (const renderer of renderers) {
-              const rendererPath = path.join(
-                urlParams.mgsp,
-                directory,
-                renderer.renderer
-              );
-
-              const buffer: Buffer = await util.promisify(fs.readFile)(
-                rendererPath
-              );
-
-              const key = guid();
-
-              const source = buffer
-                .toString()
-                .replace("export default", `window["${key}"] = `);
-
-              eval(source);
-
-              renderer.noteTemplate.rendererReference = (window as any)[key];
-            }
-          }
-
-          // ノートラインのカスタムレンダラーを読み込む
-          {
-            const renderers = musicGameSystems.customNoteLineRenderers || [];
-            musicGameSystems.customNoteLineRendererMap = new Map<
-              string,
-              CustomNoteLineRenderer
-            >();
-
-            for (const renderer of renderers) {
-              const rendererPath = path.join(
-                urlParams.mgsp,
-                directory,
-                renderer.renderer
-              );
-
-              const buffer: Buffer = await util.promisify(fs.readFile)(
-                rendererPath
-              );
-              const key = guid();
-
-              const source = buffer
-                .toString()
-                .replace("export default", `window["${key}"] = `);
-
-              // console.log(source);
-
-              eval(source);
-
-              renderer.rendererReference = (window as any)[key];
-
-              musicGameSystems.customNoteLineRendererMap.set(
-                renderer.target,
-                renderer
-              );
-            }
-          }
-
-          this.addMusicGameSystem(musicGameSystems);
+          await this.loadMusicGameSystem(json, urlParams.mgsp, directory);
         }
       }
     }
+  }
+
+  /**
+   * 音源を読み込む
+   * @param path 音源のパス
+   */
+  async loadAudio(path: string) {
+    const extension = path.split(".").pop()!;
+
+    const buffer = await util.promisify(fs.readFile)(path);
+
+    const blob = new Blob([buffer], { type: `audio/${extension}` });
+    const src = URL.createObjectURL(blob);
+
+    return new Howl({ src: src, format: [extension] });
+  }
+
+  /**
+   * 音ゲーシステムを読み込む
+   * @param json 対象 JSON
+   * @param rootPath 音ゲーシステムのパス
+   * @param directory 音ゲーシステムの階層
+   */
+  async loadMusicGameSystem(json: any, rootPath: string, directory: string) {
+    const musicGameSystems = normalizeMusicGameSystem(json);
+
+    // SE マップを生成する
+    musicGameSystems.seMap = new Map<string, Howl>();
+
+    // 名前をキーにしたレーンテンプレートのマップを生成する
+    musicGameSystems.laneTemplateMap = new Map<string, LaneTemplate>();
+    for (const laneTemplate of musicGameSystems.laneTemplates) {
+      musicGameSystems.laneTemplateMap.set(laneTemplate.name, laneTemplate);
+    }
+
+    // 名前をキーにしたノートタイプのマップを生成する
+    musicGameSystems.noteTypeMap = new Map<string, NoteType>();
+    for (const noteType of musicGameSystems.noteTypes || []) {
+      // 判定音源を読み込む
+      if (noteType.editorProps.se) {
+        const sePath = path.join(rootPath, directory, noteType.editorProps.se);
+        musicGameSystems.seMap.set(noteType.name, await this.loadAudio(sePath));
+      }
+
+      musicGameSystems.noteTypeMap.set(noteType.name, noteType);
+    }
+
+    (window as any).CustomRendererUtility = CustomRendererUtility;
+
+    // レーンのカスタムレンダラーを読み込む
+    {
+      const renderers = [
+        ...new Set(
+          musicGameSystems.laneTemplates
+            .map(lt => ({ renderer: lt.renderer, laneTemplate: lt }))
+            .filter(r => r.renderer !== "default")
+        )
+      ];
+
+      for (const renderer of renderers) {
+        const _path = path.join(rootPath, directory, renderer.renderer);
+
+        const buffer: Buffer = await util.promisify(fs.readFile)(_path);
+
+        const key = guid();
+
+        const source = buffer
+          .toString()
+          .replace("export default", `window["${key}"] = `);
+
+        eval(source);
+
+        renderer.laneTemplate.rendererReference = (window as any)[key];
+      }
+    }
+
+    // ノートのカスタムレンダラーを読み込む
+    {
+      const renderers = [
+        ...new Set(
+          (musicGameSystems.noteTypes || [])
+            .map(lt => ({ renderer: lt.renderer, noteTemplate: lt }))
+            .filter(r => r.renderer !== "default")
+        )
+      ];
+
+      for (const renderer of renderers) {
+        const rendererPath = path.join(rootPath, directory, renderer.renderer);
+
+        const buffer: Buffer = await util.promisify(fs.readFile)(rendererPath);
+
+        const key = guid();
+
+        const source = buffer
+          .toString()
+          .replace("export default", `window["${key}"] = `);
+
+        eval(source);
+
+        renderer.noteTemplate.rendererReference = (window as any)[key];
+      }
+    }
+
+    // ノートラインのカスタムレンダラーを読み込む
+    {
+      const renderers = musicGameSystems.customNoteLineRenderers || [];
+      musicGameSystems.customNoteLineRendererMap = new Map<
+        string,
+        CustomNoteLineRenderer
+      >();
+
+      for (const renderer of renderers) {
+        const rendererPath = path.join(rootPath, directory, renderer.renderer);
+
+        const buffer: Buffer = await util.promisify(fs.readFile)(rendererPath);
+        const key = guid();
+
+        const source = buffer
+          .toString()
+          .replace("export default", `window["${key}"] = `);
+
+        // console.log(source);
+
+        eval(source);
+
+        renderer.rendererReference = (window as any)[key];
+
+        musicGameSystems.customNoteLineRendererMap.set(
+          renderer.target,
+          renderer
+        );
+      }
+    }
+
+    this.addMusicGameSystem(musicGameSystems);
   }
 
   constructor(debugMode: boolean) {

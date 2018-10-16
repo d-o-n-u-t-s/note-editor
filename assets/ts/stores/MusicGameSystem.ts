@@ -33,6 +33,7 @@ export interface NoteType {
    */
   editorProps: {
     color: string;
+    se: string;
   };
 }
 
@@ -52,6 +53,12 @@ interface MusicGameSystem {
   initialLanes: InitialLane[];
   measureHorizontalDivision: number;
   noteTypes: NoteType[];
+
+  /**
+   * key: ノートタイプ
+   * value: プレイヤー
+   */
+  seMap: Map<string, Howl>;
 
   noteTypeMap: Map<string, NoteType>;
 
