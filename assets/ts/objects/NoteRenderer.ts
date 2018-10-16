@@ -83,7 +83,6 @@ class NoteRenderer implements INoteRenderer {
       return console.error("ノートの描画範囲が計算できません");
     }
 
-    q.point.x += ((note.horizontalSize - 1) * q.width) / 2;
     q.width *= note.horizontalSize;
 
     /*
