@@ -693,6 +693,34 @@ export default class Pixi extends InjectedComponent {
       }
     }
 
+    // BPM 選択
+    if (
+      setting.editMode === EditMode.Select &&
+      setting.editObjectCategory === ObjectCategory.Other &&
+      setting.editOtherTypeIndex === (OtherObjectType.BPM as number) - 1
+    ) {
+      for (const bpmChange of chart.timeline.bpmChanges) {
+        const bounds = BPMRenderer.getBounds(
+          bpmChange,
+          this.measures[bpmChange.measureIndex]
+        );
+
+        if (bounds.contains(mousePosition.x - graphics.x, mousePosition.y)) {
+          graphics
+            .lineStyle(2, 0xff9900)
+            .drawRect(
+              bounds.x - 2,
+              bounds.y - 2,
+              bounds.width + 4,
+              bounds.height + 4
+            );
+          if (isClick) {
+            editor.setInspectorTarget(bpmChange);
+          }
+        }
+      }
+    }
+
     // BPM 削除
     if (
       setting.editMode === EditMode.Delete &&
