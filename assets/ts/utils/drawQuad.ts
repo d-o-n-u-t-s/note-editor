@@ -1,6 +1,5 @@
 import * as PIXI from "pixi.js";
 import Vector2 from "../math/Vector2";
-import { Quad } from "../shapes/Quad";
 
 /**
  * 4 頂点を
@@ -27,9 +26,6 @@ export function sortQuadPoint(
   const [pp3, pp4] = [c, d].sort((a, b) => b.x - a.x);
 
   return [pp1, pp2, pp4, pp3];
-}
-export function sortQuadPointFromQuad(quad: Quad) {
-  return sortQuadPoint(quad.a, quad.b, quad.c, quad.d);
 }
 
 export function drawQuad(

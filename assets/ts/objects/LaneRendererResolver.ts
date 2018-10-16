@@ -16,6 +16,8 @@ export default class LaneRendererResolver {
 
       return {
         getNotePointInfo: LaneRenderer.getNotePointInfo,
+        getNotePointInfoFromMousePosition:
+          LaneRenderer.getNotePointInfoFromMousePosition,
         defaultRender: laneTemplate.rendererReference as any,
         render: LaneRenderer.render
       };

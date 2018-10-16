@@ -1,6 +1,5 @@
 import * as React from "react";
 import * as PIXI from "pixi.js";
-import Editor from "./stores/EditorStore";
 import { Fraction } from "./math";
 import { EditMode, ObjectCategory } from "./stores/EditorSetting";
 import LanePoint from "./objects/LanePoint";
@@ -11,11 +10,8 @@ import INote from "./objects/Note";
 import { NoteType } from "./stores/MusicGameSystem";
 import Measure from "./objects/Measure";
 import { guid } from "./util";
-import { containsQuad } from "./utils/contains";
-import { drawQuad, sortQuadPoint } from "./utils/drawQuad";
 import Vector2 from "./math/Vector2";
 import NoteLine from "./objects/NoteLine";
-import NoteLineRenderer from "./objects/NoteLineRenderer";
 import LaneRendererResolver from "./objects/LaneRendererResolver";
 import NoteRendererResolver from "./objects/NoteRendererResolver";
 import NoteLineRendererResolver from "./objects/NoteLineRendererResolver";
@@ -26,6 +22,7 @@ import { OtherObjectType } from "./stores/EditorSetting";
 import { inject, InjectedComponent } from "./stores/inject";
 import BPMChange, { BPMRenderer } from "./objects/BPMChange";
 import SpeedChange, { SpeedRenderer } from "./objects/SpeedChange";
+import { NotePointInfo } from "./objects/LaneRenderer";
 
 @inject
 @observer
@@ -333,13 +330,11 @@ export default class Pixi extends InjectedComponent {
 
     // for (const s of this.sprites) s.off("mousemove");
 
-    // 小節の高さ
-    const measureHeight = (h - padding * 2) / hC;
-
     // レーンを描画
     for (var $x = 0; $x < wC; ++$x) {
       for (var i = hC - 1; i >= 0; --i) {
-        const hh = measureHeight;
+        var hh = (h - padding * 2) / hC;
+
         const x = padding + $x * (laneWidth + padding);
         const y = padding + hh * i;
 
@@ -453,8 +448,6 @@ export default class Pixi extends InjectedComponent {
         sprite.height = hh;
         sprite.updateTransform();
 
-        const nn = index;
-
         ++index;
       }
     }
@@ -465,30 +458,6 @@ export default class Pixi extends InjectedComponent {
     graphics.x -= (laneWidth + padding) * (cy - 0.5);
 
     if (graphics.x > 0) graphics.x = 0;
-
-    // ノート配置モードなら近い分割線に配置するように座標を修正
-    // TODO: レーンの位置とサイズが固定ではない場合の対応
-    if (
-      setting.editMode === EditMode.Add &&
-      setting.editObjectCategory === ObjectCategory.Note
-    ) {
-      mousePosition = Object.assign({}, mousePosition);
-
-      // 分割された小節の半分の高さ
-      const measureDivisionHalfHeight =
-        measureHeight / setting.measureDivision / 2;
-
-      // 一番上の小節分割範囲なら次の小節にカーソルを移動
-      if (
-        mousePosition.y <
-        editor.setting.padding + measureDivisionHalfHeight
-      ) {
-        mousePosition.x += setting.laneWidth + setting.padding;
-        mousePosition.y = h - padding - 1;
-      } else {
-        mousePosition.y -= measureDivisionHalfHeight;
-      }
-    }
 
     // カーソルを合わせている小節
     const targetMeasure = this.measures.find(measure =>
@@ -577,19 +546,16 @@ export default class Pixi extends InjectedComponent {
       }
     }
 
-    let targetLane: Lane | null = null;
-    let targetLaneHorizontalIndex: number | null = null;
-    let targetLaneVerticalIndex: number | null = null;
+    let targetNotePoint: NotePointInfo | null = null;
 
     // レーン描画
     for (const lane of chart.timeline.lanes) {
-      const quads = LaneRendererResolver.resolve(lane).render(
+      LaneRendererResolver.resolve(lane).render(
         lane,
         graphics,
         chart.timeline.lanePointMap,
         this.measures,
-        targetMeasure,
-        setting.measureDivision
+        targetMeasure
       );
 
       //continue;
@@ -600,7 +566,9 @@ export default class Pixi extends InjectedComponent {
           !(
             setting.editMode === EditMode.Add &&
             setting.editObjectCategory === ObjectCategory.Note
-          )
+          ) ||
+          !targetMeasure ||
+          targetNotePoint
         ) {
           continue;
         }
@@ -614,31 +582,14 @@ export default class Pixi extends InjectedComponent {
           continue;
         }
 
-        for (const quad of quads) {
-          let color = 0xff00ff;
-
-          const p4 = sortQuadPoint(quad.a, quad.b, quad.c, quad.d);
-
-          const _p = new Vector2(mousePosition.x - graphics.x, mousePosition.y);
-
-          if (containsQuad(_p, p4[0], p4[1], p4[2], p4[3])) {
-            color = 0xffff00;
-
-            targetLane = lane;
-            targetLaneHorizontalIndex = quad.horizontalIndex;
-            targetLaneVerticalIndex = quad.verticalIndex;
-            break;
-            /*
-          drawQuad(graphics, p4[0], p4[1], p4[2], p4[3], color);
-          this.drawTempText(
-            `${quad.horizontalIndex}/${quad.verticalIndex}`,
-            p4[0].x,
-            p4[0].y,
-            {}
-          );
-          */
-          }
-        }
+        targetNotePoint = LaneRendererResolver.resolve(
+          lane
+        ).getNotePointInfoFromMousePosition(
+          lane,
+          targetMeasure!,
+          setting.measureDivision,
+          new Vector2(mousePosition.x - graphics.x, mousePosition.y)
+        );
       }
     }
 
@@ -787,7 +738,7 @@ export default class Pixi extends InjectedComponent {
     const getNoteColor = (noteType: NoteType) => {
       if (noteType.editorProps.color === "$laneColor") {
         const laneTemplate = chart.musicGameSystem!.laneTemplateMap.get(
-          targetLane!.templateName
+          targetNotePoint!.lane.templateName
         )!;
 
         return Number(laneTemplate.color);
@@ -799,7 +750,7 @@ export default class Pixi extends InjectedComponent {
     // レーン選択中ならノートを配置する
     if (
       targetMeasure &&
-      targetLane &&
+      targetNotePoint &&
       setting.editMode === EditMode.Add &&
       setting.editObjectCategory === ObjectCategory.Note
     ) {
@@ -812,19 +763,17 @@ export default class Pixi extends InjectedComponent {
         guid: guid(),
         horizontalSize: editor.setting!.objectSize,
         horizontalPosition: new Fraction(
-          targetLaneHorizontalIndex!,
-          targetLane.division
+          targetNotePoint!.horizontalIndex,
+          targetNotePoint!.lane.division
         ),
         measureIndex: this.measures.findIndex(_ => _ === targetMeasure)!,
         measurePosition: new Fraction(
-          setting.measureDivision - 1 - targetLaneVerticalIndex!,
+          setting.measureDivision - 1 - targetNotePoint!.verticalIndex!,
           setting.measureDivision
         ),
         type: newNoteType.name,
-        lane: targetLane.guid,
-        editorProps: {
-          color: getNoteColor(newNoteType)
-        },
+        lane: targetNotePoint!.lane.guid,
+        editorProps: { color: getNoteColor(newNoteType) },
         customProps: newNoteType.customProps.reduce(
           (object: any, b: { key: string; defaultValue: any }) => {
             // カスタム色をデフォルト値にする
@@ -845,7 +794,7 @@ export default class Pixi extends InjectedComponent {
         NoteRendererResolver.resolve(newNote).render(
           newNote,
           graphics,
-          targetLane,
+          targetNotePoint!.lane,
           this.measures[newNote.measureIndex]
         );
       }
@@ -1079,7 +1028,7 @@ export default class Pixi extends InjectedComponent {
       setting.editObjectCategory === ObjectCategory.Other &&
       setting.editOtherTypeIndex === (OtherObjectType.BPM as number) - 1
     ) {
-      const [_, ny] = normalizeContainsPoint(targetMeasure, mousePosition);
+      const [, ny] = normalizeContainsPoint(targetMeasure, mousePosition);
 
       const vlDiv = this.injected.editor.setting!.measureDivision;
 
@@ -1116,7 +1065,7 @@ export default class Pixi extends InjectedComponent {
       setting.editOtherTypeIndex === (OtherObjectType.Speed as number) - 1
     ) {
       console.log("速度変更はいち");
-      const [_, ny] = normalizeContainsPoint(targetMeasure, mousePosition);
+      const [, ny] = normalizeContainsPoint(targetMeasure, mousePosition);
 
       const vlDiv = this.injected.editor.setting!.measureDivision;
 
