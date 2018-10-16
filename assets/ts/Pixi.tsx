@@ -188,6 +188,7 @@ export default class Pixi extends InjectedComponent {
     const { theme } = setting;
 
     const chart = editor.currentChart!;
+    const musicGameSystem = chart.musicGameSystem!;
 
     const w = this.app!.renderer.width;
     const h = this.app!.renderer.height;
@@ -651,7 +652,7 @@ export default class Pixi extends InjectedComponent {
       NoteRendererResolver.resolve(note).render(
         note,
         graphics,
-        chart.timeline.lanes.find(lane => lane.guid === note.lane)!,
+        chart.timeline.laneMap.get(note.lane)!,
         this.measures[note.measureIndex]
       );
     }
@@ -752,7 +753,7 @@ export default class Pixi extends InjectedComponent {
 
     // ノート色を取得する
     const getNoteColor = (noteType: NoteType) => {
-      if (noteType.color === "$laneColor") {
+      if (noteType.editorProps.color === "$laneColor") {
         const laneTemplate = chart.musicGameSystem!.laneTemplateMap.get(
           targetLane!.templateName
         )!;
@@ -760,7 +761,7 @@ export default class Pixi extends InjectedComponent {
         return Number(laneTemplate.color);
       }
 
-      return Number(noteType.color);
+      return Number(noteType.editorProps.color);
     };
 
     // レーン選択中ならノートを配置する
@@ -915,7 +916,11 @@ export default class Pixi extends InjectedComponent {
 
           if (
             this.connectTargetNote &&
-            this.connectTargetNote.type === note.type
+            // 同じノートタイプか接続可能なノートタイプなら
+            (this.connectTargetNote.type === note.type ||
+              musicGameSystem.noteTypeMap
+                .get(this.connectTargetNote.type)!
+                .connectableTypes.includes(note.type))
           ) {
             const [head, tail] = [this.connectTargetNote, note].sort(
               sortMeasure

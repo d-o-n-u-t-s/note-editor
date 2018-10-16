@@ -17,10 +17,11 @@ interface InitialLane {
 
 export interface NoteType {
   name: string;
-  color: string;
   renderer: string;
   rendererReference: any;
   excludeLanes: string[];
+
+  connectableTypes: string[];
 
   /**
    * カスタムプロパティ
@@ -84,6 +85,7 @@ export function normalizeMusicGameSystem(
       },
       noteType.editorProps
     );
+    noteType.connectableTypes = noteType.connectableTypes || [];
   }
 
   return system;
