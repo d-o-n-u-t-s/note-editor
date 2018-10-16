@@ -333,13 +333,11 @@ export default class Pixi extends InjectedComponent {
 
     // for (const s of this.sprites) s.off("mousemove");
 
-    // 小節の高さ
-    const measureHeight = (h - padding * 2) / hC;
-
     // レーンを描画
     for (var $x = 0; $x < wC; ++$x) {
       for (var i = hC - 1; i >= 0; --i) {
-        const hh = measureHeight;
+        var hh = (h - padding * 2) / hC;
+
         const x = padding + $x * (laneWidth + padding);
         const y = padding + hh * i;
 
@@ -461,30 +459,6 @@ export default class Pixi extends InjectedComponent {
     graphics.x -= (laneWidth + padding) * (cy - 0.5);
 
     if (graphics.x > 0) graphics.x = 0;
-
-    // ノート配置モードなら近い分割線に配置するように座標を修正
-    // TODO: レーンの位置とサイズが固定ではない場合の対応
-    if (
-      setting.editMode === EditMode.Add &&
-      setting.editObjectCategory === ObjectCategory.Note
-    ) {
-      mousePosition = Object.assign({}, mousePosition);
-
-      // 分割された小節の半分の高さ
-      const measureDivisionHalfHeight =
-        measureHeight / setting.measureDivision / 2;
-
-      // 一番上の小節分割範囲なら次の小節にカーソルを移動
-      if (
-        mousePosition.y <
-        editor.setting.padding + measureDivisionHalfHeight
-      ) {
-        mousePosition.x += setting.laneWidth + setting.padding;
-        mousePosition.y = h - padding - 1;
-      } else {
-        mousePosition.y -= measureDivisionHalfHeight;
-      }
-    }
 
     // カーソルを合わせている小節
     const targetMeasure = this.measures.find(measure =>
