@@ -39,22 +39,22 @@ class NoteLineRenderer implements INoteLineRenderer {
       drawQuad(
         graphics,
 
-        Vector2.sub(line.start.point, new Vector2(-line.start.width / 2, 0)),
-        Vector2.sub(line.start.point, new Vector2(line.start.width / 2, 0)),
-        Vector2.sub(line.end.point, new Vector2(line.end.width / 2, 0)),
-        Vector2.sub(line.end.point, new Vector2(-line.end.width / 2, 0)),
+        line.start.point,
+        Vector2.add(line.start.point, new Vector2(line.start.width, 0)),
+        Vector2.add(line.end.point, new Vector2(-line.end.width, 0)),
+        line.end.point,
 
         head.editorProps.color
       );
 
       graphics
         .lineStyle(1, head.editorProps.color, 1)
-        .moveTo(line.start.point.x - line.start.width / 2, line.start.point.y)
-        .lineTo(line.end.point.x - line.start.width / 2, line.end.point.y);
+        .moveTo(line.start.point.x, line.start.point.y)
+        .lineTo(line.end.point.x, line.end.point.y);
       graphics
         .lineStyle(1, head.editorProps.color, 1)
-        .moveTo(line.start.point.x + line.start.width / 2, line.start.point.y)
-        .lineTo(line.end.point.x + line.start.width / 2, line.end.point.y);
+        .moveTo(line.start.point.x + line.start.width, line.start.point.y)
+        .lineTo(line.end.point.x + line.start.width, line.end.point.y);
     }
   }
 

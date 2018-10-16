@@ -48,13 +48,12 @@ export function getLines(points: LinePoint[], measures: Measure[]): LineInfo[] {
     const toLinePointInfo = (measureIndex: number, value: number) => {
       const measure = measures[measureIndex];
       const p = inverseLerp(p1.value, p2.value, value);
-      const width = lerp(p1.width, p2.width, p);
       return {
         point: new Vector2(
-          measure.x + measure.width * (lerp(p1.x, p2.x, p) + width / 2),
+          measure.x + measure.width * lerp(p1.x, p2.x, p),
           measure.y + measure.height * (measureIndex + 1 - value)
         ),
-        width: measure.width * width
+        width: measure.width * lerp(p1.width, p2.width, p)
       };
     };
 
@@ -114,10 +113,10 @@ class LaneRenderer implements ILaneRenderer {
     for (const line of lines) {
       drawQuad(
         graphics,
-        Vector2.sub(line.start.point, new Vector2(line.start.width / 2, 0)),
-        Vector2.add(line.start.point, new Vector2(line.start.width / 2, 0)),
-        Vector2.add(line.end.point, new Vector2(line.end.width / 2, 0)),
-        Vector2.sub(line.end.point, new Vector2(line.end.width / 2, 0)),
+        line.start.point,
+        Vector2.add(line.start.point, new Vector2(line.start.width, 0)),
+        Vector2.add(line.end.point, new Vector2(line.end.width, 0)),
+        line.end.point,
         Number(laneTemplate.color)
       );
 
@@ -125,15 +124,11 @@ class LaneRenderer implements ILaneRenderer {
         graphics
           .lineStyle(1, 0xffffff)
           .moveTo(
-            line.start.point.x -
-              line.start.width / 2 +
-              (line.start.width / laneTemplate.division) * i,
+            line.start.point.x + (line.start.width / laneTemplate.division) * i,
             line.start.point.y
           )
           .lineTo(
-            line.end.point.x -
-              line.end.width / 2 +
-              (line.end.width / laneTemplate.division) * i,
+            line.end.point.x + (line.end.width / laneTemplate.division) * i,
             line.end.point.y
           );
       }
@@ -185,12 +180,12 @@ class LaneRenderer implements ILaneRenderer {
     // x座標を補完で求める
     const getX = (info: LinePointInfo, i: number) =>
       info.point.x +
-      info.width * (horizontal.to01Number() - 0.5 + i / horizontal.denominator);
+      info.width * (horizontal.to01Number() + i / horizontal.denominator);
     const left = lerp(getX(end, 0), getX(start, 0), rate);
     const right = lerp(getX(end, 1), getX(start, 1), rate);
 
     return {
-      point: new Vector2((left + right) / 2, y),
+      point: new Vector2(left, y),
       width: right - left
     };
   }
@@ -235,15 +230,11 @@ class LaneRenderer implements ILaneRenderer {
         graphics
           .lineStyle(1, 0xffffff)
           .moveTo(
-            line.start.point.x -
-              line.start.width / 2 +
-              (line.start.width / lane.division) * i,
+            line.start.point.x + (line.start.width / lane.division) * i,
             line.start.point.y
           )
           .lineTo(
-            line.end.point.x -
-              line.end.width / 2 +
-              (line.end.width / lane.division) * i,
+            line.end.point.x + (line.end.width / lane.division) * i,
             line.end.point.y
           );
       }
@@ -298,15 +289,11 @@ class LaneRenderer implements ILaneRenderer {
           for (const line of targetMeasureLines) {
             const linee: Line = {
               start: new Vector2(
-                line.start.point.x -
-                  line.start.width / 2 +
-                  (line.start.width / lane.division) * j,
+                line.start.point.x + (line.start.width / lane.division) * j,
                 line.start.point.y
               ),
               end: new Vector2(
-                line.end.point.x -
-                  line.end.width / 2 +
-                  (line.end.width / lane.division) * j,
+                line.end.point.x + (line.end.width / lane.division) * j,
                 line.end.point.y
               )
             };
