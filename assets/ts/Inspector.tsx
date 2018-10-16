@@ -89,10 +89,6 @@ export default class Inspector extends InjectedComponent {
         }
 
         newController.onChange((value: any) => {
-          // 色なら文字列から数値に変換する
-          if (isColor) {
-            value = parseInt(value.substr(1), 16);
-          }
           runInAction("inspectorUpdateValue", () => {
             parent[key] = value;
           });

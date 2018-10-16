@@ -775,6 +775,7 @@ export default class Pixi extends InjectedComponent {
         setting.editNoteTypeIndex
       ];
 
+      // 新規ノート
       const newNote: INote = {
         guid: guid(),
         horizontalSize: editor.setting!.objectSize,
@@ -794,7 +795,12 @@ export default class Pixi extends InjectedComponent {
         },
         customProps: newNoteType.customProps.reduce(
           (object: any, b: { key: string; defaultValue: any }) => {
-            object[b.key] = b.defaultValue;
+            // カスタム色をデフォルト値にする
+            if (b.defaultValue === "customColor") {
+              object[b.key] = setting.customPropColor;
+            } else {
+              object[b.key] = b.defaultValue;
+            }
             return object;
           },
           {}

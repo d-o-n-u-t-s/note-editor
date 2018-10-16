@@ -16,6 +16,7 @@
     "@types/howler": "^2.0.5",
     "@types/mathjs": "^4.4.1",
     "@types/pixi.js": "^4.8.0",
+    "@types/react-color": "^2.13.6",
     "babel-runtime": "^6.26.0",
     "electron": "^2.0.9",
     "electron-load-devtool": "^1.0.0",
@@ -44,6 +45,7 @@
     "mobx-react": "^5.2.8",
     "mobx-remotedev": "^0.2.8",
     "react": "^16.5.1",
+    "react-color": "^2.14.1",
     "react-dom": "^16.5.1",
     "ts-loader": "^5.1.0"
   }

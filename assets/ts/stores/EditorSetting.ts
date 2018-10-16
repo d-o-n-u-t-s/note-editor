@@ -49,6 +49,14 @@ export default class EditorSetting {
   };
 
   @observable
+  customPropColor = "#ff0000";
+
+  @action
+  setCustomPropColor(color: string) {
+    this.customPropColor = color;
+  }
+
+  @observable
   editMode = EditMode.Select;
   @action
   setEditMode = (value: EditMode) => (this.editMode = value);

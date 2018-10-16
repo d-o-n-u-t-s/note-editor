@@ -21,6 +21,8 @@ import {
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
 
+import { SketchPicker } from "react-color";
+
 function getEnumKeys(_enum: any): string[] {
   return Object.values(_enum).filter(
     key => typeof key === "string"
@@ -49,6 +51,8 @@ import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import ShowChartIcon from "@material-ui/icons/ShowChart";
 import VisibilityIcon from "@material-ui/icons/Visibility";
+
+import PaletteIcon from "@material-ui/icons/Palette";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -101,6 +105,8 @@ class Toolbar extends InjectedComponent<Props> {
     objectSizeAnchorEl: null,
 
     displaySettingAnchorEl: null,
+
+    customColorAnchorEl: null,
 
     anchorEl: null
   };
@@ -439,6 +445,35 @@ class Toolbar extends InjectedComponent<Props> {
               />
             ))}
           </FormGroup>
+        </Menu>
+
+        <div style={{ width: 1, background: "#ddd" }} />
+        {/* カスタムパレット */}
+        <IconButton
+          onClick={event => {
+            this.setState({
+              customColorAnchorEl: event.currentTarget
+            });
+          }}
+        >
+          <PaletteIcon style={{ color: editor.setting.customPropColor }} />
+        </IconButton>
+        <Menu
+          style={{ marginTop: "2rem" }}
+          anchorEl={this.state.customColorAnchorEl}
+          open={Boolean(this.state.customColorAnchorEl)}
+          onClose={() =>
+            this.setState({
+              customColorAnchorEl: null
+            })
+          }
+        >
+          <SketchPicker
+            color={editor.setting.customPropColor}
+            onChange={({ hex }) => {
+              editor.setting.setCustomPropColor(hex);
+            }}
+          />
         </Menu>
 
         <NewChartDialog />
