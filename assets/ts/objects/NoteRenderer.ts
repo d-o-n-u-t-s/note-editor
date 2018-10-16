@@ -30,7 +30,7 @@ class NoteRenderer implements INoteRenderer {
     )!;
 
     return new PIXI.Rectangle(
-      q.point.x - q.width / 2,
+      q.point.x,
       q.point.y - 5,
       q.width * note.horizontalSize,
       10
@@ -43,8 +43,8 @@ class NoteRenderer implements INoteRenderer {
     graphics
       // .lineStyle(4, note.color)
       .lineStyle(6, note.editorProps.color)
-      .moveTo(q.point.x - q.width / 2, q.point.y)
-      .lineTo(q.point.x + q.width / 2, q.point.y);
+      .moveTo(q.point.x, q.point.y)
+      .lineTo(q.point.x + q.width, q.point.y);
   }
 
   render(note: INote, graphics: PIXI.Graphics, lane: Lane, measure: Measure) {
