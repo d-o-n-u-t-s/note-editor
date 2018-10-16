@@ -26,6 +26,7 @@ import { OtherObjectType } from "./stores/EditorSetting";
 import { inject, InjectedComponent } from "./stores/inject";
 import BPMChange, { BPMRenderer } from "./objects/BPMChange";
 import SpeedChange, { SpeedRenderer } from "./objects/SpeedChange";
+import LaneRenderer, { NotePointInfo } from "./objects/LaneRenderer";
 
 @inject
 @observer
@@ -547,19 +548,16 @@ export default class Pixi extends InjectedComponent {
       }
     }
 
-    let targetLane: Lane | null = null;
-    let targetLaneHorizontalIndex: number | null = null;
-    let targetLaneVerticalIndex: number | null = null;
+    let targetNotePoint: NotePointInfo | null = null;
 
     // レーン描画
     for (const lane of chart.timeline.lanes) {
-      const quads = LaneRendererResolver.resolve(lane).render(
+      LaneRendererResolver.resolve(lane).render(
         lane,
         graphics,
         chart.timeline.lanePointMap,
         this.measures,
-        targetMeasure,
-        setting.measureDivision
+        targetMeasure
       );
 
       //continue;
@@ -570,7 +568,9 @@ export default class Pixi extends InjectedComponent {
           !(
             setting.editMode === EditMode.Add &&
             setting.editObjectCategory === ObjectCategory.Note
-          )
+          ) ||
+          !targetMeasure ||
+          targetNotePoint
         ) {
           continue;
         }
@@ -584,31 +584,14 @@ export default class Pixi extends InjectedComponent {
           continue;
         }
 
-        for (const quad of quads) {
-          let color = 0xff00ff;
-
-          const p4 = sortQuadPoint(quad.a, quad.b, quad.c, quad.d);
-
-          const _p = new Vector2(mousePosition.x - graphics.x, mousePosition.y);
-
-          if (containsQuad(_p, p4[0], p4[1], p4[2], p4[3])) {
-            color = 0xffff00;
-
-            targetLane = lane;
-            targetLaneHorizontalIndex = quad.horizontalIndex;
-            targetLaneVerticalIndex = quad.verticalIndex;
-            break;
-            /*
-          drawQuad(graphics, p4[0], p4[1], p4[2], p4[3], color);
-          this.drawTempText(
-            `${quad.horizontalIndex}/${quad.verticalIndex}`,
-            p4[0].x,
-            p4[0].y,
-            {}
-          );
-          */
-          }
-        }
+        targetNotePoint = LaneRendererResolver.resolve(
+          lane
+        ).getNotePointInfoFromMousePosition(
+          lane,
+          targetMeasure!,
+          setting.measureDivision,
+          new Vector2(mousePosition.x - graphics.x, mousePosition.y)
+        );
       }
     }
 
@@ -757,7 +740,7 @@ export default class Pixi extends InjectedComponent {
     const getNoteColor = (noteType: NoteType) => {
       if (noteType.editorProps.color === "$laneColor") {
         const laneTemplate = chart.musicGameSystem!.laneTemplateMap.get(
-          targetLane!.templateName
+          targetNotePoint!.lane.templateName
         )!;
 
         return Number(laneTemplate.color);
@@ -769,7 +752,7 @@ export default class Pixi extends InjectedComponent {
     // レーン選択中ならノートを配置する
     if (
       targetMeasure &&
-      targetLane &&
+      targetNotePoint &&
       setting.editMode === EditMode.Add &&
       setting.editObjectCategory === ObjectCategory.Note
     ) {
@@ -782,19 +765,17 @@ export default class Pixi extends InjectedComponent {
         guid: guid(),
         horizontalSize: editor.setting!.objectSize,
         horizontalPosition: new Fraction(
-          targetLaneHorizontalIndex!,
-          targetLane.division
+          targetNotePoint!.horizontalIndex,
+          targetNotePoint!.lane.division
         ),
         measureIndex: this.measures.findIndex(_ => _ === targetMeasure)!,
         measurePosition: new Fraction(
-          setting.measureDivision - 1 - targetLaneVerticalIndex!,
+          setting.measureDivision - 1 - targetNotePoint!.verticalIndex!,
           setting.measureDivision
         ),
         type: newNoteType.name,
-        lane: targetLane.guid,
-        editorProps: {
-          color: getNoteColor(newNoteType)
-        },
+        lane: targetNotePoint!.lane.guid,
+        editorProps: { color: getNoteColor(newNoteType) },
         customProps: newNoteType.customProps.reduce(
           (object: any, b: { key: string; defaultValue: any }) => {
             // カスタム色をデフォルト値にする
@@ -815,7 +796,7 @@ export default class Pixi extends InjectedComponent {
         NoteRendererResolver.resolve(newNote).render(
           newNote,
           graphics,
-          targetLane,
+          targetNotePoint!.lane,
           this.measures[newNote.measureIndex]
         );
       }

@@ -21,7 +21,9 @@ interface LinePoint {
   horizontalPosition: Fraction;
 }
 
-interface QuadAndIndex extends Quad {
+export interface NotePointInfo {
+  lane: Lane;
+  linePointInfo: LinePointInfo;
   horizontalIndex: number;
   verticalIndex: number;
 }
@@ -88,14 +90,19 @@ export interface ILaneRenderer {
     horizontal: Fraction,
     vertical: Fraction
   ): LinePointInfo | null;
+  getNotePointInfoFromMousePosition(
+    lane: Lane,
+    measure: Measure,
+    measureDivision: number,
+    mousePosition: Vector2
+  ): NotePointInfo | null;
   render(
     lane: Lane,
     graphics: PIXI.Graphics,
     lanePointMap: Map<string, LanePoint>,
     measures: Measure[],
-    drawHorizontalLineTargetMeasure?: Measure,
-    md?: number
-  ): QuadAndIndex[];
+    drawHorizontalLineTargetMeasure?: Measure
+  ): void;
 
   defaultRender(
     graphics: PIXI.Graphics,
@@ -171,6 +178,9 @@ class LaneRenderer implements ILaneRenderer {
         line.start.point.y >= y &&
         line.end.point.y <= y
     );
+    if (!targetLine) {
+      return null;
+    }
 
     // ライン上でのy座標の位置
     const start = targetLine!.start;
@@ -190,6 +200,40 @@ class LaneRenderer implements ILaneRenderer {
     };
   }
 
+  getNotePointInfoFromMousePosition(
+    lane: Lane,
+    measure: Measure,
+    measureDivision: number,
+    mousePosition: Vector2
+  ): NotePointInfo | null {
+    const height = measure.height / measureDivision / 2;
+    const horizontal = new Fraction(0, lane.division);
+    const vertical = new Fraction(0, measureDivision);
+
+    for (var i = 0; i < lane.division; i++) {
+      horizontal.numerator = i;
+      for (var j = 0; j < measureDivision; j++) {
+        vertical.numerator = j;
+        const data = this.getNotePointInfo(lane, measure, horizontal, vertical);
+        if (
+          data &&
+          mousePosition.x > data!.point.x &&
+          mousePosition.x < data!.point.x + data!.width &&
+          mousePosition.y > data!.point.y - height &&
+          mousePosition.y < data!.point.y + height
+        ) {
+          return {
+            lane,
+            linePointInfo: data!,
+            horizontalIndex: i,
+            verticalIndex: measureDivision - j - 1
+          };
+        }
+      }
+    }
+    return null;
+  }
+
   // private linesCache: LineInfo[] = [];
 
   customRender(render: any) {}
@@ -201,7 +245,7 @@ class LaneRenderer implements ILaneRenderer {
     measures: Measure[],
     drawHorizontalLineTargetMeasure?: Measure,
     md = 4
-  ): QuadAndIndex[] {
+  ): void {
     const lines = getLines(
       lane.points.map(point => lanePointMap.get(point)!),
       measures
@@ -238,134 +282,6 @@ class LaneRenderer implements ILaneRenderer {
             line.end.point.y
           );
       }
-    }
-
-    {
-      const resultQuads: QuadAndIndex[] = [];
-
-      if (drawHorizontalLineTargetMeasure && targetMeasureLines.length) {
-        let pp = 0;
-
-        // 対象の小節に存在してるレーン中間点の y 座標一覧
-        var b3: number[] = Array.from(
-          new Set(
-            targetMeasureLines
-              .map(line => [line.start.point.y, line.end.point.y])
-              .reduce((acc: any, val: any) => acc.concat(val), [])
-          )
-        );
-
-        // console.log(b3);
-
-        // y 軸のライン
-        const yLines: Line[] = [];
-        // x 軸のライン
-        const xLines: Line[][] = [];
-
-        // 縦
-        for (let i = 0; i < md + 1; ++i) {
-          // 小節内分割ライン
-
-          const y =
-            drawHorizontalLineTargetMeasure!.y +
-            (drawHorizontalLineTargetMeasure!.height / md) * i;
-
-          const measureLine: Line = {
-            start: new Vector2(drawHorizontalLineTargetMeasure!.x, y),
-            end: new Vector2(
-              drawHorizontalLineTargetMeasure!.x +
-                drawHorizontalLineTargetMeasure!.width,
-              y
-            )
-          };
-
-          yLines.push(measureLine);
-        }
-
-        // 横
-        for (let j = 0; j < lane.division + 1; ++j) {
-          xLines[j] = [];
-
-          for (const line of targetMeasureLines) {
-            const linee: Line = {
-              start: new Vector2(
-                line.start.point.x + (line.start.width / lane.division) * j,
-                line.start.point.y
-              ),
-              end: new Vector2(
-                line.end.point.x + (line.end.width / lane.division) * j,
-                line.end.point.y
-              )
-            };
-            xLines[j].push(linee);
-          }
-        }
-
-        // 縦
-        for (let i = 0; i < md; ++i) {
-          const yLine1 = yLines[i];
-          const yLine2 = yLines[i + 1];
-
-          const yLines2: Line[] = [yLine1];
-
-          // 小節縦分割線 2 つの間に含まれている分割線
-
-          const f = b3.filter(f => f > yLine1.start.y && f < yLine2.start.y);
-
-          //          console.log("split", f.length);
-
-          for (const ff of f) {
-            const line = {
-              start: new Vector2(yLine1.start.x, ff),
-              end: new Vector2(yLine1.end.x, ff)
-            };
-
-            //drawLine(line, 10, 0xffffff);
-
-            yLines2.push(line);
-          }
-
-          yLines2.push(yLine2);
-
-          for (var kk = 0; kk < yLines2.length - 1; ++kk) {
-            const yLine1 = yLines2[kk];
-            const yLine2 = yLines2[kk + 1];
-
-            //drawLine(yLine1, 4, 0xff00ff);
-
-            // 横
-            for (let j = 0; j < lane.division; ++j) {
-              const xLine1 = xLines[j];
-              const xLine2 = xLines[j + 1];
-
-              for (var k = 0; k < xLine1.length; ++k) {
-                const xll1 = xLine1[k];
-                const xll2 = xLine2[k];
-
-                var ret1 = lineIntersect(yLine1, xll1);
-                var ret2 = lineIntersect(yLine1, xll2);
-                var ret3 = lineIntersect(yLine2, xll1);
-                var ret4 = lineIntersect(yLine2, xll2);
-
-                if (ret1 && ret2 && ret3 && ret4) {
-                  resultQuads.push({
-                    a: ret1,
-                    b: ret2,
-                    c: ret3,
-                    d: ret4,
-                    horizontalIndex: j,
-                    verticalIndex: i
-                  });
-                }
-              }
-            }
-          }
-        }
-      }
-
-      //  quadCache.set(lane, resultQuads);
-
-      return resultQuads;
     }
   }
 }
