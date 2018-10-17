@@ -108,6 +108,8 @@ export default class Chart implements IStore {
           note.horizontalPosition.denominator
         );
 
+        if (!note.customProps) note.customProps = { color: "#ffffff" };
+
         note.editorProps = {
           color: Number(
             this.musicGameSystem!.noteTypeMap.get(note.type)!.editorProps.color

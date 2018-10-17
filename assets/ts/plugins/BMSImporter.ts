@@ -7,6 +7,8 @@ import Chart from "../stores/Chart";
 import store from "../stores/stores";
 import { Fraction } from "../math";
 import { guid } from "../util";
+import { IMeasureData } from "../objects/Measure";
+import { number } from "prop-types";
 
 export default class BMSImporter {
   public static import() {
@@ -47,7 +49,7 @@ export default class BMSImporter {
 
     const notes: any[] = [];
 
-    const tempos: any[] = [];
+    const measures: IMeasureData[] = [];
 
     const note = (index: number, id: number, values: string) => {
       const mc = values.match(/.{2}/g)!;
@@ -143,6 +145,7 @@ export default class BMSImporter {
     };
 
     const bpms: any[] = [];
+    const exBpms = new Map<number, number>();
 
     const bpmN = (laneIndex: number, source: string) => {
       const values = source.match(/.{2}/)!;
@@ -175,31 +178,21 @@ export default class BMSImporter {
       const values = source.match(/.{2}/g)!;
       console.log(values);
 
-      let count = 0;
+      const denominator = values.length;
 
-      for (const value of values) {
-        const index = count++;
+      for (const [index, value] of values.entries()) {
+        console.log("拡張BPM を読み込みます", index, value, bpms);
 
         if (value === "00") continue;
 
         // 00 ~ FF
-        const bpmIndex = parseInt(value[0], 16);
+        const bpmIndex = parseInt(value, 16);
 
-        if (bpmIndex == 0) continue;
-
-        // console.log("BPM", bpmIndex);
-
-        /*
-            BPM bpmObj = new BPM();
-
-            bpmObj.laneIndex = laneIndex;
-            bpmObj.position = new NotePosition(index, denominator);
-
-
-            println(bpmIndex.ToString());
-
-            bpmObj.value = HeaderCollection_BPM[bpmIndex].floatValue();
-*/
+        bpms.push({
+          bpm: exBpms.get(bpmIndex),
+          laneIndex: laneIndex,
+          position: new Fraction(index, denominator)
+        });
       }
     };
     const channel = (index: number, id: number, values: string) => {
@@ -223,9 +216,10 @@ export default class BMSImporter {
         // values には 0.125 みたいな文字列が入っている
         const value = Number(values);
 
-        tempos.push({
-          tempo: value,
-          laneIndex
+        measures.push({
+          index: laneIndex,
+          beat: new Fraction(value, 1),
+          customProps: {}
         });
 
         // console.log("Tempo", value, laneIndex);
@@ -333,15 +327,13 @@ export default class BMSImporter {
           continue;
         }
 
+        // 拡張 BPM
         if (line.match(/#BPM[0-9A-F]{2} .+/)) {
           const bpm = Number(headerN(line));
 
-          console.log("bpm2", bpm);
-          // println(bpm.ToString());
+          const id = parseInt(line.substr(4, 2), 16);
 
-          //    BMS_Header header = new BMS_Header(line, 16);
-
-          //  HeaderCollection_BPM.Add(header.id, header);
+          exBpms.set(id, bpm);
 
           continue;
         }
@@ -372,7 +364,7 @@ export default class BMSImporter {
       guid: guid(),
       horizontalSize: 1,
       horizontalPosition: {
-        numerator: note.id === -1 ? 8 : note.id,
+        numerator: note.id,
         denominator: 9
       },
       measureIndex: note.laneIndex,
@@ -400,9 +392,26 @@ export default class BMSImporter {
       }
     }
 
+    const maxMeasureIndex = Math.max(...measures.map(m => m.index));
+
+    const newMeasures: IMeasureData[] = Array(maxMeasureIndex + 1)
+      .fill(0)
+      .map((_, index) => {
+        return {
+          index,
+          beat: new Fraction(4, 4),
+          customProps: {}
+        };
+      });
+
+    for (const measure of measures) {
+      newMeasures[measure.index].beat = measure.beat;
+    }
+
     Chart.fromJSON(
       JSON.stringify({
         timeline: {
+          speedChanges: [],
           horizontalLaneDivision: 9,
           bpmChanges: bpms.map(bpm => ({
             measureIndex: bpm.laneIndex,
@@ -440,7 +449,22 @@ export default class BMSImporter {
               }
             }
           ],
-          notes: notes.map(toNote).concat(notes2),
+          notes: notes
+            .map(toNote)
+            .concat(notes2)
+            .map(note => {
+              (note as any).customProps = {
+                color:
+                  note.horizontalPosition.numerator === -1
+                    ? "#666666"
+                    : note.horizontalPosition.numerator === 0
+                      ? "#ff0000"
+                      : note.horizontalPosition.numerator % 2
+                        ? "#ffffff"
+                        : "#0000ff"
+              };
+              return note;
+            }),
           noteLines: noteLines,
           lanes: [
             {
@@ -453,10 +477,11 @@ export default class BMSImporter {
               ]
             }
           ],
-          tempos,
+          measures: newMeasures,
           lanePointMap: {},
           noteMap: {}
         },
+        startTime: 0,
         name: "新規譜面",
         audioSource: store.editor.asset.audioAssetPaths[16],
         musicGameSystemName: "BMS",
