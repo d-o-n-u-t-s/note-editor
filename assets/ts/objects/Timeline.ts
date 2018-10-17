@@ -5,7 +5,7 @@ import SpeedChange from "./SpeedChange";
 import INote from "./Note";
 import NoteLine from "./NoteLine";
 import { observable, observe, action, computed, IObservableArray } from "mobx";
-import { sortMeasure } from "./Measure";
+import Measure, { sortMeasure, IMeasureData } from "./Measure";
 
 export default class Timeline {
   constructor() {
@@ -55,6 +55,14 @@ export default class Timeline {
   @action
   removeBpmChange(bpmChange: BPMChange) {
     this.bpmChanges.remove(bpmChange);
+  }
+
+  @observable
+  measures: IObservableArray<Measure> = observable([]);
+
+  @action
+  setMeasures(measures: Measure[]) {
+    this.measures.replace(measures);
   }
 
   /**
@@ -114,14 +122,6 @@ export default class Timeline {
 
   @action
   addLanePoint = (value: LanePoint) => this.lanePoints.push(value);
-
-  @observable
-  tempos: { laneIndex: number; tempo: number }[] = [];
-
-  @action
-  setTempos(tempos: { laneIndex: number; tempo: number }[]) {
-    this.tempos = tempos;
-  }
 
   /**
    * レーン

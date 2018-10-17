@@ -3,6 +3,7 @@ import TimelineObject from "./TimelineObject";
 import { GUID } from "../util";
 import { Fraction } from "../math";
 import Pixi from "../Pixi";
+import Measure from "./Measure";
 
 enum Types {
   Integer,
@@ -29,7 +30,7 @@ export default interface SpeedChange extends IChronoObject {
 }
 
 class _SpeedRenderer {
-  getBounds(speedChange: SpeedChange, measure: PIXI.Container): PIXI.Rectangle {
+  getBounds(speedChange: SpeedChange, measure: Measure): PIXI.Rectangle {
     const lane = measure;
 
     const y =
@@ -48,7 +49,7 @@ class _SpeedRenderer {
     return new PIXI.Rectangle(_x, _y, measure.width, colliderH);
   }
 
-  render(speed: SpeedChange, graphics: PIXI.Graphics, measure: PIXI.Container) {
+  render(speed: SpeedChange, graphics: PIXI.Graphics, measure: Measure) {
     const bounds = this.getBounds(speed, measure);
 
     graphics

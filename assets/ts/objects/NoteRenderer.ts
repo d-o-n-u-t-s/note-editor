@@ -37,7 +37,6 @@ class NoteRenderer implements INoteRenderer {
     const q = area;
 
     graphics
-      // .lineStyle(4, note.color)
       .lineStyle(6, note.editorProps.color)
       .moveTo(q.point.x, q.point.y)
       .lineTo(q.point.x + q.width, q.point.y);
@@ -45,27 +44,6 @@ class NoteRenderer implements INoteRenderer {
 
   render(note: INote, graphics: PIXI.Graphics, lane: Lane, measure: Measure) {
     const measureBounds = measure.getBounds();
-
-    /*
-    if (
-      [
-        [measureBounds.x, measureBounds.y],
-        [measureBounds.x + measureBounds.width, measureBounds.y],
-        [
-          measureBounds.x + measureBounds.width,
-          measureBounds.y + measureBounds.height
-        ],
-        [measureBounds.x, measureBounds.y + measureBounds.height]
-      ]
-        .map(pos => renderArea.contains(pos[0], pos[1]))
-        .every(_ => _ === false)
-    ) {
-      return;
-    }
-*/
-
-    if (measureBounds.x + measureBounds.width < 0) return;
-    if (measureBounds.x > Pixi.instance!.getRenderAreaSize().x) return;
 
     const q = LaneRendererResolver.resolve(lane).getNotePointInfo(
       lane,

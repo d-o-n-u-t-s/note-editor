@@ -24,6 +24,7 @@ import BPMChange, { BPMRenderer } from "./objects/BPMChange";
 import SpeedChange, { SpeedRenderer } from "./objects/SpeedChange";
 import { NotePointInfo } from "./objects/LaneRenderer";
 import { runInAction } from "mobx";
+import * as _ from "lodash";
 
 @inject
 @observer
@@ -47,7 +48,7 @@ export default class Pixi extends InjectedComponent {
 
     this.container!.addEventListener(
       "mousewheel",
-      e => {
+      (e: any) => {
         this.injected.editor.currentChart!.setTime(
           this.injected.editor.currentChart!.time + e.wheelDelta * 0.01,
           true
@@ -153,8 +154,6 @@ export default class Pixi extends InjectedComponent {
 
     ++this.tempTextIndex;
   }
-
-  measures: Measure[] = [];
 
   prev: number = 0;
 
@@ -277,7 +276,9 @@ export default class Pixi extends InjectedComponent {
         measureIndex++
       ) {
         // TODO: 小節に拍情報を追加する
-        var tempo = 1.0;
+        var tempo = Fraction.to01(
+          chart.timeline.measures[measureIndex].data.beat
+        ); // 1.0;
 
         // 区間の秒数
         var time = unitTime2 * tempo;
@@ -315,10 +316,6 @@ export default class Pixi extends InjectedComponent {
       0
     );
 
-    //console.log(currentTime);
-
-    // while (graphics.children[0]) graphics.removeChild(graphics.children[0]);
-
     (window as any).g = graphics;
 
     const laneWidth = this.injected.editor.setting!.laneWidth;
@@ -334,8 +331,6 @@ export default class Pixi extends InjectedComponent {
     // 0 ~ 1 に正規化された判定ラインの y 座標
     let cy = 0;
 
-    // for (const s of this.sprites) s.off("mousemove");
-
     // レーンを描画
     for (var $x = 0; $x < wC; ++$x) {
       for (var i = hC - 1; i >= 0; --i) {
@@ -344,7 +339,7 @@ export default class Pixi extends InjectedComponent {
         const x = padding + $x * (laneWidth + padding);
         const y = padding + hh * i;
 
-        const measure = this.measures[index];
+        const measure = chart.timeline.measures[index];
 
         // 画面内に表示されているか
         measure.isVisible = x + laneWidth > -graphics.x && x < -graphics.x + w;
@@ -361,42 +356,6 @@ export default class Pixi extends InjectedComponent {
         // 小節の開始時刻、終了時刻
         var b = measureTimeInfo.get(index + 0)!.BeginTime; // 0;// unitTime * index;
         var e = measureTimeInfo.get(index + 1)!.BeginTime; //0;//unitTime * (index + 1);
-
-        if (this.renderedAudioBuffer && 0.4 > 1) {
-          // TODO: ステレオ判定
-          // if (ab.numberOfChannels > 1)
-
-          (window as any).ch = channel;
-
-          // 小節の開始、終了サンプルインデックス
-          var bb = (b / this.renderedAudioBuffer.duration) * channel!.length;
-          var ee = (e / this.renderedAudioBuffer.duration) * channel!.length;
-
-          for (var ii = 0; ii < hh; ++ii) {
-            //var p1 = i - 1;
-            //var p2 = i;
-
-            // 描画 Y 座標の開始、終了サンプルインデックス
-            var bbb = bb + ((ee - bb) / hh) * (hh - 1 - ii);
-            var eee = bb + ((ee - bb) / hh) * (hh - 1 - ii + 1);
-
-            const renderSample = 3;
-
-            for (var j = 0; j < renderSample; ++j) {
-              var value = channel![
-                Math.floor(bbb + ((eee - bbb) / renderSample) * j)
-              ];
-
-              // -1 ~ 1 を 0 ~ 1 に正規化する
-              // value = value * 0.5 + 0.5; //) / 2;
-
-              graphics
-                .lineStyle(1, 0x00ff00, 0.3)
-                .moveTo(x + laneWidth / 2 - (value * laneWidth) / 2, y + ii)
-                .lineTo(x + laneWidth / 2 + (value * laneWidth) / 2, y + ii);
-            }
-          }
-        }
 
         // 小節の中に現在時刻があるなら
         if (b <= currentTime && currentTime < e) {
@@ -415,32 +374,21 @@ export default class Pixi extends InjectedComponent {
             .lineTo(x + laneWidth, $y);
         }
 
-        if (!this.measures[index]) {
-          const collider = new Measure(
-            index,
-            PIXI.Texture.fromImage(
-              "data:image/png;base64,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"
-            )
-          );
-
-          // collider.interactive = true;
-          graphics.addChild(collider);
-
-          this.measures[index] = collider;
-        }
-
         if (!this.texts[index]) {
-          let text = new PIXI.Text(index + "", {
-            fontFamily: "Arial",
-            fontSize: 20,
-            fill: 0xffffff,
-            align: "center",
-            // textBaseline: "middle",
-            dropShadow: true,
-            dropShadowBlur: 8,
-            dropShadowColor: "#000000",
-            dropShadowDistance: 0
-          });
+          let text = new PIXI.Text(
+            index + "/" + Fraction.to01(measure.data.beat),
+            {
+              fontFamily: "Arial",
+              fontSize: 20,
+              fill: 0xffffff,
+              align: "center",
+              // textBaseline: "middle",
+              dropShadow: true,
+              dropShadowBlur: 8,
+              dropShadowColor: "#000000",
+              dropShadowDistance: 0
+            }
+          );
           graphics.addChild(text);
 
           this.texts[index] = text;
@@ -451,13 +399,12 @@ export default class Pixi extends InjectedComponent {
         text.x = x - 15;
         text.y = y;
 
-        const sprite = this.measures[index];
-        sprite.alpha = 0.4;
-        sprite.x = x;
-        sprite.y = y;
-        sprite.width = laneWidth;
-        sprite.height = hh;
-        sprite.updateTransform();
+        text.visible = measure.isVisible;
+
+        measure.x = x;
+        measure.y = y;
+        measure.width = laneWidth;
+        measure.height = hh;
 
         ++index;
       }
@@ -471,14 +418,15 @@ export default class Pixi extends InjectedComponent {
     if (graphics.x > 0) graphics.x = 0;
 
     // カーソルを合わせている小節
-    const targetMeasure = this.measures.find(measure =>
+    const targetMeasure = chart.timeline.measures.find(measure =>
       measure.containsPoint(mousePosition)
     );
 
     const getLane = (note: INote) => {
       return chart.timeline.lanes.find(lane => lane.guid === note.lane)!;
     };
-    const getMeasure = (note: INote) => this.measures[note.measureIndex];
+    const getMeasure = (note: INote) =>
+      chart.timeline.measures[note.measureIndex];
 
     const getLanePointRenderer = (lanePoint: LanePoint) => LanePointRenderer;
 
@@ -537,21 +485,21 @@ export default class Pixi extends InjectedComponent {
 
     // BPM 描画
     for (const bpm of chart.timeline.bpmChanges) {
-      const measure = this.measures[bpm.measureIndex];
+      const measure = chart.timeline.measures[bpm.measureIndex];
 
       BPMRenderer.render(bpm, graphics, measure);
     }
 
     // 速度変更描画
     for (const speedChange of chart.timeline.speedChanges) {
-      const measure = this.measures[speedChange.measureIndex];
+      const measure = chart.timeline.measures[speedChange.measureIndex];
       SpeedRenderer.render(speedChange, graphics, measure);
     }
 
     // レーン中間点描画
     if (setting.objectVisibility.lanePoint) {
       for (const lanePoint of chart.timeline.lanePoints) {
-        const measure = this.measures[lanePoint.measureIndex];
+        const measure = chart.timeline.measures[lanePoint.measureIndex];
 
         getLanePointRenderer(lanePoint).render(lanePoint, graphics, measure);
       }
@@ -565,11 +513,9 @@ export default class Pixi extends InjectedComponent {
         lane,
         graphics,
         chart.timeline.lanePointMap,
-        this.measures,
+        chart.timeline.measures,
         targetMeasure
       );
-
-      //continue;
 
       // ノート配置モードなら選択中のレーンを計算する
       {
@@ -604,6 +550,14 @@ export default class Pixi extends InjectedComponent {
       }
     }
 
+    // ノート更新
+    for (const note of chart.timeline.notes) {
+      const measure = chart.timeline.measures[note.measureIndex];
+
+      // 小節が描画されているなら描画する
+      runInAction(() => (note.isVisible = measure.isVisible));
+    }
+
     // ノートライン描画
     for (const noteLine of chart.timeline.noteLines) {
       NoteLineRendererResolver.resolve(noteLine).render(
@@ -615,11 +569,12 @@ export default class Pixi extends InjectedComponent {
 
     // ノート描画
     for (const note of chart.timeline.notes) {
+      if (!note.isVisible) continue;
       NoteRendererResolver.resolve(note).render(
         note,
         graphics,
         chart.timeline.laneMap.get(note.lane)!,
-        this.measures[note.measureIndex]
+        chart.timeline.measures[note.measureIndex]
       );
     }
 
@@ -630,6 +585,8 @@ export default class Pixi extends InjectedComponent {
       setting.editObjectCategory === ObjectCategory.Note
     ) {
       for (const note of chart.timeline.notes) {
+        if (!note.isVisible) continue;
+
         const bounds = NoteRendererResolver.resolve(note)!.getBounds(
           note,
           getLane(note),
@@ -655,6 +612,7 @@ export default class Pixi extends InjectedComponent {
               editor.setInspectorTarget(note);
             }
           }
+          break;
         }
       }
     }
@@ -668,7 +626,7 @@ export default class Pixi extends InjectedComponent {
       for (const bpmChange of chart.timeline.bpmChanges) {
         const bounds = BPMRenderer.getBounds(
           bpmChange,
-          this.measures[bpmChange.measureIndex]
+          chart.timeline.measures[bpmChange.measureIndex]
         );
 
         if (bounds.contains(mousePosition.x - graphics.x, mousePosition.y)) {
@@ -696,7 +654,7 @@ export default class Pixi extends InjectedComponent {
       for (const bpmChange of chart.timeline.bpmChanges) {
         const bounds = BPMRenderer.getBounds(
           bpmChange,
-          this.measures[bpmChange.measureIndex]
+          chart.timeline.measures[bpmChange.measureIndex]
         );
 
         if (bounds.contains(mousePosition.x - graphics.x, mousePosition.y)) {
@@ -725,7 +683,7 @@ export default class Pixi extends InjectedComponent {
       for (const bpmChange of chart.timeline.speedChanges) {
         const bounds = SpeedRenderer.getBounds(
           bpmChange,
-          this.measures[bpmChange.measureIndex]
+          chart.timeline.measures[bpmChange.measureIndex]
         );
 
         if (bounds.contains(mousePosition.x - graphics.x, mousePosition.y)) {
@@ -777,7 +735,9 @@ export default class Pixi extends InjectedComponent {
           targetNotePoint!.horizontalIndex,
           targetNotePoint!.lane.division
         ),
-        measureIndex: this.measures.findIndex(_ => _ === targetMeasure)!,
+        measureIndex: chart.timeline.measures.findIndex(
+          _ => _ === targetMeasure
+        )!,
         measurePosition: new Fraction(
           setting.measureDivision - 1 - targetNotePoint!.verticalIndex!,
           setting.measureDivision
@@ -806,32 +766,17 @@ export default class Pixi extends InjectedComponent {
           newNote,
           graphics,
           targetNotePoint!.lane,
-          this.measures[newNote.measureIndex]
+          chart.timeline.measures[newNote.measureIndex]
         );
       }
     }
 
     const tempPoint = new PIXI.Point();
-    function normalizeContainsPoint(__this: PIXI.Sprite, point: PIXI.Point) {
-      __this.worldTransform.applyInverse(point, tempPoint);
-
-      const width: number = (__this as any)._texture.orig.width;
-      const height: number = (__this as any)._texture.orig.height;
-      const x1 = -width * __this.anchor.x;
-      let y1 = 0;
-
-      if (tempPoint.x >= x1 && tempPoint.x < x1 + width) {
-        y1 = -height * __this.anchor.y;
-
-        if (tempPoint.y >= y1 && tempPoint.y < y1 + height) {
-          const x = (tempPoint.x - x1) / (x1 + width);
-          const y = (tempPoint.y - x1) / (y1 + height);
-
-          return [x, y];
-        }
-      }
-
-      return [0, 0];
+    function normalizeContainsPoint(measure: Measure, point: PIXI.Point) {
+      return [
+        (point.x - measure.x + graphics.x) / measure.width,
+        (point.y - measure.y) / measure.height
+      ];
     }
 
     // 接続モード && レーン編集
@@ -845,7 +790,10 @@ export default class Pixi extends InjectedComponent {
         .lanePoints) {
         if (
           getLanePointRenderer(lanePoint)
-            .getBounds(lanePoint, this.measures[lanePoint.measureIndex])
+            .getBounds(
+              lanePoint,
+              chart.timeline.measures[lanePoint.measureIndex]
+            )
             .contains(mousePosition.x - graphics.x, mousePosition.y)
         ) {
           // console.log("接続！", lanePoint);
@@ -872,7 +820,7 @@ export default class Pixi extends InjectedComponent {
               newLane,
               graphics,
               chart.timeline.lanePointMap,
-              this.measures
+              chart.timeline.measures
             );
 
             if (isClick) {
@@ -998,7 +946,7 @@ export default class Pixi extends InjectedComponent {
       const p = (editor.setting!.objectSize - 1) / maxObjectSize / 2;
 
       const newLanePoint = {
-        measureIndex: targetMeasure.index,
+        measureIndex: targetMeasure.data.index,
         measurePosition: new Fraction(
           vlDiv - 1 - clamp(Math.floor(ny * vlDiv), 0, vlDiv - 1),
           vlDiv
@@ -1017,7 +965,7 @@ export default class Pixi extends InjectedComponent {
         )
       } as LanePoint;
 
-      //lane.renderer.update(graphics, this.measures);
+      //lane.renderer.update(graphics, chart.timeline.measures);
 
       if (isClick) {
         this.injected.editor.currentChart!.timeline.addLanePoint(newLanePoint);
@@ -1027,7 +975,7 @@ export default class Pixi extends InjectedComponent {
         getLanePointRenderer(newLanePoint).render(
           newLanePoint,
           graphics,
-          this.measures[newLanePoint.measureIndex]
+          chart.timeline.measures[newLanePoint.measureIndex]
         );
       }
     }
@@ -1047,7 +995,7 @@ export default class Pixi extends InjectedComponent {
         num <= min ? min : num >= max ? max : num;
 
       const newLanePoint = {
-        measureIndex: targetMeasure.index,
+        measureIndex: targetMeasure.data.index,
         measurePosition: new Fraction(
           vlDiv - 1 - clamp(Math.floor(ny * vlDiv), 0, vlDiv - 1),
           vlDiv
@@ -1063,7 +1011,7 @@ export default class Pixi extends InjectedComponent {
         BPMRenderer.render(
           newLanePoint,
           graphics,
-          this.measures[newLanePoint.measureIndex]
+          chart.timeline.measures[newLanePoint.measureIndex]
         );
       }
     }
@@ -1075,18 +1023,13 @@ export default class Pixi extends InjectedComponent {
       setting.editObjectCategory === ObjectCategory.Other &&
       setting.editOtherTypeIndex === (OtherObjectType.Speed as number) - 1
     ) {
-      console.log("速度変更はいち");
       const [, ny] = normalizeContainsPoint(targetMeasure, mousePosition);
 
       const vlDiv = this.injected.editor.setting!.measureDivision;
-
-      const clamp = (num: number, min: number, max: number) =>
-        num <= min ? min : num >= max ? max : num;
-
       const newLanePoint = {
-        measureIndex: targetMeasure.index,
+        measureIndex: targetMeasure.data.index,
         measurePosition: new Fraction(
-          vlDiv - 1 - clamp(Math.floor(ny * vlDiv), 0, vlDiv - 1),
+          vlDiv - 1 - _.clamp(Math.floor(ny * vlDiv), 0, vlDiv - 1),
           vlDiv
         ),
         guid: guid(),
@@ -1102,7 +1045,7 @@ export default class Pixi extends InjectedComponent {
         SpeedRenderer.render(
           newLanePoint,
           graphics,
-          this.measures[newLanePoint.measureIndex]
+          chart.timeline.measures[newLanePoint.measureIndex]
         );
       }
     }

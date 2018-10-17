@@ -124,6 +124,8 @@ export default class Asset implements IStore {
     // 名前をキーにしたノートタイプのマップを生成する
     musicGameSystems.noteTypeMap = new Map<string, NoteType>();
     for (const noteType of musicGameSystems.noteTypes || []) {
+      if (!noteType.customProps) noteType.customProps = [];
+
       // 判定音源を読み込む
       if (noteType.editorProps.se) {
         const sePath = path.join(rootPath, directory, noteType.editorProps.se);

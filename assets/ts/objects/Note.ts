@@ -6,7 +6,14 @@ export default interface INote extends TimelineObject {
   horizontalSize: number;
   horizontalPosition: Fraction;
 
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+
   type: string;
+
+  isVisible: boolean;
 
   /**
    * 所属レーンの GUID

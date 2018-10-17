@@ -3,9 +3,10 @@ import TimelineObject from "./TimelineObject";
 import { LaneTemplate } from "../stores/MusicGameSystem";
 import Pixi from "../Pixi";
 import LanePoint from "./LanePoint";
+import Measure from "./Measure";
 
 class LanePointRenderer {
-  getBounds(lanePoint: LanePoint, measure: PIXI.Container): PIXI.Rectangle {
+  getBounds(lanePoint: LanePoint, measure: Measure): PIXI.Rectangle {
     const lane = measure;
 
     //    math.fraction(0, 0)
@@ -35,11 +36,7 @@ class LanePointRenderer {
     return new PIXI.Rectangle(_x, _y, w, colliderH);
   }
 
-  render(
-    lanePoint: LanePoint,
-    graphics: PIXI.Graphics,
-    measure: PIXI.Container
-  ) {
+  render(lanePoint: LanePoint, graphics: PIXI.Graphics, measure: Measure) {
     const bounds = this.getBounds(lanePoint, measure);
 
     graphics

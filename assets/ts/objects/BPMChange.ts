@@ -3,6 +3,8 @@ import TimelineObject from "./TimelineObject";
 import { GUID } from "../util";
 import { Fraction } from "../math";
 import Pixi from "../Pixi";
+import Measure from "./Measure";
+import { Graphics } from "pixi.js";
 
 enum Types {
   Integer,
@@ -29,7 +31,7 @@ export default interface BPMChange extends IChronoObject {
 }
 
 class _BPMRenderer {
-  getBounds(bpmChange: BPMChange, measure: PIXI.Container): PIXI.Rectangle {
+  getBounds(bpmChange: BPMChange, measure: Measure): PIXI.Rectangle {
     const lane = measure;
 
     const y =
@@ -48,7 +50,7 @@ class _BPMRenderer {
     return new PIXI.Rectangle(_x, _y, measure.width, colliderH);
   }
 
-  render(bpm: BPMChange, graphics: PIXI.Graphics, measure: PIXI.Container) {
+  render(bpm: BPMChange, graphics: PIXI.Graphics, measure: Measure) {
     const bounds = this.getBounds(bpm, measure);
 
     graphics

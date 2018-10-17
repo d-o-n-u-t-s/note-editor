@@ -1,25 +1,19 @@
 import { Howl } from "howler";
+import * as _ from "lodash";
 import { action, observable, computed, transaction } from "mobx";
-
 import HotReload from "../HotReload";
-
 import { Fraction } from "../math";
-
-import * as PIXI from "pixi.js";
 import MusicGameSystem from "./MusicGameSystem";
 
 interface IStore {}
 
 import Timeline from "../objects/Timeline";
-import BPMChange, { BPMRenderer } from "../objects/BPMChange";
-import LanePointRenderer from "../objects/LanePoint";
-
-import NoteRenderer from "../objects/NoteRenderer";
 import Editor from "./EditorStore";
 import Lane from "../objects/Lane";
 import LanePoint from "../objects/LanePoint";
 import { guid } from "../util";
 import INote from "../objects/Note";
+import Measure, { IMeasureData } from "../objects/Measure";
 
 export default class Chart implements IStore {
   @observable
@@ -65,6 +59,30 @@ export default class Chart implements IStore {
     this.setName(chart.name);
     this.setStartTime(chart.startTime);
     transaction(() => {
+      const measures: Measure[] = [];
+
+      // 小節を読み込む
+      for (const measureData of (chart.timeline.measures ||
+        []) as IMeasureData[]) {
+        const measure = new Measure(measureData);
+        measures.push(measure);
+      }
+
+      // 1000 小節まで生成する
+      for (let i = measures.length; i <= 999; i++) {
+        measures.push(
+          new Measure({
+            index: i,
+            beat: new Fraction(4, 4),
+            customProps: {}
+          })
+        );
+      }
+
+      this.timeline.setMeasures(measures);
+
+      console.log("measures", measures);
+
       for (const lanePoint of chart.timeline.lanePoints) {
         lanePoint.measurePosition = new Fraction(
           lanePoint.measurePosition.numerator,
@@ -122,8 +140,6 @@ export default class Chart implements IStore {
         );
         this.timeline.addSpeedChange(speedChange);
       }
-
-      this.timeline.setTempos(chart.timeline.tempos);
     });
   }
 
@@ -227,11 +243,7 @@ export default class Chart implements IStore {
 
   @action
   setTime = (time: number, seek: boolean = false) => {
-    function clamp(num: number, min: number, max: number) {
-      return num <= min ? min : num >= max ? max : num;
-    }
-
-    this.time = clamp(time, 0, this.audio!.duration());
+    this.time = _.clamp(time, 0, this.audio!.duration());
 
     //    console.log("change time", time);
 
@@ -376,6 +388,10 @@ export default class Chart implements IStore {
       const note = Object.assign({}, t);
       delete note.editorProps;
       return note;
+    });
+
+    (tl as any).measures = chart.timeline.measures.map(measure => {
+      return measure.data;
     });
 
     //  for (const e of tl.bpmChanges) delete e.renderer;

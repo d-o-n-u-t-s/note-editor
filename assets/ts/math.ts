@@ -1,7 +1,16 @@
 import * as math from "mathjs";
 
+export interface IFraction {
+  numerator: number;
+  denominator: number;
+}
+
 export class Fraction {
   constructor(public numerator: number, public denominator: number) {}
+
+  static to01(fraction: IFraction) {
+    return (1 / fraction.denominator) * fraction.numerator;
+  }
 
   static none = new Fraction(0, 0);
 

@@ -35,7 +35,7 @@ class NoteLineRenderer implements INoteLineRenderer {
 
         line.start.point,
         Vector2.add(line.start.point, new Vector2(line.start.width, 0)),
-        Vector2.add(line.end.point, new Vector2(-line.end.width, 0)),
+        Vector2.add(line.end.point, new Vector2(line.end.width, 0)),
         line.end.point,
 
         head.editorProps.color
@@ -53,15 +53,17 @@ class NoteLineRenderer implements INoteLineRenderer {
   }
 
   render(noteLine: NoteLine, graphics: PIXI.Graphics, notes: INote[]) {
-    const measures = Pixi.instance!.measures;
     const {
       lanePointMap,
       noteMap,
-      laneMap
+      laneMap,
+      measures
     } = Pixi.instance!.injected.editor!.currentChart!.timeline;
 
     let head = noteMap.get(noteLine.head)!;
     let tail = noteMap.get(noteLine.tail)!;
+
+    if (!head.isVisible && !tail.isVisible) return;
 
     // head, tail をソート
     [head, tail] = [head, tail].sort(sortMeasure);
@@ -87,15 +89,11 @@ class NoteLineRenderer implements INoteLineRenderer {
       measures[head.measureIndex]
     );
 
-    //console.log("headBounds: " + headBounds.x);
-
     const tailBounds = NoteRenderer.getBounds(
       tail,
       laneMap.get(tail.lane)!,
       measures[tail.measureIndex]
     );
-
-    // let prevBounds = headBounds;
 
     // 先頭ノートと末尾ノートの間にあるレーン中間ポイントを取得する
     let lps = lane.points
@@ -208,10 +206,6 @@ class NoteLineRenderer implements INoteLineRenderer {
       ...lps,
       noteToLanePoint(tail, tailBounds)
     ];
-
-    //  (window as any).testtest = true;
-
-    //  console.log(lps.length);
 
     const lines = getLines(lps, measures);
 
