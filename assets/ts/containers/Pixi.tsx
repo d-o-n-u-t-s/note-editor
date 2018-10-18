@@ -297,7 +297,9 @@ export default class Pixi extends InjectedComponent {
       }
     }
 
-    var mousePosition = this.app!.renderer.plugins.interaction.mouse.global;
+    var mousePosition: PIXI.Point = this.app!.renderer.plugins.interaction.mouse
+      .global;
+    mousePosition.x -= graphics.x;
 
     // this.app!.renderer.plugins.interaction.mouse.
 
@@ -546,7 +548,7 @@ export default class Pixi extends InjectedComponent {
           lane,
           targetMeasure!,
           setting.measureDivision,
-          new Vector2(mousePosition.x - graphics.x, mousePosition.y)
+          new Vector2(mousePosition.x, mousePosition.y)
         );
       }
     }
@@ -596,7 +598,7 @@ export default class Pixi extends InjectedComponent {
           getMeasure(note)
         );
 
-        if (bounds.contains(mousePosition.x - graphics.x, mousePosition.y)) {
+        if (bounds.contains(mousePosition.x, mousePosition.y)) {
           graphics
             .lineStyle(2, 0xff9900)
             .drawRect(
@@ -632,7 +634,7 @@ export default class Pixi extends InjectedComponent {
           chart.timeline.measures[bpmChange.measureIndex]
         );
 
-        if (bounds.contains(mousePosition.x - graphics.x, mousePosition.y)) {
+        if (bounds.contains(mousePosition.x, mousePosition.y)) {
           graphics
             .lineStyle(2, 0xff9900)
             .drawRect(
@@ -660,7 +662,7 @@ export default class Pixi extends InjectedComponent {
           chart.timeline.measures[bpmChange.measureIndex]
         );
 
-        if (bounds.contains(mousePosition.x - graphics.x, mousePosition.y)) {
+        if (bounds.contains(mousePosition.x, mousePosition.y)) {
           graphics
             .lineStyle(2, 0xff9900)
             .drawRect(
@@ -689,7 +691,7 @@ export default class Pixi extends InjectedComponent {
           chart.timeline.measures[bpmChange.measureIndex]
         );
 
-        if (bounds.contains(mousePosition.x - graphics.x, mousePosition.y)) {
+        if (bounds.contains(mousePosition.x, mousePosition.y)) {
           graphics
             .lineStyle(2, 0xff9900)
             .drawRect(
@@ -781,7 +783,7 @@ export default class Pixi extends InjectedComponent {
     const tempPoint = new PIXI.Point();
     function normalizeContainsPoint(measure: Measure, point: PIXI.Point) {
       return [
-        (point.x - measure.x + graphics.x) / measure.width,
+        (point.x - measure.x) / measure.width,
         (point.y - measure.y) / measure.height
       ];
     }
@@ -801,7 +803,7 @@ export default class Pixi extends InjectedComponent {
               lanePoint,
               chart.timeline.measures[lanePoint.measureIndex]
             )
-            .contains(mousePosition.x - graphics.x, mousePosition.y)
+            .contains(mousePosition.x, mousePosition.y)
         ) {
           // console.log("接続！", lanePoint);
 
@@ -860,7 +862,7 @@ export default class Pixi extends InjectedComponent {
           getMeasure(note)
         );
 
-        if (bounds.contains(mousePosition.x - graphics.x, mousePosition.y)) {
+        if (bounds.contains(mousePosition.x, mousePosition.y)) {
           graphics
             .lineStyle(2, 0xff9900)
             //.beginFill(0x0099ff, 0.3)
