@@ -65,6 +65,8 @@ interface MusicGameSystem {
   customNoteLineRenderers: CustomNoteLineRenderer[];
 
   customNoteLineRendererMap: Map<string, CustomNoteLineRenderer>;
+
+  converter: string;
 }
 /**
  * 音ゲーシステムを正規化して不正な値を修正する

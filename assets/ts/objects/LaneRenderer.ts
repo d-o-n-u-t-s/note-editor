@@ -1,6 +1,6 @@
 import LanePoint from "./LanePoint";
 import Measure from "./Measure";
-import { Fraction, Vector2, lerp, inverseLerp } from "../math";
+import { Fraction, Vector2, lerp, inverseLerp, IFraction } from "../math";
 import Lane, { LinePointInfo, LineInfo } from "./Lane";
 
 import { sortMeasure } from "../objects/Measure";
@@ -12,9 +12,9 @@ import { drawQuad } from "../utils/drawQuad";
 
 interface LinePoint {
   measureIndex: number;
-  measurePosition: Fraction;
+  measurePosition: IFraction;
   horizontalSize: number;
-  horizontalPosition: Fraction;
+  horizontalPosition: IFraction;
 }
 
 export interface NotePointInfo {
@@ -33,9 +33,9 @@ export function getLines(points: LinePoint[], measures: Measure[]): LineInfo[] {
     .slice()
     .sort(sortMeasure)
     .map(p => ({
-      x: p.horizontalPosition.to01Number(),
+      x: Fraction.to01(p.horizontalPosition),
       width: p.horizontalSize / p.horizontalPosition.denominator,
-      value: p.measureIndex + p.measurePosition.to01Number()
+      value: p.measureIndex + Fraction.to01(p.measurePosition)
     }));
 
   for (let i = 0; i < _points.length - 1; ++i) {
@@ -83,8 +83,8 @@ export interface ILaneRenderer {
   getNotePointInfo(
     lane: Lane,
     measure: Measure,
-    horizontal: Fraction,
-    vertical: Fraction
+    horizontal: IFraction,
+    vertical: IFraction
   ): LinePointInfo | null;
   getNotePointInfoFromMousePosition(
     lane: Lane,
@@ -161,11 +161,11 @@ class LaneRenderer implements ILaneRenderer {
   getNotePointInfo(
     lane: Lane,
     measure: Measure,
-    horizontal: Fraction,
-    vertical: Fraction
+    horizontal: IFraction,
+    vertical: IFraction
   ): LinePointInfo | null {
     // y座標
-    const y = measure.y + measure.height * (1 - vertical.to01Number());
+    const y = measure.y + measure.height * (1 - Fraction.to01(vertical));
 
     // y座標が含まれるライン
     const targetLine = (linesCache.get(lane) || []).find(
@@ -186,7 +186,7 @@ class LaneRenderer implements ILaneRenderer {
     // x座標を補完で求める
     const getX = (info: LinePointInfo, i: number) =>
       info.point.x +
-      info.width * (horizontal.to01Number() + i / horizontal.denominator);
+      info.width * (Fraction.to01(horizontal) + i / horizontal.denominator);
     const left = lerp(getX(end, 0), getX(start, 0), rate);
     const right = lerp(getX(end, 1), getX(start, 1), rate);
 

@@ -12,6 +12,13 @@ export class Fraction {
     return (1 / fraction.denominator) * fraction.numerator;
   }
 
+  static clone(fraction: IFraction) {
+    return {
+      numerator: fraction.numerator,
+      denominator: fraction.denominator
+    };
+  }
+
   static none = new Fraction(0, 0);
 
   to01Number = () => (1 / this.denominator) * this.numerator;

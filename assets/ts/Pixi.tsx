@@ -6,9 +6,9 @@ import LanePoint from "./objects/LanePoint";
 import LanePointRenderer from "./objects/LanePointRenderer";
 import { observer } from "mobx-react";
 import Lane from "./objects/Lane";
-import INote from "./objects/Note";
+import INote, { INoteData } from "./objects/Note";
 import { NoteType } from "./stores/MusicGameSystem";
-import Measure from "./objects/Measure";
+import Measure, { sortMeasureData } from "./objects/Measure";
 import { guid } from "./util";
 import Vector2 from "./math/Vector2";
 import NoteLine from "./objects/NoteLine";
@@ -25,6 +25,7 @@ import SpeedChange, { SpeedRenderer } from "./objects/SpeedChange";
 import { NotePointInfo } from "./objects/LaneRenderer";
 import { runInAction, transaction } from "mobx";
 import * as _ from "lodash";
+import Note from "./objects/Note";
 
 @inject
 @observer
@@ -423,10 +424,10 @@ export default class Pixi extends InjectedComponent {
     );
 
     const getLane = (note: INote) => {
-      return chart.timeline.lanes.find(lane => lane.guid === note.lane)!;
+      return chart.timeline.lanes.find(lane => lane.guid === note.data.lane)!;
     };
     const getMeasure = (note: INote) =>
-      chart.timeline.measures[note.measureIndex];
+      chart.timeline.measures[note.data.measureIndex];
 
     const getLanePointRenderer = (lanePoint: LanePoint) => LanePointRenderer;
 
@@ -553,7 +554,7 @@ export default class Pixi extends InjectedComponent {
     runInAction("updateNoteVisible", () => {
       // ノート更新
       for (const note of chart.timeline.notes) {
-        const measure = chart.timeline.measures[note.measureIndex];
+        const measure = chart.timeline.measures[note.data.measureIndex];
 
         // 小節が描画されているなら描画する
         note.isVisible = measure.isVisible;
@@ -575,8 +576,8 @@ export default class Pixi extends InjectedComponent {
       NoteRendererResolver.resolve(note).render(
         note,
         graphics,
-        chart.timeline.laneMap.get(note.lane)!,
-        chart.timeline.measures[note.measureIndex]
+        chart.timeline.laneMap.get(note.data.lane)!,
+        chart.timeline.measures[note.data.measureIndex]
       );
     }
 
@@ -730,7 +731,7 @@ export default class Pixi extends InjectedComponent {
       ];
 
       // 新規ノート
-      const newNote: INote = {
+      const newNote = new Note({
         guid: guid(),
         horizontalSize: editor.setting!.objectSize,
         horizontalPosition: new Fraction(
@@ -746,7 +747,11 @@ export default class Pixi extends InjectedComponent {
         ),
         type: newNoteType.name,
         lane: targetNotePoint!.lane.guid,
-        editorProps: { color: getNoteColor(newNoteType) },
+        editorProps: {
+          time: 0,
+          sePlayed: false,
+          color: getNoteColor(newNoteType)
+        },
         customProps: newNoteType.customProps.reduce(
           (object: any, b: { key: string; defaultValue: any }) => {
             // カスタム色をデフォルト値にする
@@ -759,7 +764,7 @@ export default class Pixi extends InjectedComponent {
           },
           {}
         )
-      } as INote;
+      });
 
       if (isClick) {
         chart.timeline.addNote(newNote);
@@ -768,7 +773,7 @@ export default class Pixi extends InjectedComponent {
           newNote,
           graphics,
           targetNotePoint!.lane,
-          chart.timeline.measures[newNote.measureIndex]
+          chart.timeline.measures[newNote.data.measureIndex]
         );
       }
     }
@@ -865,18 +870,18 @@ export default class Pixi extends InjectedComponent {
           if (
             this.connectTargetNote &&
             // 同じノートタイプか接続可能なノートタイプなら
-            (this.connectTargetNote.type === note.type ||
+            (this.connectTargetNote.data.type === note.data.type ||
               musicGameSystem.noteTypeMap
-                .get(this.connectTargetNote.type)!
-                .connectableTypes.includes(note.type))
+                .get(this.connectTargetNote.data.type)!
+                .connectableTypes.includes(note.data.type))
           ) {
             const [head, tail] = [this.connectTargetNote, note].sort(
-              sortMeasure
+              sortMeasureData
             );
 
             const newNoteLine: NoteLine = {
-              head: head.guid,
-              tail: tail.guid
+              head: head.data.guid,
+              tail: tail.data.guid
             };
 
             // ノートラインプレビュー
@@ -1057,22 +1062,24 @@ export default class Pixi extends InjectedComponent {
       for (const note of chart.timeline.notes) {
         // 判定時間
         const judgeTime = measureTimeInfo
-          .get(note.measureIndex)!
-          .GetJudgeTime(note.measureIndex + note.measurePosition.to01Number());
+          .get(note.data.measureIndex)!
+          .GetJudgeTime(
+            note.data.measureIndex + Fraction.to01(note.data.measurePosition)
+          );
 
         // 時間が巻き戻っていたら SE 再生済みフラグをリセットする
         if (currentTime < this.previousTime && currentTime < judgeTime) {
-          note.editorProps.sePlayed = false;
+          note.data.editorProps.sePlayed = false;
         }
 
-        if (!chart.isPlaying || note.editorProps.sePlayed) continue;
+        if (!chart.isPlaying || note.data.editorProps.sePlayed) continue;
 
         if (currentTime >= judgeTime) {
           // SE を鳴らす
-          if (musicGameSystem.seMap.has(note.type)) {
-            musicGameSystem.seMap.get(note.type)!.play();
+          if (musicGameSystem.seMap.has(note.data.type)) {
+            musicGameSystem.seMap.get(note.data.type)!.play();
           }
-          note.editorProps.sePlayed = true;
+          note.data.editorProps.sePlayed = true;
         }
       }
     });

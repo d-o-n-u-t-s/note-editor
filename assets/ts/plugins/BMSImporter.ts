@@ -218,6 +218,7 @@ export default class BMSImporter {
 
         measures.push({
           index: laneIndex,
+          editorProps: { time: 0 },
           beat: new Fraction(value, 1),
           customProps: {}
         });
@@ -400,6 +401,7 @@ export default class BMSImporter {
         return {
           index,
           beat: new Fraction(4, 4),
+          editorProps: { time: 0 },
           customProps: {}
         };
       });

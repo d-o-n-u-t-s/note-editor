@@ -13,7 +13,7 @@ export default class Timeline {
       this.noteMap.clear();
 
       for (const note of this.notes) {
-        this.noteMap.set(note.guid, note);
+        this.noteMap.set(note.data.guid, note);
       }
 
       console.log("NoteMap を更新しました");
@@ -101,7 +101,8 @@ export default class Timeline {
   removeNote(note: INote) {
     // ノートを参照しているノートラインを削除する
     for (const noteLine of this.noteLines.filter(
-      noteLine => noteLine.head === note.guid || noteLine.tail === note.guid
+      noteLine =>
+        noteLine.head === note.data.guid || noteLine.tail === note.data.guid
     )) {
       this.removeNoteLine(noteLine);
     }
@@ -146,8 +147,8 @@ export default class Timeline {
     for (const noteLine of this.noteLines) {
       // 先頭と末尾をソートして正しい順序にする
       const [head, tail] = [
-        this.noteMap.get(noteLine.head)!,
-        this.noteMap.get(noteLine.tail)!
+        this.noteMap.get(noteLine.head)!.data,
+        this.noteMap.get(noteLine.tail)!.data
       ].sort(sortMeasure);
 
       noteLine.head = head.guid;
@@ -198,9 +199,9 @@ export default class Timeline {
         if (nextLane) {
           // 古いレーンを参照していたノートのレーン情報を更新
           for (const note of this.notes.filter(
-            note => note.lane === nextLane.guid
+            note => note.data.lane === nextLane.guid
           )) {
-            note.lane = lane.guid;
+            note.data.lane = lane.guid;
           }
 
           const nextLaneIndex = this.lanes.findIndex(l => l === nextLane);

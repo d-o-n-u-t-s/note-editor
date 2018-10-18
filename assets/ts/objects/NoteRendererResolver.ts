@@ -1,4 +1,3 @@
-import Lane from "./Lane";
 import INote from "./Note";
 import NoteRenderer, { INoteRenderer } from "./NoteRenderer";
 import Pixi from "../Pixi";
@@ -6,7 +5,7 @@ import Pixi from "../Pixi";
 export default class NoteRendererResolver {
   static resolve(note: INote): INoteRenderer {
     const noteType = Pixi.instance!.injected.editor!.currentChart!.musicGameSystem!.noteTypeMap.get(
-      note.type
+      note.data.type
     )!;
 
     // console.log(noteType.rendererReference);

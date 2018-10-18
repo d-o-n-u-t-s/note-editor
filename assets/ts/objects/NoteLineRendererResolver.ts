@@ -10,7 +10,7 @@ export default class NoteLineRendererResolver {
     )!;
 
     const customRenderer = Pixi.instance!.injected.editor!.currentChart!.musicGameSystem!.customNoteLineRendererMap.get(
-      headNote.type
+      headNote.data.type
     );
 
     if (!customRenderer) return NoteLineRenderer;

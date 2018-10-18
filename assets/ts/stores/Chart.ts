@@ -12,7 +12,7 @@ import Editor from "./EditorStore";
 import Lane from "../objects/Lane";
 import LanePoint from "../objects/LanePoint";
 import { guid } from "../util";
-import INote from "../objects/Note";
+import Note, { INoteData } from "../objects/Note";
 import Measure, { IMeasureData } from "../objects/Measure";
 
 export default class Chart implements IStore {
@@ -74,6 +74,7 @@ export default class Chart implements IStore {
           new Measure({
             index: i,
             beat: new Fraction(4, 4),
+            editorProps: { time: 0 },
             customProps: {}
           })
         );
@@ -98,22 +99,25 @@ export default class Chart implements IStore {
 
       const notes: any[] = [];
 
-      for (const note of chart.timeline.notes as INote[]) {
-        note.measurePosition = new Fraction(
-          note.measurePosition.numerator,
-          note.measurePosition.denominator
-        );
-        note.horizontalPosition = new Fraction(
-          note.horizontalPosition.numerator,
-          note.horizontalPosition.denominator
-        );
+      // 小節を読み込む
+      for (const measureData of (chart.timeline.measures ||
+        []) as IMeasureData[]) {
+        const measure = new Measure(measureData);
+        measures.push(measure);
+      }
 
-        if (!note.customProps) note.customProps = { color: "#ffffff" };
+      for (const noteData of chart.timeline.notes as INoteData[]) {
+        const note = new Note(noteData);
 
-        note.editorProps = {
+        if (!note.data.customProps)
+          note.data.customProps = { color: "#ffffff" };
+
+        note.data.editorProps = {
           color: Number(
-            this.musicGameSystem!.noteTypeMap.get(note.type)!.editorProps.color
+            this.musicGameSystem!.noteTypeMap.get(note.data.type)!.editorProps
+              .color
           ),
+          time: 0,
           sePlayed: false
         };
 
@@ -386,10 +390,8 @@ export default class Chart implements IStore {
     );
     tl.lanePoints = chart.timeline.lanePoints.map(t => Object.assign({}, t));
     (tl as any).lanes = chart.timeline.lanes.map(t => Object.assign({}, t));
-    (tl as any).notes = chart.timeline.notes.map(t => {
-      const note = Object.assign({}, t);
-      delete note.editorProps;
-      return note;
+    (tl as any).notes = chart.timeline.notes.map(note => {
+      return note.data;
     });
 
     (tl as any).measures = chart.timeline.measures.map(measure => {

@@ -1,7 +1,7 @@
 import { Fraction } from "../math";
 import { LineInfo } from "./Lane";
 import { drawQuad } from "../utils/drawQuad";
-import { sortMeasure } from "./Measure";
+import { sortMeasure, sortMeasureData } from "./Measure";
 import INote from "./Note";
 import NoteRenderer from "./NoteRenderer";
 import NoteLine from "./NoteLine";
@@ -38,15 +38,15 @@ class NoteLineRenderer implements INoteLineRenderer {
         Vector2.add(line.end.point, new Vector2(line.end.width, 0)),
         line.end.point,
 
-        head.editorProps.color
+        head.data.editorProps.color
       );
 
       graphics
-        .lineStyle(1, head.editorProps.color, 1)
+        .lineStyle(1, head.data.editorProps.color, 1)
         .moveTo(line.start.point.x, line.start.point.y)
         .lineTo(line.end.point.x, line.end.point.y);
       graphics
-        .lineStyle(1, head.editorProps.color, 1)
+        .lineStyle(1, head.data.editorProps.color, 1)
         .moveTo(line.start.point.x + line.start.width, line.start.point.y)
         .lineTo(line.end.point.x + line.start.width, line.end.point.y);
     }
@@ -66,14 +66,16 @@ class NoteLineRenderer implements INoteLineRenderer {
     if (!head.isVisible && !tail.isVisible) return;
 
     // head, tail をソート
-    [head, tail] = [head, tail].sort(sortMeasure);
+    [head, tail] = [head, tail].sort(sortMeasureData);
 
-    const lane = laneMap.get(head.lane)!;
+    const lane = laneMap.get(head.data.lane)!;
 
     if (!lane) console.error(laneMap);
 
-    const headPos = head.measureIndex + head.measurePosition.to01Number();
-    const tailPos = tail.measureIndex + tail.measurePosition.to01Number();
+    const headPos =
+      head.data.measureIndex + Fraction.to01(head.data.measurePosition);
+    const tailPos =
+      tail.data.measureIndex + Fraction.to01(tail.data.measurePosition);
 
     const length = tailPos - headPos;
 
@@ -86,13 +88,13 @@ class NoteLineRenderer implements INoteLineRenderer {
     const headBounds = NoteRenderer.getBounds(
       head,
       lane,
-      measures[head.measureIndex]
+      measures[head.data.measureIndex]
     );
 
     const tailBounds = NoteRenderer.getBounds(
       tail,
-      laneMap.get(tail.lane)!,
-      measures[tail.measureIndex]
+      laneMap.get(tail.data.lane)!,
+      measures[tail.data.measureIndex]
     );
 
     // 先頭ノートと末尾ノートの間にあるレーン中間ポイントを取得する
@@ -134,25 +136,25 @@ class NoteLineRenderer implements INoteLineRenderer {
 
         // 先頭ノートが配置してある位置のレーンの横幅
         const headNoteLaneWidth =
-          (headBounds.width / head.horizontalSize) *
-          head.horizontalPosition.denominator;
+          (headBounds.width / head.data.horizontalSize) *
+          head.data.horizontalPosition.denominator;
 
         // 末尾ノートが配置してある位置のレーンの横幅
         const tailNoteLaneWidth =
-          (tailBounds.width / tail.horizontalSize) *
-          tail.horizontalPosition.denominator;
+          (tailBounds.width / tail.data.horizontalSize) *
+          tail.data.horizontalPosition.denominator;
 
         // 先頭ノートが配置してあるレーンの左座標
         const headNoteLaneLeft =
           headBounds.x -
-          (headNoteLaneWidth / head.horizontalPosition.denominator) *
-            head.horizontalPosition.numerator;
+          (headNoteLaneWidth / head.data.horizontalPosition.denominator) *
+            head.data.horizontalPosition.numerator;
 
         // 末尾ノートが配置してあるレーンの左座標
         const tailNoteLaneLeft =
           tailBounds.x -
-          (tailNoteLaneWidth / tail.horizontalPosition.denominator) *
-            tail.horizontalPosition.numerator;
+          (tailNoteLaneWidth / tail.data.horizontalPosition.denominator) *
+            tail.data.horizontalPosition.numerator;
 
         const headLaneNormalizedHorizontalPos =
           (headBounds.x - headNoteLaneLeft) / headNoteLaneWidth;
@@ -193,11 +195,11 @@ class NoteLineRenderer implements INoteLineRenderer {
       return {
         horizontalSize: noteBounds.width,
         horizontalPosition: new Fraction(
-          noteBounds.x - measures[note.measureIndex].x,
-          measures[note.measureIndex].width
+          noteBounds.x - measures[note.data.measureIndex].x,
+          measures[note.data.measureIndex].width
         ),
-        measureIndex: note.measureIndex,
-        measurePosition: note.measurePosition.clone()
+        measureIndex: note.data.measureIndex,
+        measurePosition: Fraction.clone(note.data.measurePosition)
       } as LanePoint;
     };
 

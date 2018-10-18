@@ -1,29 +1,43 @@
-import { Fraction } from "../math";
-import TimelineObject from "./TimelineObject";
+import { Fraction, IFraction } from "../math";
+import GraphicObject from "./GraphicObject";
 import { GUID } from "../util";
 
-export default interface INote extends TimelineObject {
+interface INoteEditorProps {
+  time: number;
+
+  color: number;
+  sePlayed: boolean;
+}
+
+export interface INoteData {
+  editorProps: INoteEditorProps;
+
+  guid: GUID;
+
+  /**
+   * 小節インデックス
+   */
+  measureIndex: number;
+  /**
+   * 小節内の位置
+   */
+  measurePosition: IFraction;
+
   horizontalSize: number;
   horizontalPosition: Fraction;
 
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-
   type: string;
-
-  isVisible: boolean;
 
   /**
    * 所属レーンの GUID
    */
   lane: GUID;
 
-  editorProps: {
-    color: number;
-    sePlayed: boolean;
-  };
-
   customProps: any;
+}
+
+export default class Note extends GraphicObject {
+  constructor(public data: INoteData) {
+    super();
+  }
 }

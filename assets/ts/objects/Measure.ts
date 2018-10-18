@@ -1,18 +1,16 @@
 import * as _ from "lodash";
 import { Fraction, IFraction } from "../math";
-import Pixi from "../Pixi";
+import GraphicObject from "./GraphicObject";
+
+export interface IMeasureEditorProps {
+  time: number;
+}
 
 export interface IMeasureData {
   index: number;
   beat: IFraction;
+  editorProps: IMeasureEditorProps;
   customProps: any;
-}
-
-class GraphicObject {
-  x = 0;
-  y = 0;
-  width = 0;
-  height = 0;
 }
 
 /**
@@ -26,30 +24,6 @@ interface MeasurePoint {
  * 小節
  */
 export default class Measure extends GraphicObject {
-  isVisible = false;
-
-  x = 0;
-  y = 0;
-  width = 0;
-  height = 0;
-
-  containsPoint(point: { x: number; y: number }) {
-    return (
-      _.inRange(point.x, this.x, this.x + this.width) &&
-      _.inRange(point.y, this.y, this.y + this.height)
-    );
-  }
-
-  getBounds() {
-    return new PIXI.Rectangle(
-      this.x + Pixi.debugGraphics!.x,
-
-      this.y,
-      this.width,
-      this.height
-    );
-  }
-
   constructor(public data: IMeasureData) {
     super();
   }
@@ -57,12 +31,25 @@ export default class Measure extends GraphicObject {
 
 interface MeasureObject {
   measureIndex: number;
-  measurePosition: Fraction;
+  measurePosition: IFraction;
+}
+interface MeasureDataObject {
+  data: {
+    measureIndex: number;
+    measurePosition: IFraction;
+  };
 }
 
 export function sortMeasure(a: MeasureObject, b: MeasureObject) {
-  const v1 = a.measureIndex + a.measurePosition.to01Number();
-  const v2 = b.measureIndex + b.measurePosition.to01Number();
+  const v1 = a.measureIndex + Fraction.to01(a.measurePosition);
+  const v2 = b.measureIndex + Fraction.to01(b.measurePosition);
+
+  return v1 - v2;
+}
+
+export function sortMeasureData(a: MeasureDataObject, b: MeasureDataObject) {
+  const v1 = a.data.measureIndex + Fraction.to01(a.data.measurePosition);
+  const v2 = b.data.measureIndex + Fraction.to01(b.data.measurePosition);
 
   return v1 - v2;
 }
