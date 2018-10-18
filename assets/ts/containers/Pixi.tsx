@@ -6,7 +6,7 @@ import LanePoint from "../objects/LanePoint";
 import LanePointRenderer from "../objects/LanePointRenderer";
 import { observer } from "mobx-react";
 import Lane from "../objects/Lane";
-import INote, { INoteData } from "../objects/Note";
+import Note, { INoteData } from "../objects/Note";
 import { NoteType } from "../stores/MusicGameSystem";
 import Measure, { sortMeasureData } from "../objects/Measure";
 import { guid } from "../util";
@@ -25,7 +25,6 @@ import SpeedChange, { SpeedRenderer } from "../objects/SpeedChange";
 import { NotePointInfo } from "../objects/LaneRenderer";
 import { runInAction, transaction } from "mobx";
 import * as _ from "lodash";
-import Note from "../objects/Note";
 
 @inject
 @observer
@@ -158,7 +157,7 @@ export default class Pixi extends InjectedComponent {
 
   prev: number = 0;
 
-  connectTargetNote: INote | null = null;
+  connectTargetNote: Note | null = null;
   connectTargetLanePoint: LanePoint | null = null;
 
   /**
@@ -276,13 +275,12 @@ export default class Pixi extends InjectedComponent {
         measureIndex < endMeasureIndex;
         measureIndex++
       ) {
-        // TODO: 小節に拍情報を追加する
-        var tempo = Fraction.to01(
+        const tempo = Fraction.to01(
           chart.timeline.measures[measureIndex].data.beat
-        ); // 1.0;
+        );
 
         // 区間の秒数
-        var time = unitTime2 * tempo;
+        const time = unitTime2 * tempo;
 
         var bpmRange = new BPMRange();
         bpmRange.BeginPosition = measureIndex;
@@ -425,10 +423,10 @@ export default class Pixi extends InjectedComponent {
       measure.containsPoint(mousePosition)
     );
 
-    const getLane = (note: INote) => {
+    const getLane = (note: Note) => {
       return chart.timeline.lanes.find(lane => lane.guid === note.data.lane)!;
     };
-    const getMeasure = (note: INote) =>
+    const getMeasure = (note: Note) =>
       chart.timeline.measures[note.data.measureIndex];
 
     const getLanePointRenderer = (lanePoint: LanePoint) => LanePointRenderer;
@@ -458,6 +456,10 @@ export default class Pixi extends InjectedComponent {
           .lineStyle(2, 0xffffff, 0.8)
           .moveTo(s.x, y)
           .lineTo(s.x + laneWidth, y);
+      }
+
+      if (setting.editMode === EditMode.Select && isClick) {
+        editor.setInspectorTarget(targetMeasure.data);
       }
 
       // レーン追加モードなら小節の横分割線を描画
@@ -614,7 +616,7 @@ export default class Pixi extends InjectedComponent {
             }
             if (setting.editMode === EditMode.Select) {
               console.log("ノートを選択しました", note);
-              editor.setInspectorTarget(note);
+              editor.setInspectorTarget(note.data);
             }
           }
           break;
