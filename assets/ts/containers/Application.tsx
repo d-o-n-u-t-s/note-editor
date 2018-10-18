@@ -12,7 +12,7 @@ import Inspector from "./Inspector";
 
 import Player from "./Player";
 
-import config from "./config";
+import config from "../config";
 
 const drawerWidth: number = config.sidebarWidth;
 
@@ -84,7 +84,7 @@ const styles = (theme: Theme) =>
     }
   });
 
-import Editor from "./stores/EditorStore";
+import Editor from "../stores/EditorStore";
 
 interface Props extends WithStyles<typeof styles> {
   editor?: Editor;
@@ -93,12 +93,12 @@ interface Props extends WithStyles<typeof styles> {
 import Menu from "./EditorSetting";
 import { Provider, inject, observer } from "mobx-react";
 
-import stores from "./stores/stores";
+import stores from "../stores/stores";
 import { observable } from "mobx";
 import Slider from "@material-ui/lab/Slider";
 
 import ChartTab from "./Tab";
-import Empty from "./containers/Empty";
+import Empty from "./Empty";
 
 import Toolbar from "./Toolbar";
 import Sidebar from "./Sidebar";

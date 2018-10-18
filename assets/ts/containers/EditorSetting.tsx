@@ -17,7 +17,7 @@ configure({
   enforceActions: "observed"
 });
 
-import Editor from "./stores/EditorStore";
+import Editor from "../stores/EditorStore";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 
 import AddIcon from "@material-ui/icons/Add";

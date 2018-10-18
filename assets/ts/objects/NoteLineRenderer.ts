@@ -5,7 +5,7 @@ import { sortMeasure, sortMeasureData } from "./Measure";
 import INote from "./Note";
 import NoteRenderer from "./NoteRenderer";
 import NoteLine from "./NoteLine";
-import Pixi from "../Pixi";
+import Pixi from "../containers/Pixi";
 
 export interface INoteLineRenderer {
   customRender(

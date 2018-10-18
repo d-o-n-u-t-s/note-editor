@@ -12,10 +12,10 @@ import {
   createStyles,
   Button
 } from "@material-ui/core";
-import Editor from "./stores/EditorStore";
+import Editor from "../stores/EditorStore";
 
-import AudioSelect from "./components/AudioSelect";
-import MusicGameSystemSelect from "./components/MusicGameSystemSelect";
+import AudioSelect from "../components/AudioSelect";
+import MusicGameSystemSelect from "../components/MusicGameSystemSelect";
 
 const styles = (theme: Theme) =>
   createStyles({

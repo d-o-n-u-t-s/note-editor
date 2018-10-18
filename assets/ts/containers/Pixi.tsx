@@ -1,31 +1,31 @@
 import * as React from "react";
 import * as PIXI from "pixi.js";
-import { Fraction } from "./math";
-import { EditMode, ObjectCategory } from "./stores/EditorSetting";
-import LanePoint from "./objects/LanePoint";
-import LanePointRenderer from "./objects/LanePointRenderer";
+import { Fraction } from "../math";
+import { EditMode, ObjectCategory } from "../stores/EditorSetting";
+import LanePoint from "../objects/LanePoint";
+import LanePointRenderer from "../objects/LanePointRenderer";
 import { observer } from "mobx-react";
-import Lane from "./objects/Lane";
-import INote, { INoteData } from "./objects/Note";
-import { NoteType } from "./stores/MusicGameSystem";
-import Measure, { sortMeasureData } from "./objects/Measure";
-import { guid } from "./util";
-import Vector2 from "./math/Vector2";
-import NoteLine from "./objects/NoteLine";
-import LaneRendererResolver from "./objects/LaneRendererResolver";
-import NoteRendererResolver from "./objects/NoteRendererResolver";
-import NoteLineRendererResolver from "./objects/NoteLineRendererResolver";
-import CustomRendererUtility from "./utils/CustomRendererUtility";
-import { sortMeasure } from "./objects/Measure";
-import { OtherObjectType } from "./stores/EditorSetting";
+import Lane from "../objects/Lane";
+import INote, { INoteData } from "../objects/Note";
+import { NoteType } from "../stores/MusicGameSystem";
+import Measure, { sortMeasureData } from "../objects/Measure";
+import { guid } from "../util";
+import Vector2 from "../math/Vector2";
+import NoteLine from "../objects/NoteLine";
+import LaneRendererResolver from "../objects/LaneRendererResolver";
+import NoteRendererResolver from "../objects/NoteRendererResolver";
+import NoteLineRendererResolver from "../objects/NoteLineRendererResolver";
+import CustomRendererUtility from "../utils/CustomRendererUtility";
+import { sortMeasure } from "../objects/Measure";
+import { OtherObjectType } from "../stores/EditorSetting";
 
-import { inject, InjectedComponent } from "./stores/inject";
-import BPMChange, { BPMRenderer } from "./objects/BPMChange";
-import SpeedChange, { SpeedRenderer } from "./objects/SpeedChange";
-import { NotePointInfo } from "./objects/LaneRenderer";
+import { inject, InjectedComponent } from "../stores/inject";
+import BPMChange, { BPMRenderer } from "../objects/BPMChange";
+import SpeedChange, { SpeedRenderer } from "../objects/SpeedChange";
+import { NotePointInfo } from "../objects/LaneRenderer";
 import { runInAction, transaction } from "mobx";
 import * as _ from "lodash";
-import Note from "./objects/Note";
+import Note from "../objects/Note";
 
 @inject
 @observer

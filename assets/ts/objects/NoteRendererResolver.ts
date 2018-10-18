@@ -1,6 +1,6 @@
 import INote from "./Note";
 import NoteRenderer, { INoteRenderer } from "./NoteRenderer";
-import Pixi from "../Pixi";
+import Pixi from "../containers/Pixi";
 
 export default class NoteRendererResolver {
   static resolve(note: INote): INoteRenderer {

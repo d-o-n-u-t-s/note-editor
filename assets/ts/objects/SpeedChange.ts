@@ -2,7 +2,7 @@ import TimelineObject from "./TimelineObject";
 
 import { GUID } from "../util";
 import { Fraction } from "../math";
-import Pixi from "../Pixi";
+import Pixi from "../containers/Pixi";
 import Measure from "./Measure";
 
 enum Types {

@@ -1,6 +1,6 @@
 import Lane from "./Lane";
 import LaneRenderer, { ILaneRenderer } from "./LaneRenderer";
-import Pixi from "../Pixi";
+import Pixi from "../containers/Pixi";
 
 export default class LaneRendererResolver {
   static resolve(lane: Lane): ILaneRenderer {

@@ -10,7 +10,7 @@ import {
   createStyles,
   Divider
 } from "@material-ui/core";
-import Editor from "./stores/EditorStore";
+import Editor from "../stores/EditorStore";
 
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 

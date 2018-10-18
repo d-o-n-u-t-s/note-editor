@@ -6,7 +6,7 @@ const fs = __require("fs");
 const util = __require("util");
 
 import * as PIXI from "pixi.js";
-import Pixi from "../Pixi";
+import Pixi from "../containers/Pixi";
 
 import { getUrlParams } from "./url";
 import { Vector2, lerp } from "../math";

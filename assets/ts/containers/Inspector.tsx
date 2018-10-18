@@ -16,9 +16,9 @@ Object.defineProperty(GUI.prototype, "removeFolder", {
   }
 });
 
-import config from "./config";
+import config from "../config";
 import { runInAction } from "mobx";
-import { inject, InjectedComponent } from "./stores/inject";
+import { inject, InjectedComponent } from "../stores/inject";
 import { observer } from "mobx-react";
 
 /**

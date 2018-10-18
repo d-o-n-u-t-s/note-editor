@@ -1,7 +1,6 @@
 import { Howl } from "howler";
 import * as _ from "lodash";
 import { action, observable, computed, transaction } from "mobx";
-import HotReload from "../HotReload";
 import { Fraction } from "../math";
 import MusicGameSystem from "./MusicGameSystem";
 
@@ -14,6 +13,7 @@ import LanePoint from "../objects/LanePoint";
 import { guid } from "../util";
 import Note, { INoteData } from "../objects/Note";
 import Measure, { IMeasureData } from "../objects/Measure";
+import HotReload from "../utils/HotReload";
 
 export default class Chart implements IStore {
   @observable

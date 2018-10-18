@@ -5,7 +5,7 @@ import Lane, { LinePointInfo, LineInfo } from "./Lane";
 
 import { sortMeasure } from "../objects/Measure";
 
-import Pixi from "../Pixi";
+import Pixi from "../containers/Pixi";
 
 import { LaneTemplate } from "../stores/MusicGameSystem";
 import { drawQuad } from "../utils/drawQuad";

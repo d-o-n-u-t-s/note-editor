@@ -1,7 +1,7 @@
 import { Fraction } from "../math";
 import TimelineObject from "./TimelineObject";
 import { LaneTemplate } from "../stores/MusicGameSystem";
-import Pixi from "../Pixi";
+import Pixi from "../containers/Pixi";
 
 /**
  * レーンの中間点

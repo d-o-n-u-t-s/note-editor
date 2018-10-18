@@ -1,6 +1,6 @@
 import Measure from "./Measure";
 import Note from "./Note";
-import Pixi from "../Pixi";
+import Pixi from "../containers/Pixi";
 import Lane, { LinePointInfo } from "./Lane";
 
 import LaneRendererResolver from "./LaneRendererResolver";

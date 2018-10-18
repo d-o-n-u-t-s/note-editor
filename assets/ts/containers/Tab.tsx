@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { observer, inject } from "mobx-react";
 
-import Editor from "./stores/EditorStore";
+import Editor from "../stores/EditorStore";
 
 interface Props {
   editor?: Editor;

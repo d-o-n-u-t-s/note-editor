@@ -2,11 +2,11 @@ import * as React from "react";
 
 import { observer } from "mobx-react";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
-import { safe } from "../ts/util";
+import { safe } from "../util";
 
-import NewChartDialog from "./components/NewChartDialog";
+import NewChartDialog from "../components/NewChartDialog";
 
-import { ObjectCategory, OtherObjectType } from "./stores/EditorSetting";
+import { ObjectCategory, OtherObjectType } from "../stores/EditorSetting";
 import {
   withStyles,
   WithStyles,
@@ -85,7 +85,7 @@ const styles = (theme: Theme) =>
 
 interface Props extends WithStyles<typeof styles> {}
 
-import { inject, InjectedComponent } from "./stores/inject";
+import { inject, InjectedComponent } from "../stores/inject";
 
 @inject
 @observer

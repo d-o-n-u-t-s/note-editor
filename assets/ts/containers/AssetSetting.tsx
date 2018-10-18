@@ -14,7 +14,7 @@ const electron = (window as any).require("electron");
 const remote = electron.remote as Electrom.Remote;
 const BrowserWindow = remote.BrowserWindow;
 
-import { inject, InjectedComponent } from "./stores/inject";
+import { inject, InjectedComponent } from "../stores/inject";
 
 @inject
 @observer
