@@ -39,7 +39,7 @@ class NewChartDialog extends React.Component<{ editor?: Editor }> {
       editor.asset.musicGameSystems[Number(this.state.musicGameSystemIndex)],
       editor.asset.audioAssetPaths[Number(this.state.audioIndex)]
     );
-
+    newChart.loadInitialMeasures();
     newChart.loadInitialLanes();
     editor.setCurrentChart(editor.charts.length - 1);
 

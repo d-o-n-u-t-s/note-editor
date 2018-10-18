@@ -321,6 +321,26 @@ export default class Chart implements IStore {
   private musicGameSystemVersion = 0;
 
   /**
+   * 初期小節を読み込む
+   */
+  @action
+  loadInitialMeasures() {
+    this.timeline.setMeasures(
+      Array(1000)
+        .fill(0)
+        .map(
+          (_, index) =>
+            new Measure({
+              index,
+              beat: new Fraction(4, 4),
+              editorProps: { time: 0 },
+              customProps: {}
+            })
+        )
+    );
+  }
+
+  /**
    * 初期レーンを読み込む
    */
   @action

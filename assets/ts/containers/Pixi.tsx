@@ -1067,6 +1067,8 @@ export default class Pixi extends InjectedComponent {
             note.data.measureIndex + Fraction.to01(note.data.measurePosition)
           );
 
+        note.data.editorProps.time = judgeTime;
+
         // 時間が巻き戻っていたら SE 再生済みフラグをリセットする
         if (currentTime < this.previousTime && currentTime < judgeTime) {
           note.data.editorProps.sePlayed = false;
