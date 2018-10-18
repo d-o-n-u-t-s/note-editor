@@ -1060,6 +1060,8 @@ export default class Pixi extends InjectedComponent {
     }
 
     runInAction("updateSE", () => {
+      const seSet = new Set<Howl>();
+
       // 再生時間がノートの判定時間を超えたら SE を鳴らす
       for (const note of chart.timeline.notes) {
         // 判定時間
@@ -1081,10 +1083,14 @@ export default class Pixi extends InjectedComponent {
         if (currentTime >= judgeTime) {
           // SE を鳴らす
           if (musicGameSystem.seMap.has(note.data.type)) {
-            musicGameSystem.seMap.get(note.data.type)!.play();
+            seSet.add(musicGameSystem.seMap.get(note.data.type)!);
           }
           note.data.editorProps.sePlayed = true;
         }
+      }
+
+      for (const se of seSet) {
+        se.play();
       }
     });
 
