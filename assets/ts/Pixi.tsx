@@ -23,7 +23,7 @@ import { inject, InjectedComponent } from "./stores/inject";
 import BPMChange, { BPMRenderer } from "./objects/BPMChange";
 import SpeedChange, { SpeedRenderer } from "./objects/SpeedChange";
 import { NotePointInfo } from "./objects/LaneRenderer";
-import { runInAction } from "mobx";
+import { runInAction, transaction } from "mobx";
 import * as _ from "lodash";
 
 @inject
@@ -550,13 +550,15 @@ export default class Pixi extends InjectedComponent {
       }
     }
 
-    // ノート更新
-    for (const note of chart.timeline.notes) {
-      const measure = chart.timeline.measures[note.measureIndex];
+    runInAction("updateNoteVisible", () => {
+      // ノート更新
+      for (const note of chart.timeline.notes) {
+        const measure = chart.timeline.measures[note.measureIndex];
 
-      // 小節が描画されているなら描画する
-      runInAction(() => (note.isVisible = measure.isVisible));
-    }
+        // 小節が描画されているなら描画する
+        note.isVisible = measure.isVisible;
+      }
+    });
 
     // ノートライン描画
     for (const noteLine of chart.timeline.noteLines) {
@@ -1050,28 +1052,30 @@ export default class Pixi extends InjectedComponent {
       }
     }
 
-    // 再生時間がノートの判定時間を超えたら SE を鳴らす
-    for (const note of chart.timeline.notes) {
-      // 判定時間
-      const judgeTime = measureTimeInfo
-        .get(note.measureIndex)!
-        .GetJudgeTime(note.measureIndex + note.measurePosition.to01Number());
+    runInAction("updateSE", () => {
+      // 再生時間がノートの判定時間を超えたら SE を鳴らす
+      for (const note of chart.timeline.notes) {
+        // 判定時間
+        const judgeTime = measureTimeInfo
+          .get(note.measureIndex)!
+          .GetJudgeTime(note.measureIndex + note.measurePosition.to01Number());
 
-      // 時間が巻き戻っていたら SE 再生済みフラグをリセットする
-      if (currentTime < this.previousTime && currentTime < judgeTime) {
-        runInAction(() => (note.editorProps.sePlayed = false));
-      }
-
-      if (!chart.isPlaying || note.editorProps.sePlayed) continue;
-
-      if (currentTime >= judgeTime) {
-        // SE を鳴らす
-        if (musicGameSystem.seMap.has(note.type)) {
-          musicGameSystem.seMap.get(note.type)!.play();
+        // 時間が巻き戻っていたら SE 再生済みフラグをリセットする
+        if (currentTime < this.previousTime && currentTime < judgeTime) {
+          note.editorProps.sePlayed = false;
         }
-        runInAction(() => (note.editorProps.sePlayed = true));
+
+        if (!chart.isPlaying || note.editorProps.sePlayed) continue;
+
+        if (currentTime >= judgeTime) {
+          // SE を鳴らす
+          if (musicGameSystem.seMap.has(note.type)) {
+            musicGameSystem.seMap.get(note.type)!.play();
+          }
+          note.editorProps.sePlayed = true;
+        }
       }
-    }
+    });
 
     this.previousTime = currentTime;
   }

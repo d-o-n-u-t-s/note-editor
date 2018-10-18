@@ -140,7 +140,9 @@ export default class Inspector extends InjectedComponent {
             component.gameCanvas = thisDiv!;
           }}
         />
-        {JSON.stringify(this.injected.editor.inspectorTarget)}
+        <span style={{ display: "none" }}>
+          {JSON.stringify(this.injected.editor.inspectorTarget)}
+        </span>
       </div>
     );
   }
