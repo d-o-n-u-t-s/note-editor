@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as _ from "lodash";
 import { GUI, GUIController } from "dat-gui";
 
 /**
@@ -45,9 +46,9 @@ export default class Inspector extends InjectedComponent {
     if (this.previousTarget === target) return;
     this.previousTarget = target;
 
-    console.log("update inspector");
+    console.log("update inspector", target);
 
-    const obj = JSON.parse(JSON.stringify(target));
+    const obj = _.cloneDeep(target);
 
     // 既存のコントローラーを削除する
     for (const controller of this.controllers) {
@@ -73,7 +74,7 @@ export default class Inspector extends InjectedComponent {
 
         let newController: GUIController | null = null;
 
-        const isColor = key.toLowerCase().includes("color");
+        const isColor = obj[key].toString().match(/^#[0-9A-F]{6}$/i);
 
         if (isColor) {
           // 数値形式なら #nnnnnn 形式の文字列にする
@@ -84,6 +85,8 @@ export default class Inspector extends InjectedComponent {
           }
 
           newController = gui.addColor(obj, key);
+        } else if (`_${key}_items` in obj) {
+          newController = gui.add(obj, key, obj[`_${key}_items`]);
         } else {
           newController = gui.add(obj, key);
         }

@@ -2,7 +2,10 @@ import { Howl } from "howler";
 import * as _ from "lodash";
 import { action, observable, computed, transaction } from "mobx";
 import { Fraction } from "../math";
-import MusicGameSystem from "./MusicGameSystem";
+import MusicGameSystem, {
+  IMusicGameSystemMeasure,
+  IMusicGameSystemMeasureCustomProps
+} from "./MusicGameSystem";
 
 interface IStore {}
 
@@ -51,6 +54,28 @@ export default class Chart implements IStore {
     editor.setCurrentChart(editor.charts.length - 1);
   }
 
+  /**
+   * 小節を生成する
+   * @param index 小節番号
+   */
+  private createMeasure(index: number) {
+    const customProps = this.musicGameSystem!.measure.customProps.reduce(
+      (object: any, customProps: IMusicGameSystemMeasureCustomProps) => {
+        object[customProps.key] = customProps.defaultValue;
+        object[Symbol(`_${customProps.key}_items`)] = customProps.items;
+        return object;
+      },
+      {}
+    );
+
+    return new Measure({
+      index,
+      beat: new Fraction(4, 4),
+      editorProps: { time: 0 },
+      customProps
+    });
+  }
+
   @action
   load(json: string) {
     const chart = JSON.parse(json);
@@ -80,9 +105,15 @@ export default class Chart implements IStore {
         );
       }
 
-      this.timeline.setMeasures(measures);
+      // HACK: テスト
+      for (const [index, measure] of measures.entries()) {
+        measure.data.customProps = Object.assign(
+          this.createMeasure(index).data.customProps,
+          measure.data.customProps
+        );
+      }
 
-      console.log("measures", measures);
+      this.timeline.setMeasures(measures);
 
       for (const lanePoint of chart.timeline.lanePoints) {
         lanePoint.measurePosition = new Fraction(

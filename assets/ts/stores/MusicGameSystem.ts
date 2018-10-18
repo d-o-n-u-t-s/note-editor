@@ -43,6 +43,16 @@ export interface CustomNoteLineRenderer {
   rendererReference: any;
 }
 
+export interface IMusicGameSystemMeasureCustomProps {
+  key: string;
+  defaultValue: any;
+  items: string[] | null;
+}
+
+export interface IMusicGameSystemMeasure {
+  customProps: IMusicGameSystemMeasureCustomProps[];
+}
+
 interface MusicGameSystem {
   name: string;
   version: number;
@@ -66,6 +76,8 @@ interface MusicGameSystem {
 
   customNoteLineRendererMap: Map<string, CustomNoteLineRenderer>;
 
+  measure: IMusicGameSystemMeasure;
+
   converter: string;
 }
 /**
@@ -82,7 +94,8 @@ export function normalizeMusicGameSystem(
       customNoteLineRenderers: [],
       customProps: [],
       editorProps: [],
-      noteTypes: []
+      noteTypes: [],
+      measure: { customProps: [] }
     },
     musicGameSystem
   );

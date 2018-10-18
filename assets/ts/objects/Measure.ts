@@ -6,18 +6,18 @@ export interface IMeasureEditorProps {
   time: number;
 }
 
+export interface IMeasureCustomProps {
+  [key: string]: {
+    defaultValue: any;
+    items: string[] | null;
+  };
+}
+
 export interface IMeasureData {
   index: number;
   beat: IFraction;
   editorProps: IMeasureEditorProps;
-  customProps: any;
-}
-
-/**
- * 小節内の位置
- */
-interface MeasurePoint {
-  x: number;
+  customProps: IMeasureCustomProps;
 }
 
 /**
