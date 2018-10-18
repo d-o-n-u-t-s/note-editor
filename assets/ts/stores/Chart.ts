@@ -62,7 +62,7 @@ export default class Chart implements IStore {
     const customProps = this.musicGameSystem!.measure.customProps.reduce(
       (object: any, customProps: IMusicGameSystemMeasureCustomProps) => {
         object[customProps.key] = customProps.defaultValue;
-        object[Symbol(`_${customProps.key}_items`)] = customProps.items;
+        // object[Symbol(`_${customProps.key}_items`)] = customProps.items;
         return object;
       },
       {}

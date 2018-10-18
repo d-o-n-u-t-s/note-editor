@@ -17,7 +17,7 @@ export interface IMeasureData {
   index: number;
   beat: IFraction;
   editorProps: IMeasureEditorProps;
-  customProps: IMeasureCustomProps;
+  customProps: any;
 }
 
 /**

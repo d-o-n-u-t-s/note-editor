@@ -1,6 +1,7 @@
 import { Fraction, IFraction } from "../math";
 import GraphicObject from "./GraphicObject";
 import { GUID } from "../util";
+import { observable } from "mobx";
 
 interface INoteEditorProps {
   time: number;
@@ -37,7 +38,11 @@ export interface INoteData {
 }
 
 export default class Note extends GraphicObject {
-  constructor(public data: INoteData) {
+  @observable
+  data: INoteData;
+
+  constructor(data: INoteData) {
     super();
+    this.data = data;
   }
 }

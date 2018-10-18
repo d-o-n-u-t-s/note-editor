@@ -50,6 +50,8 @@ export interface IMusicGameSystemMeasureCustomProps {
 }
 
 export interface IMusicGameSystemMeasure {
+  renderer: string;
+  rendererReference: any;
   customProps: IMusicGameSystemMeasureCustomProps[];
 }
 
@@ -95,7 +97,11 @@ export function normalizeMusicGameSystem(
       customProps: [],
       editorProps: [],
       noteTypes: [],
-      measure: { customProps: [] }
+
+      measure: {
+        renderer: "default",
+        customProps: []
+      }
     },
     musicGameSystem
   );

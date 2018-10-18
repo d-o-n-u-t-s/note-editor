@@ -25,6 +25,7 @@ import SpeedChange, { SpeedRenderer } from "../objects/SpeedChange";
 import { NotePointInfo } from "../objects/LaneRenderer";
 import { runInAction, transaction } from "mobx";
 import * as _ from "lodash";
+import MeasureRendererResolver from "../objects/MeasureRendererResolver";
 
 @inject
 @observer
@@ -35,6 +36,8 @@ export default class Pixi extends InjectedComponent {
   private renderedAudioBuffer?: AudioBuffer;
 
   private graphics?: PIXI.Graphics;
+
+  private currentFrame = 0;
 
   componentDidMount() {
     this.app = new PIXI.Application(window.innerWidth, window.innerHeight, {
@@ -68,8 +71,6 @@ export default class Pixi extends InjectedComponent {
 
     app.renderer.plugins.interaction.moveWhenInside = false;
 
-    function onClick() {}
-
     app.ticker.add(() => {
       const w = app!.view.parentElement!.parentElement!.clientWidth;
       const h = app!.view.parentElement!.parentElement!.clientHeight;
@@ -80,6 +81,8 @@ export default class Pixi extends InjectedComponent {
         //this.renderCanvas();
       }
       this.renderCanvas();
+
+      this.currentFrame++;
     });
 
     this.app.start();
@@ -165,16 +168,24 @@ export default class Pixi extends InjectedComponent {
    */
   previousTime = 0.0;
 
+  inspectTarget: any = null;
+
+  private inspect(target: any) {
+    this.inspectTarget = target;
+  }
+
   /**
    * canvas を再描画する
    */
   private renderCanvas() {
+    this.inspectTarget = null;
+
     if (!this.app) return;
     if (!this.injected.editor.currentChart) return;
 
     // console.log("renderCanvas");
 
-    CustomRendererUtility.update();
+    CustomRendererUtility.update(this.currentFrame);
 
     Pixi.instance = this;
     const graphics = this.graphics!;
@@ -197,7 +208,25 @@ export default class Pixi extends InjectedComponent {
 
     const buttons = this.app!.renderer.plugins.interaction.mouse.buttons;
 
-    const isClick = this.prev === 0 && buttons === 1;
+    let isClick = this.prev === 0 && buttons === 1;
+
+    const viewRect = this.app!.view.getBoundingClientRect();
+
+    // 編集画面外ならクリックしていないことにする
+    if (
+      !new PIXI.Rectangle(
+        viewRect.left,
+        viewRect.top,
+        viewRect.width,
+        viewRect.height
+      ).contains(
+        this.app!.renderer.plugins.interaction.mouse.global.x,
+        this.app!.renderer.plugins.interaction.mouse.global.y
+      )
+    ) {
+      isClick = false;
+    }
+
     this.prev = buttons;
 
     graphics.clear();
@@ -295,15 +324,10 @@ export default class Pixi extends InjectedComponent {
       }
     }
 
-    var mousePosition: PIXI.Point = this.app!.renderer.plugins.interaction.mouse
-      .global;
+    const mousePosition = _.clone(
+      this.app!.renderer.plugins.interaction.mouse.global
+    );
     mousePosition.x -= graphics.x;
-
-    // this.app!.renderer.plugins.interaction.mouse.
-
-    // 背景
-    // graphics.beginFill(0x171717);
-    // graphics.drawRect(0, 0, w, h);
 
     // 縦に何個小節を配置するか
     var hC = this.injected.editor.setting!.verticalLaneCount;
@@ -323,10 +347,6 @@ export default class Pixi extends InjectedComponent {
 
     let index = 0;
 
-    const channel = this.renderedAudioBuffer
-      ? this.renderedAudioBuffer.getChannelData(0)
-      : null;
-
     // 判定ラインの x 座標
     let cx = 0;
     // 0 ~ 1 に正規化された判定ラインの y 座標
@@ -345,13 +365,18 @@ export default class Pixi extends InjectedComponent {
         // 画面内に表示されているか
         measure.isVisible = x + laneWidth > -graphics.x && x < -graphics.x + w;
 
+        measure.x = x;
+        measure.y = y;
+        measure.width = laneWidth;
+        measure.height = hh;
+
         // 画面内なら小節を描画する
         if (measure.isVisible) {
-          graphics
-            .lineStyle(2, 0xffffff)
-            .beginFill(0x333333)
-            .drawRect(x, y, laneWidth, hh)
-            .endFill();
+          MeasureRendererResolver.resolve().render(
+            graphics,
+            measure,
+            chart.timeline.measures
+          );
         }
 
         // 小節の開始時刻、終了時刻
@@ -402,11 +427,6 @@ export default class Pixi extends InjectedComponent {
 
         text.visible = measure.isVisible;
 
-        measure.x = x;
-        measure.y = y;
-        measure.width = laneWidth;
-        measure.height = hh;
-
         ++index;
       }
     }
@@ -423,9 +443,12 @@ export default class Pixi extends InjectedComponent {
       measure.containsPoint(mousePosition)
     );
 
-    const getLane = (note: Note) => {
-      return chart.timeline.lanes.find(lane => lane.guid === note.data.lane)!;
-    };
+    // カーソルを合わせている番号
+    const targetMeasureIndex = chart.timeline.measures.findIndex(measure =>
+      measure.containsPoint(mousePosition)
+    );
+
+    const getLane = (note: Note) => chart.timeline.laneMap.get(note.data.lane)!;
     const getMeasure = (note: Note) =>
       chart.timeline.measures[note.data.measureIndex];
 
@@ -459,7 +482,7 @@ export default class Pixi extends InjectedComponent {
       }
 
       if (setting.editMode === EditMode.Select && isClick) {
-        editor.setInspectorTarget(targetMeasure.data);
+        this.inspect(chart.timeline.measures[targetMeasureIndex]);
       }
 
       // レーン追加モードなら小節の横分割線を描画
@@ -616,7 +639,7 @@ export default class Pixi extends InjectedComponent {
             }
             if (setting.editMode === EditMode.Select) {
               console.log("ノートを選択しました", note);
-              editor.setInspectorTarget(note.data);
+              this.inspect(note.data);
             }
           }
           break;
@@ -646,7 +669,7 @@ export default class Pixi extends InjectedComponent {
               bounds.height + 4
             );
           if (isClick) {
-            editor.setInspectorTarget(bpmChange);
+            this.inspect(bpmChange);
           }
         }
       }
@@ -1097,6 +1120,10 @@ export default class Pixi extends InjectedComponent {
     });
 
     this.previousTime = currentTime;
+
+    if (this.inspectTarget) {
+      editor.setInspectorTarget(this.inspectTarget);
+    }
   }
 
   /**

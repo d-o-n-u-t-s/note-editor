@@ -222,6 +222,26 @@ export default class Asset implements IStore {
       }
     }
 
+    // 小節のカスタムレンダラーを読み込む
+    {
+      const measureRenderer = musicGameSystems.measure.renderer;
+
+      if (measureRenderer !== "default") {
+        const rendererPath = path.join(rootPath, directory, measureRenderer);
+
+        const buffer: Buffer = await util.promisify(fs.readFile)(rendererPath);
+        const key = guid();
+
+        const source = buffer
+          .toString()
+          .replace("export default", `window["${key}"] = `);
+
+        eval(source);
+
+        musicGameSystems.measure.rendererReference = (window as any)[key];
+      }
+    }
+
     this.addMusicGameSystem(musicGameSystems);
   }
 

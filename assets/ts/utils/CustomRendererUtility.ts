@@ -41,7 +41,11 @@ const spriteMap = new WeakMap<any, PIXI.Sprite>();
 const sprites: PIXI.Sprite[] = [];
 
 class CustomRendererUtility {
-  update() {
+  currentFrame = 0;
+
+  update(currentFrame: number) {
+    this.currentFrame = currentFrame;
+
     for (const sprite of sprites) sprite.visible = false;
   }
 
