@@ -213,19 +213,18 @@ export default class Pixi extends InjectedComponent {
     const viewRect = this.app!.view.getBoundingClientRect();
 
     // 編集画面外ならクリックしていないことにする
+    const mousePosition = _.clone(
+      this.app!.renderer.plugins.interaction.mouse.global
+    );
     if (
-      !new PIXI.Rectangle(
-        viewRect.left,
-        viewRect.top,
-        viewRect.width,
-        viewRect.height
-      ).contains(
-        this.app!.renderer.plugins.interaction.mouse.global.x,
-        this.app!.renderer.plugins.interaction.mouse.global.y
+      !new PIXI.Rectangle(0, 0, viewRect.width, viewRect.height).contains(
+        mousePosition.x,
+        mousePosition.y
       )
     ) {
       isClick = false;
     }
+    mousePosition.x -= graphics.x;
 
     this.prev = buttons;
 
@@ -323,11 +322,6 @@ export default class Pixi extends InjectedComponent {
         beginTime += time;
       }
     }
-
-    const mousePosition = _.clone(
-      this.app!.renderer.plugins.interaction.mouse.global
-    );
-    mousePosition.x -= graphics.x;
 
     // 縦に何個小節を配置するか
     var hC = this.injected.editor.setting!.verticalLaneCount;
