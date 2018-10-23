@@ -52,8 +52,16 @@ export default class Note extends GraphicObject {
     for (const prop of noteType.customProps) {
       if (prop.key in data.customProps) {
         newProps[prop.key] = data.customProps[prop.key];
-      } else {
+      } else if (
+        typeof prop.defaultValue !== "string" ||
+        prop.defaultValue.indexOf("return") === -1
+      ) {
         newProps[prop.key] = prop.defaultValue;
+      } else {
+        newProps[prop.key] = new Function("chart", "data", prop.defaultValue)(
+          chart,
+          data
+        );
       }
     }
     this.data.customProps = newProps;
