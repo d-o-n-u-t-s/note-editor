@@ -3,3 +3,4 @@ dist/
 assets/audio/
 assets/musicGameSystems/
 node_modules/
+dist/

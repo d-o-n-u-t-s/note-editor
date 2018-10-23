@@ -1,12 +1,14 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, Menu, ipcMain } = require("electron");
+const { app, BrowserWindow, Menu, ipcMain, dialog } = require("electron");
 
 const path = require("path");
 
-const loadDevtool = require("electron-load-devtool");
+const isDevelopment = process.env.NODE_ENV === "development";
 
-const audioAssetPath = path.resolve(__dirname, "assets/audio");
-const musicGameSystemsPath = path.resolve(__dirname, "assets/musicGameSystems");
+const dirname = isDevelopment ? __dirname : path.resolve(__dirname, "../../");
+
+const audioAssetPath = path.resolve(dirname, "assets/audio");
+const musicGameSystemsPath = path.resolve(dirname, "assets/musicGameSystems");
 
 let mainWindow;
 
@@ -19,15 +21,25 @@ function createWindow() {
 
   mainWindow.setTitle("ChartEditor");
 
-  mainWindow.loadURL(
-    `http://localhost:9000?aap=${audioAssetPath}&mgsp=${musicGameSystemsPath}`
-  );
+  if (isDevelopment) {
+    mainWindow.loadURL(
+      `http://localhost:9000?aap=${audioAssetPath}&mgsp=${musicGameSystemsPath}`
+    );
+  } else {
+    mainWindow.loadURL(
+      `file:///resources/app.asar/dist/index.html?aap=${audioAssetPath}&mgsp=${musicGameSystemsPath}`
+    );
+  }
+
   initWindowMenu();
 
-  loadDevtool({
-    id: "pfgnfdagidkfgccljigdamigbcnndkod",
-    name: "MobX Developer Tools"
-  });
+  if (isDevelopment) {
+    const loadDevtool = require("electron-load-devtool");
+    loadDevtool({
+      id: "pfgnfdagidkfgccljigdamigbcnndkod",
+      name: "MobX Developer Tools"
+    });
+  }
 
   mainWindow.webContents.openDevTools();
 

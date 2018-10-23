@@ -4,12 +4,17 @@
   "description": "",
   "main": "electron-main.js",
   "scripts": {
-    "build": "yarn run webpack-dev-server --colors --config ./webpack.config.dev.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "yarn run webpack-dev-server --colors --config ./webpack.dev.ts",
+    "prod": "yarn run webpack --colors --config ./webpack.prod.ts",
+    "dev:electron": "cross-env NODE_ENV=development yarn run electron .",
+    "build:win": "electron-builder -w --dir"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@material-ui/core": "3.1.0",
+    "@material-ui/icons": "^3.0.1",
+    "@material-ui/lab": "^3.0.0-alpha.20",
     "@types/classnames": "^2.2.6",
     "@types/config": "0.0.34",
     "@types/dat-gui": "^0.6.3",
@@ -17,26 +22,28 @@
     "@types/lodash": "^4.14.117",
     "@types/mathjs": "^4.4.1",
     "@types/pixi.js": "^4.8.1",
+    "@types/react": "^16.4.18",
     "@types/react-color": "^2.13.6",
+    "@types/react-dom": "^16.0.9",
+    "@types/webpack-merge": "^4.1.3",
     "babel-runtime": "^6.26.0",
+    "cross-env": "^5.2.0",
     "electron": "^3.0.4",
+    "electron-builder": "^20.28.4",
     "electron-load-devtool": "^1.0.0",
     "file-loader": "^2.0.0",
     "hard-source-webpack-plugin": "^0.12.0",
     "html-webpack-plugin": "^3.2.0",
     "pixi.js": "^4.8.2",
+    "ts-node": "^7.0.1",
     "typescript": "^3.1.3",
     "url-loader": "^1.1.2",
     "webpack": "^4.20.2",
     "webpack-cli": "^3.1.2",
-    "webpack-dev-server": "^3.1.9"
+    "webpack-dev-server": "^3.1.9",
+    "webpack-merge": "^4.1.4"
   },
   "dependencies": {
-    "@material-ui/core": "^3.1.0",
-    "@material-ui/icons": "^3.0.1",
-    "@material-ui/lab": "^3.0.0-alpha.20",
-    "@types/react": "^16.4.18",
-    "@types/react-dom": "^16.0.9",
     "config": "^2.0.1",
     "dat-gui": "^0.5.0",
     "dat.gui": "^0.7.3",
@@ -50,5 +57,19 @@
     "react-color": "^2.14.1",
     "react-dom": "^16.5.2",
     "ts-loader": "^5.2.2"
+  },
+  "engines": {
+    "node": ">=10.12.0"
+  },
+  "build": {
+    "appId": "note-editor",
+    "mac": {
+      "category": "category.type"
+    },
+    "files": [
+      "electron-main.js",
+      "dist/index.html",
+      "dist/dist/*"
+    ]
   }
 }
