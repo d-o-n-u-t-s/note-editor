@@ -213,19 +213,18 @@ export default class Pixi extends InjectedComponent {
     const viewRect = this.app!.view.getBoundingClientRect();
 
     // 編集画面外ならクリックしていないことにする
+    const mousePosition = _.clone(
+      this.app!.renderer.plugins.interaction.mouse.global
+    );
     if (
-      !new PIXI.Rectangle(
-        viewRect.left,
-        viewRect.top,
-        viewRect.width,
-        viewRect.height
-      ).contains(
-        this.app!.renderer.plugins.interaction.mouse.global.x,
-        this.app!.renderer.plugins.interaction.mouse.global.y
+      !new PIXI.Rectangle(0, 0, viewRect.width, viewRect.height).contains(
+        mousePosition.x,
+        mousePosition.y
       )
     ) {
       isClick = false;
     }
+    mousePosition.x -= graphics.x;
 
     this.prev = buttons;
 
@@ -323,11 +322,6 @@ export default class Pixi extends InjectedComponent {
         beginTime += time;
       }
     }
-
-    const mousePosition = _.clone(
-      this.app!.renderer.plugins.interaction.mouse.global
-    );
-    mousePosition.x -= graphics.x;
 
     // 縦に何個小節を配置するか
     var hC = this.injected.editor.setting!.verticalLaneCount;
@@ -733,19 +727,6 @@ export default class Pixi extends InjectedComponent {
       }
     }
 
-    // ノート色を取得する
-    const getNoteColor = (noteType: NoteType) => {
-      if (noteType.editorProps.color === "$laneColor") {
-        const laneTemplate = chart.musicGameSystem!.laneTemplateMap.get(
-          targetNotePoint!.lane.templateName
-        )!;
-
-        return Number(laneTemplate.color);
-      }
-
-      return Number(noteType.editorProps.color);
-    };
-
     // レーン選択中ならノートを配置する
     if (
       targetMeasure &&
@@ -758,40 +739,34 @@ export default class Pixi extends InjectedComponent {
       ];
 
       // 新規ノート
-      const newNote = new Note({
-        guid: guid(),
-        horizontalSize: editor.setting!.objectSize,
-        horizontalPosition: new Fraction(
-          targetNotePoint!.horizontalIndex,
-          targetNotePoint!.lane.division
-        ),
-        measureIndex: chart.timeline.measures.findIndex(
-          _ => _ === targetMeasure
-        )!,
-        measurePosition: new Fraction(
-          setting.measureDivision - 1 - targetNotePoint!.verticalIndex!,
-          setting.measureDivision
-        ),
-        type: newNoteType.name,
-        lane: targetNotePoint!.lane.guid,
-        editorProps: {
-          time: 0,
-          sePlayed: false,
-          color: getNoteColor(newNoteType)
-        },
-        customProps: newNoteType.customProps.reduce(
-          (object: any, b: { key: string; defaultValue: any }) => {
-            // カスタム色をデフォルト値にする
-            if (b.defaultValue === "customColor") {
-              object[b.key] = setting.customPropColor;
-            } else {
-              object[b.key] = b.defaultValue;
-            }
-            return object;
+      const newNote = new Note(
+        {
+          guid: guid(),
+          horizontalSize: editor.setting!.objectSize,
+          horizontalPosition: new Fraction(
+            targetNotePoint!.horizontalIndex,
+            targetNotePoint!.lane.division
+          ),
+          measureIndex: chart.timeline.measures.findIndex(
+            _ => _ === targetMeasure
+          )!,
+          measurePosition: new Fraction(
+            setting.measureDivision - 1 - targetNotePoint!.verticalIndex!,
+            setting.measureDivision
+          ),
+          type: newNoteType.name,
+          lane: targetNotePoint!.lane.guid,
+          editorProps: {
+            time: 0,
+            sePlayed: false,
+            color: 0
           },
-          {}
-        )
-      });
+          customProps: {
+            customColor: setting.customPropColor
+          }
+        },
+        chart
+      );
 
       if (isClick) {
         chart.timeline.addNote(newNote);

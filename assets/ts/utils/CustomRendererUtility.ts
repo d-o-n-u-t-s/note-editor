@@ -45,6 +45,7 @@ class CustomRendererUtility {
 
   update(currentFrame: number) {
     this.currentFrame = currentFrame;
+    this.Pixi = Pixi.instance;
 
     for (const sprite of sprites) sprite.visible = false;
   }
@@ -52,6 +53,7 @@ class CustomRendererUtility {
   drawQuad = drawQuad;
   Vector2 = Vector2;
   lerp = lerp;
+  Pixi: any;
 
   getSprite(target: any, imagePath: string): PIXI.Sprite | null {
     getImage(imagePath);

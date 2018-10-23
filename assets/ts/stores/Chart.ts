@@ -137,30 +137,15 @@ export default class Chart implements IStore {
         measures.push(measure);
       }
 
-      for (const noteData of chart.timeline.notes as INoteData[]) {
-        const note = new Note(noteData);
-
-        if (!note.data.customProps)
-          note.data.customProps = { color: "#ffffff" };
-
-        note.data.editorProps = {
-          color: Number(
-            this.musicGameSystem!.noteTypeMap.get(note.data.type)!.editorProps
-              .color
-          ),
-          time: 0,
-          sePlayed: false
-        };
-
-        notes.push(note);
-      }
-      this.timeline.addNotes(notes);
-
       for (const noteLine of chart.timeline.noteLines) {
         this.timeline.addNoteLine(noteLine);
       }
-
       this.timeline.setLanes(chart.timeline.lanes);
+
+      for (const noteData of chart.timeline.notes as INoteData[]) {
+        notes.push(new Note(noteData, this));
+      }
+      this.timeline.addNotes(notes);
 
       for (const bpmChange of chart.timeline.bpmChanges) {
         bpmChange.measurePosition = new Fraction(
