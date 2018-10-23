@@ -149,7 +149,7 @@ class Application extends React.Component<Props, {}> {
     return (
       <Provider {...stores}>
         <div style={{ flexGrow: 1 }}>
-          <div className={classes.appFrame}>
+          <div className={classes.appFrame} style={{ height: "100vh" }}>
             <AppBar
               position="absolute"
               color="default"
