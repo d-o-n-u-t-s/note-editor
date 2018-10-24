@@ -86,8 +86,7 @@ class Player extends React.Component<Props, {}> {
           style={{
             display: "flex",
             background: "#000",
-            // marginRight: "32px",
-            marginTop: "-14px"
+            marginBottom: "14px"
           }}
         >
           <Slider
@@ -149,9 +148,10 @@ class Player extends React.Component<Props, {}> {
             min={0}
             max={1}
             style={{
+              marginBottom: "4px",
+              marginRight: "2rem",
               width: "100px",
-              display: "inline-block",
-              marginBottom: "-12px"
+              display: "inline-block"
             }}
             classes={{
               track: classes.volumeSliderTrack,
