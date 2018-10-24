@@ -107,7 +107,7 @@ function initWindowMenu() {
       submenu: [
         {
           label: "開く",
-          accelerator: "Command+O",
+          accelerator: "CmdOrCtrl+O",
           click() {
             mainWindow.webContents.send("open");
           }
@@ -117,14 +117,14 @@ function initWindowMenu() {
         },
         {
           label: "保存",
-          accelerator: "Command+S",
+          accelerator: "CmdOrCtrl+S",
           click() {
             mainWindow.webContents.send("save");
           }
         },
         {
           label: "名前を付けて保存",
-          accelerator: "Command+Shift+S",
+          accelerator: "CmdOrCtrl+Shift+S",
           click() {
             mainWindow.webContents.send("saveAs");
           }
