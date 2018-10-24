@@ -113,7 +113,17 @@ class LaneRenderer implements ILaneRenderer {
     lines: LineInfo[],
     laneTemplate: LaneTemplate
   ) {
+    const renderArea = Pixi.instance!.getRenderArea();
     for (const line of lines) {
+      // レーンが描画範囲外なので描画しない
+      if (
+        (renderArea.left > line.start.point.x + line.start.width &&
+          renderArea.left > line.end.point.x + line.start.width) ||
+        (renderArea.right < line.start.point.x &&
+          renderArea.right < line.end.point.x)
+      )
+        continue;
+
       drawQuad(
         graphics,
         line.start.point,
@@ -135,19 +145,6 @@ class LaneRenderer implements ILaneRenderer {
             line.end.point.y
           );
       }
-
-      /*
-
-      graphics
-        .lineStyle(1, Number(laneTemplate.color))
-        .moveTo(line.start.point.x - line.start.width / 2, line.start.point.y)
-        .lineTo(line.end.point.x - line.end.width / 2, line.end.point.y);
-      graphics
-        .lineStyle(1, Number(laneTemplate.color))
-        .moveTo(line.start.point.x + line.start.width / 2, line.start.point.y)
-        .lineTo(line.end.point.x + line.end.width / 2, line.end.point.y);
-    
-    */
     }
   }
 

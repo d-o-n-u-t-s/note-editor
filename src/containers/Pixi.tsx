@@ -532,7 +532,9 @@ export default class Pixi extends InjectedComponent {
 
     // レーン描画
     for (const lane of chart.timeline.lanes) {
-      LaneRendererResolver.resolve(lane).render(
+      const laneRenderer = LaneRendererResolver.resolve(lane);
+
+      laneRenderer.render(
         lane,
         graphics,
         chart.timeline.lanePointMap,
@@ -562,9 +564,7 @@ export default class Pixi extends InjectedComponent {
           continue;
         }
 
-        targetNotePoint = LaneRendererResolver.resolve(
-          lane
-        ).getNotePointInfoFromMousePosition(
+        targetNotePoint = laneRenderer.getNotePointInfoFromMousePosition(
           lane,
           targetMeasure!,
           setting.measureDivision,
