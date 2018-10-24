@@ -258,8 +258,8 @@ export default class Chart implements IStore {
     this.audio!.play();
   }
 
-  private observeTimeId: number | null = null;
-
+  // 現在時刻
+  // ※ setTime か updateTime を呼ばないと更新されない
   @observable
   time: number = 0;
 
@@ -279,6 +279,12 @@ export default class Chart implements IStore {
   }
 
   @action
+  updateTime() {
+    const time = this.audio!.seek() as number;
+    if (this.time !== time) this.setTime(time);
+  }
+
+  @action
   setAudio(buffer: Buffer, source: string) {
     // BinaryString, UintXXArray, ArrayBuffer -> Blob
     const blob = new Blob([buffer], { type: "audio/wav" });
@@ -291,9 +297,6 @@ export default class Chart implements IStore {
     if (this.audio) {
       this.audio.off("end");
     }
-    if (this.observeTimeId !== null) {
-      window.clearInterval(this.observeTimeId);
-    }
 
     this.audio = new Howl({ src: src, format: ["wav"] });
 
@@ -302,13 +305,6 @@ export default class Chart implements IStore {
     // 秒数リセット
     this.setTime(0);
     this.isPlaying = false;
-
-    // 毎フレーム再生秒数を監視する
-    this.observeTimeId = window.setInterval(() => {
-      const time = this.audio!.seek() as number;
-
-      if (this.time !== time) this.setTime(time);
-    }, 1000 / 60);
 
     this.audioSource = source;
 
@@ -408,7 +404,6 @@ export default class Chart implements IStore {
     delete chart.audio;
     delete chart.audioBuffer;
     delete chart.isPlaying;
-    delete chart.observeTimeId;
     delete chart.volume;
     delete chart.musicGameSystem;
 
