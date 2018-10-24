@@ -260,10 +260,10 @@ export default class Asset implements IStore {
     this.audioAssetPaths.push(path);
   }
 
-  async loadAudioAsset(path: string) {
+  loadAudioAsset(path: string) {
     console.log("loadAudioAsset", path);
 
-    const buffer: Buffer = await util.promisify(fs.readFile)(path);
+    const buffer: Buffer = fs.readFileSync(path);
 
     return buffer;
   }
