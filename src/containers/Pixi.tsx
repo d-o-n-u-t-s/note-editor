@@ -300,8 +300,18 @@ export default class Pixi extends InjectedComponent {
 
         // 小節の中に現在時刻があるなら
         if (b <= currentTime && currentTime < e) {
-          // 0 ~ 1
-          const pos = (currentTime - b) / (e - b);
+          // 位置を二分探索
+          let min = 0,
+            max = 1,
+            pos = 0.5;
+          while ((max - min) * hh > 1) {
+            if (currentTime < timeCalculator.getTime(index + pos)) {
+              max = pos;
+            } else {
+              min = pos;
+            }
+            pos = (min + max) / 2;
+          }
 
           const $y = y + hh - hh * pos;
 
