@@ -371,7 +371,8 @@ export default class BMSImporter {
       measureIndex: note.laneIndex,
       measurePosition: note.position,
       type: "tap",
-      lane: "60914b20c1205ff1563407fa2d2b233d"
+      lane: "60914b20c1205ff1563407fa2d2b233d",
+      editorProps: {}
     });
 
     const noteLines: any[] = [];

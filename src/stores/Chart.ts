@@ -286,19 +286,17 @@ export default class Chart implements IStore {
 
   @action
   setAudio(buffer: Buffer, source: string) {
-    // BinaryString, UintXXArray, ArrayBuffer -> Blob
-    const blob = new Blob([buffer], { type: "audio/wav" });
+    const extension = source.split(".").pop()!;
 
+    const blob = new Blob([buffer], { type: `audio/${extension}` });
     const src = URL.createObjectURL(blob);
-
-    console.warn(src);
 
     // 既に楽曲が存在したら
     if (this.audio) {
       this.audio.off("end");
     }
 
-    this.audio = new Howl({ src: src, format: ["wav"] });
+    this.audio = new Howl({ src, format: [extension] });
 
     this.audio.on("end", () => this.setIsPlaying(false));
 
