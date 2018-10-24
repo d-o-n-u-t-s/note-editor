@@ -216,7 +216,7 @@ class Toolbar extends InjectedComponent<Props> {
           open={Boolean(anchorEl)}
           onClose={this.handleClose}
         >
-          {[1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64].map((value, index) => (
+          {EditorSetting.MEASURE_DIVISIONS.map((value, index) => (
             <MenuItem
               key={index}
               onClick={(e: any) => {

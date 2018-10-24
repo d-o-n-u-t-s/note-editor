@@ -139,6 +139,25 @@ function initWindowMenu() {
           }
         }
       ]
+    },
+    {
+      label: "編集",
+      submenu: [
+        {
+          label: "小節分割数 アップ",
+          accelerator: "CmdOrCtrl+Right",
+          click() {
+            mainWindow.webContents.send("changeMeasureDivision", 1);
+          }
+        },
+        {
+          label: "小節分割数 ダウン",
+          accelerator: "CmdOrCtrl+Left",
+          click() {
+            mainWindow.webContents.send("changeMeasureDivision", -1);
+          }
+        }
+      ]
     }
   ];
 

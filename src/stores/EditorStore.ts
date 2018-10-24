@@ -127,11 +127,22 @@ export default class Editor implements IStore {
     );
   }
 
+  @action
+  changeMeasureDivision(index: number) {
+    const divs = EditorSetting.MEASURE_DIVISIONS;
+    index += divs.indexOf(this.setting.measureDivision);
+    index = Math.max(0, Math.min(divs.length - 1, index));
+    this.setting.measureDivision = divs[index];
+  }
+
   constructor() {
     ipcRenderer.on("open", () => this.open());
     ipcRenderer.on("save", () => this.save());
     ipcRenderer.on("saveAs", () => this.saveAs());
     ipcRenderer.on("importBMS", () => BMSImporter.import());
+    ipcRenderer.on("changeMeasureDivision", (_: any, index: number) =>
+      this.changeMeasureDivision(index)
+    );
 
     // テスト処理
     /*
