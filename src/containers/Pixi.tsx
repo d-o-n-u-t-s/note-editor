@@ -32,11 +32,7 @@ import MeasureRendererResolver from "../objects/MeasureRendererResolver";
 export default class Pixi extends InjectedComponent {
   private app?: PIXI.Application;
   private container?: HTMLDivElement;
-
-  private renderedAudioBuffer?: AudioBuffer;
-
   private graphics?: PIXI.Graphics;
-
   private currentFrame = 0;
 
   componentDidMount() {
@@ -1012,7 +1008,7 @@ export default class Pixi extends InjectedComponent {
         if (currentTime >= judgeTime) {
           // SE を鳴らす
           if (musicGameSystem.seMap.has(note.data.type)) {
-            seSet.add(musicGameSystem.seMap.get(note.data.type)!);
+            seSet.add(musicGameSystem.seMap.get(note.data.type)!.next());
           }
           note.data.editorProps.sePlayed = true;
         }
@@ -1030,26 +1026,8 @@ export default class Pixi extends InjectedComponent {
     }
   }
 
-  /**
-   * 譜面情報を更新する
-   */
-  private updateAudioInfo() {
-    const currentChart = this.injected.editor.currentChart!;
-
-    if (!currentChart) return;
-
-    this.renderedAudioBuffer = currentChart!.audioBuffer;
-
-    //   this.renderCanvas();
-  }
-
   render() {
     let component = this;
-
-    //console.log("再描画します: pixi", this.injected.editor.currentChart!.name);
-
-    this.updateAudioInfo();
-
     return (
       <div
         ref={thisDiv => {

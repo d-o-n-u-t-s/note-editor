@@ -1,6 +1,6 @@
 import { action, observable } from "mobx";
 import { guid } from "../util";
-import { CustomNoteLineRenderer } from "../stores/MusicGameSystem";
+import { CustomNoteLineRenderer, HowlPool } from "../stores/MusicGameSystem";
 
 import * as Electrom from "electron";
 
@@ -113,7 +113,7 @@ export default class Asset implements IStore {
     const musicGameSystems = normalizeMusicGameSystem(json);
 
     // SE マップを生成する
-    musicGameSystems.seMap = new Map<string, Howl>();
+    musicGameSystems.seMap = new Map<string, HowlPool>();
 
     // 名前をキーにしたレーンテンプレートのマップを生成する
     musicGameSystems.laneTemplateMap = new Map<string, LaneTemplate>();
@@ -129,7 +129,10 @@ export default class Asset implements IStore {
       // 判定音源を読み込む
       if (noteType.editorProps.se) {
         const sePath = path.join(rootPath, directory, noteType.editorProps.se);
-        musicGameSystems.seMap.set(noteType.name, await this.loadAudio(sePath));
+        musicGameSystems.seMap.set(
+          noteType.name,
+          new HowlPool(async () => await this.loadAudio(sePath), 10)
+        );
       }
 
       musicGameSystems.noteTypeMap.set(noteType.name, noteType);

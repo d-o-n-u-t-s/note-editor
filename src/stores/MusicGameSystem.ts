@@ -55,6 +55,22 @@ export interface IMusicGameSystemMeasure {
   customProps: IMusicGameSystemMeasureCustomProps[];
 }
 
+export class HowlPool {
+  index = 0;
+  howls?: Howl[];
+  constructor(factory: any, count: number) {
+    this.howls = Array(count);
+    (async () => {
+      for (var i = 0; i < count; i++) {
+        this.howls![i] = (await factory()) as Howl;
+      }
+    })();
+  }
+  next() {
+    return this.howls![this.index++ % this.howls!.length];
+  }
+}
+
 interface MusicGameSystem {
   name: string;
   version: number;
@@ -70,7 +86,7 @@ interface MusicGameSystem {
    * key: ノートタイプ
    * value: プレイヤー
    */
-  seMap: Map<string, Howl>;
+  seMap: Map<string, HowlPool>;
 
   noteTypeMap: Map<string, NoteType>;
 
