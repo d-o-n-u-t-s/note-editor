@@ -68,3 +68,37 @@ class _BPMRenderer {
 }
 
 export const BPMRenderer = new _BPMRenderer();
+
+class BPMChangeData {
+  measurePosition: number;
+  unitTime: number;
+  time: number;
+
+  constructor(current: BPMChange, prev: BPMChangeData) {
+    this.measurePosition =
+      current.measureIndex + current.measurePosition.to01Number();
+    this.unitTime = 240 / current.bpm;
+    this.time = prev ? prev.getTime(this.measurePosition) : 0;
+  }
+
+  getTime(measurePosition: number) {
+    return this.time + (measurePosition - this.measurePosition) * this.unitTime;
+  }
+}
+
+export class TimeCalculator {
+  data: BPMChangeData[] = [];
+  constructor(data: BPMChange[]) {
+    for (let i = 0; i < data.length; i++) {
+      this.data.push(new BPMChangeData(data[i], this.data[i - 1]));
+    }
+  }
+
+  getTime(measurePosition: number) {
+    for (var i = this.data.length - 1; ; i--) {
+      if (this.data[i].measurePosition <= measurePosition) {
+        return this.data[i].getTime(measurePosition);
+      }
+    }
+  }
+}

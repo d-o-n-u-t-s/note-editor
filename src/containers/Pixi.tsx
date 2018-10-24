@@ -20,7 +20,7 @@ import { sortMeasure } from "../objects/Measure";
 import { OtherObjectType } from "../stores/EditorSetting";
 
 import { inject, InjectedComponent } from "../stores/inject";
-import BPMChange, { BPMRenderer } from "../objects/BPMChange";
+import BPMChange, { BPMRenderer, TimeCalculator } from "../objects/BPMChange";
 import SpeedChange, { SpeedRenderer } from "../objects/SpeedChange";
 import { NotePointInfo } from "../objects/LaneRenderer";
 import { runInAction, transaction } from "mobx";
@@ -239,89 +239,9 @@ export default class Pixi extends InjectedComponent {
         bpm: 120
       });
     }
-
-    // 小節位置でソートした BPM 変更オブジェクト
-    var sortedBpmChanges = chart.timeline.bpmChanges.slice().sort(sortMeasure);
-
-    sortedBpmChanges.push({
-      guid: guid(),
-      measureIndex: 999,
-      measurePosition: new Fraction(0, 1),
-      bpm: sortedBpmChanges[sortedBpmChanges.length - 1].bpm
-    });
-
-    class BPMRange {
-      // 開始時刻
-      BeginTime: number = 0;
-
-      // 開始小節
-      BeginPosition: number = 0;
-
-      // 終了小節
-      public EndPosition = 0;
-
-      // 区間の秒数
-      public Duration = 0;
-
-      public Between(value: number): boolean {
-        return value >= this.BeginPosition && value < this.EndPosition;
-      }
-
-      /// <summary>
-      /// 判定時間を取得する
-      /// </summary>
-      /// <param name="measurePosition">小節位置</param>
-      /// <returns>判定時間</returns>
-      public GetJudgeTime(measurePosition: number) {
-        return (
-          this.BeginTime +
-          ((measurePosition - this.BeginPosition) /
-            (this.EndPosition - this.BeginPosition)) *
-            this.Duration
-        );
-      }
-    }
-
-    const measureTimeInfo = new Map<number, BPMRange>();
-    var bpmChanges: BPMRange[] = [];
-    // BPM の区間を計算する
-    var beginTime = 0;
-    for (let i = 0; i < sortedBpmChanges.length - 1; i++) {
-      var begin = sortedBpmChanges[i];
-      var end = sortedBpmChanges[i + 1];
-
-      // 1 小節の時間
-      var unitTime2 = (60 / begin.bpm) * 4;
-
-      var beginMeasureIndex =
-        Math.floor(begin.measureIndex + begin.measurePosition.to01Number()) | 0;
-      var endMeasureIndex =
-        Math.floor(end.measureIndex + end.measurePosition.to01Number()) | 0;
-
-      for (
-        var measureIndex = beginMeasureIndex;
-        measureIndex < endMeasureIndex;
-        measureIndex++
-      ) {
-        const tempo = Fraction.to01(
-          chart.timeline.measures[measureIndex].data.beat
-        );
-
-        // 区間の秒数
-        const time = unitTime2 * tempo;
-
-        var bpmRange = new BPMRange();
-        bpmRange.BeginPosition = measureIndex;
-        bpmRange.EndPosition = measureIndex + 1;
-        bpmRange.BeginTime = beginTime;
-        bpmRange.Duration = time;
-        bpmChanges.push(bpmRange);
-
-        measureTimeInfo.set(bpmRange.BeginPosition, bpmRange);
-
-        beginTime += time;
-      }
-    }
+    const timeCalculator = new TimeCalculator(
+      chart.timeline.bpmChanges.slice().sort(sortMeasure)
+    );
 
     // 縦に何個小節を配置するか
     var hC = this.injected.editor.setting!.verticalLaneCount;
@@ -375,8 +295,8 @@ export default class Pixi extends InjectedComponent {
         }
 
         // 小節の開始時刻、終了時刻
-        var b = measureTimeInfo.get(index + 0)!.BeginTime; // 0;// unitTime * index;
-        var e = measureTimeInfo.get(index + 1)!.BeginTime; //0;//unitTime * (index + 1);
+        var b = timeCalculator.getTime(index);
+        var e = timeCalculator.getTime(index + 1);
 
         // 小節の中に現在時刻があるなら
         if (b <= currentTime && currentTime < e) {
@@ -1066,11 +986,9 @@ export default class Pixi extends InjectedComponent {
       // 再生時間がノートの判定時間を超えたら SE を鳴らす
       for (const note of chart.timeline.notes) {
         // 判定時間
-        const judgeTime = measureTimeInfo
-          .get(note.data.measureIndex)!
-          .GetJudgeTime(
-            note.data.measureIndex + Fraction.to01(note.data.measurePosition)
-          );
+        const judgeTime = timeCalculator.getTime(
+          note.data.measureIndex + Fraction.to01(note.data.measurePosition)
+        );
 
         note.data.editorProps.time = judgeTime;
 
