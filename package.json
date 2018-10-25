@@ -1,5 +1,5 @@
 {
-  "name": "charteditor",
+  "name": "note-editor",
   "version": "1.0.0",
   "description": "",
   "main": "electron-main.js",
@@ -7,7 +7,8 @@
     "dev": "yarn run webpack-dev-server --colors --config ./webpack.dev.ts",
     "prod": "yarn run webpack --colors --config ./webpack.prod.ts",
     "dev:electron": "cross-env NODE_ENV=development yarn run electron .",
-    "build:win": "electron-builder -w --dir"
+    "build:win": "electron-builder -w --dir",
+    "build:mac": "electron-builder -m --dir"
   },
   "author": "",
   "license": "ISC",

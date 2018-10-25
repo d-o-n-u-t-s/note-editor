@@ -1,11 +1,14 @@
-// Modules to control application life and create native browser window
-const { app, BrowserWindow, Menu, ipcMain, dialog } = require("electron");
+const { app, BrowserWindow, Menu, ipcMain } = require("electron");
 
 const path = require("path");
 
 const isDevelopment = process.env.NODE_ENV === "development";
 
-const dirname = isDevelopment ? __dirname : path.resolve(__dirname, "../../");
+let dirname = isDevelopment ? __dirname : path.resolve(__dirname, "../../");
+
+if (dirname.includes(".app")) {
+  dirname = path.resolve(dirname, "../../");
+}
 
 const audioAssetPath = path.resolve(dirname, "assets/audio");
 const musicGameSystemsPath = path.resolve(dirname, "assets/musicGameSystems");
@@ -22,17 +25,19 @@ function createWindow() {
   mainWindow.setTitle("ChartEditor");
 
   if (isDevelopment) {
-    mainWindow.loadURL(
-      `http://localhost:9000` //?aap=${audioAssetPath}&mgsp=${musicGameSystemsPath}`
-    );
+    mainWindow.loadURL(`http://localhost:9000`);
   } else {
-    mainWindow.loadURL(
-      `file:///resources/app.asar/dist/index.html?aap=${audioAssetPath}&mgsp=${musicGameSystemsPath}`
-    );
+    if (process.platform === "darwin") {
+      // win
+      mainWindow.loadFile(`dist/index.html`);
+    } else {
+      // mac
+      mainWindow.loadURL(`file:///resources/app.asar/dist/index.html`);
+    }
   }
 
   // ページが読み込まれたら assets フォルダのパスを渡す
-  mainWindow.webContents.on('did-finish-load', () => {
+  mainWindow.webContents.on("did-finish-load", () => {
     mainWindow.webContents.send("assets", {
       aap: audioAssetPath,
       mgsp: musicGameSystemsPath

@@ -25,8 +25,6 @@ export default class HotReload {
     const base = ((window as any)[key] = (window as any)[key] || target[key]);
 
     target[key] = function(...args: any[]) {
-      console.log("call");
-
       return overrideFunction(base.bind(this), ...args);
     };
   }
