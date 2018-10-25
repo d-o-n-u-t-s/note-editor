@@ -136,12 +136,18 @@ export default class Editor implements IStore {
   }
 
   constructor() {
+    // ファイル
     ipcRenderer.on("open", () => this.open());
     ipcRenderer.on("save", () => this.save());
     ipcRenderer.on("saveAs", () => this.saveAs());
     ipcRenderer.on("importBMS", () => BMSImporter.import());
+
+    // 編集
     ipcRenderer.on("changeMeasureDivision", (_: any, index: number) =>
       this.changeMeasureDivision(index)
+    );
+    ipcRenderer.on("changeObjectSize", (_: any, index: number) =>
+      this.setting.setObjectSize(Math.max(1, this.setting.objectSize + index))
     );
     ipcRenderer.on("changeEditMode", (_: any, index: number) =>
       this.setting.setEditMode(index)

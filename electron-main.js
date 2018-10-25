@@ -148,16 +148,35 @@ function initWindowMenu() {
           submenu: [
             {
               label: "アップ",
-              accelerator: "CmdOrCtrl+Right",
+              accelerator: "CmdOrCtrl+Up",
               click() {
                 mainWindow.webContents.send("changeMeasureDivision", 1);
               }
             },
             {
               label: "ダウン",
-              accelerator: "CmdOrCtrl+Left",
+              accelerator: "CmdOrCtrl+Down",
               click() {
                 mainWindow.webContents.send("changeMeasureDivision", -1);
+              }
+            }
+          ]
+        },
+        {
+          label: "ノートサイズ",
+          submenu: [
+            {
+              label: "アップ",
+              accelerator: "CmdOrCtrl+Right",
+              click() {
+                mainWindow.webContents.send("changeObjectSize", 1);
+              }
+            },
+            {
+              label: "ダウン",
+              accelerator: "CmdOrCtrl+Left",
+              click() {
+                mainWindow.webContents.send("changeObjectSize", -1);
               }
             }
           ]
