@@ -163,6 +163,39 @@ function initWindowMenu() {
           ]
         },
         {
+          label: "編集モード",
+          submenu: [
+            {
+              label: "選択モード",
+              accelerator: "Q",
+              click() {
+                mainWindow.webContents.send("changeEditMode", 1);
+              }
+            },
+            {
+              label: "追加モード",
+              accelerator: "W",
+              click() {
+                mainWindow.webContents.send("changeEditMode", 2);
+              }
+            },
+            {
+              label: "削除モード",
+              accelerator: "E",
+              click() {
+                mainWindow.webContents.send("changeEditMode", 3);
+              }
+            },
+            {
+              label: "接続モード",
+              accelerator: "R",
+              click() {
+                mainWindow.webContents.send("changeEditMode", 4);
+              }
+            }
+          ]
+        },
+        {
           label: "ノートタイプ",
           submenu: [
             {
