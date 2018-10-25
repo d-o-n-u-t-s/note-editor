@@ -1,4 +1,5 @@
 import * as math from "mathjs";
+import * as _ from "lodash";
 
 export interface IFraction {
   numerator: number;
@@ -44,3 +45,13 @@ export const lerp = (from: number, to: number, t: number) =>
 
 export const inverseLerp = (from: number, to: number, value: number) =>
   (value - from) / (to - from);
+
+/**
+ * 数値を検査して正常な値にする
+ * @param value 値
+ * @param min 最小値
+ * @param max 最大値
+ */
+export function verifyNumber(value: number, min = -Infinity, max = Infinity) {
+  return _.clamp(Number.isFinite(value) ? value : 0, min, max);
+}

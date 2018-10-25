@@ -1,5 +1,6 @@
 import { action, observable, observe } from "mobx";
 import * as _ from "lodash";
+import { verifyNumber } from "../math";
 
 /**
  * 編集モード
@@ -36,7 +37,6 @@ export interface ObjectVisibility {
 
 export default class EditorSetting {
   constructor() {
-    //localStorage.clear();
     this.load();
     observe(this, () => {
       localStorage.setItem("editorSetting", JSON.stringify(this));
@@ -131,7 +131,8 @@ export default class EditorSetting {
   verticalLaneCount = 3;
 
   @action
-  setVerticalLaneCount = (value: number) => (this.verticalLaneCount = value);
+  setVerticalLaneCount = (value: number) =>
+    (this.verticalLaneCount = verifyNumber(value, 1));
 
   @observable
   padding: number = 20;
