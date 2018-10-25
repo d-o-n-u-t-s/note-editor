@@ -10,6 +10,7 @@ import Pixi from "../containers/Pixi";
 
 import { getUrlParams } from "./url";
 import { Vector2, lerp } from "../math";
+import { defaultRender } from "../objects/NoteRenderer";
 
 const textures = new Map<string, PIXI.Texture>();
 
@@ -54,6 +55,7 @@ class CustomRendererUtility {
   Vector2 = Vector2;
   lerp = lerp;
   Pixi: any;
+  defaultNoteRender = defaultRender;
 
   getSprite(target: any, imagePath: string): PIXI.Sprite | null {
     getImage(imagePath);

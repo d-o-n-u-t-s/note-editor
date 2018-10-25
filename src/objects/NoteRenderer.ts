@@ -16,6 +16,17 @@ export interface INoteRenderer {
   ): void;
 }
 
+export function defaultRender(
+  graphics: PIXI.Graphics,
+  note: Note,
+  area: LinePointInfo
+) {
+  graphics
+    .lineStyle(6, note.data.editorProps.color)
+    .moveTo(area.point.x, area.point.y)
+    .lineTo(area.point.x + area.width, area.point.y);
+}
+
 class NoteRenderer implements INoteRenderer {
   getBounds(note: Note, lane: Lane, measure: Measure): PIXI.Rectangle {
     const q = LaneRendererResolver.resolve(lane).getNotePointInfo(
@@ -33,14 +44,7 @@ class NoteRenderer implements INoteRenderer {
     );
   }
 
-  customRender(graphics: PIXI.Graphics, note: Note, area: LinePointInfo) {
-    const q = area;
-
-    graphics
-      .lineStyle(6, note.data.editorProps.color)
-      .moveTo(q.point.x, q.point.y)
-      .lineTo(q.point.x + q.width, q.point.y);
-  }
+  customRender = defaultRender;
 
   render(note: Note, graphics: PIXI.Graphics, lane: Lane, measure: Measure) {
     const measureBounds = measure.getBounds();
