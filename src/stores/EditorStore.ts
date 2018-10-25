@@ -143,6 +143,10 @@ export default class Editor implements IStore {
     ipcRenderer.on("changeMeasureDivision", (_: any, index: number) =>
       this.changeMeasureDivision(index)
     );
+    ipcRenderer.on("changeNoteTypeIndex", (_: any, index: number) => {
+      const max = this.currentChart!.musicGameSystem!.noteTypes.length - 1;
+      this.setting.setEditNoteTypeIndex(Math.min(index, max));
+    });
 
     // テスト処理
     /*

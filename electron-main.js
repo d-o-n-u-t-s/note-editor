@@ -144,18 +144,91 @@ function initWindowMenu() {
       label: "編集",
       submenu: [
         {
-          label: "小節分割数 アップ",
-          accelerator: "CmdOrCtrl+Right",
-          click() {
-            mainWindow.webContents.send("changeMeasureDivision", 1);
-          }
+          label: "小節分割数",
+          submenu: [
+            {
+              label: "アップ",
+              accelerator: "CmdOrCtrl+Right",
+              click() {
+                mainWindow.webContents.send("changeMeasureDivision", 1);
+              }
+            },
+            {
+              label: "ダウン",
+              accelerator: "CmdOrCtrl+Left",
+              click() {
+                mainWindow.webContents.send("changeMeasureDivision", -1);
+              }
+            }
+          ]
         },
         {
-          label: "小節分割数 ダウン",
-          accelerator: "CmdOrCtrl+Left",
-          click() {
-            mainWindow.webContents.send("changeMeasureDivision", -1);
-          }
+          label: "ノートタイプ",
+          submenu: [
+            {
+              label: "1番目を選択",
+              accelerator: "1",
+              click() {
+                mainWindow.webContents.send("changeNoteTypeIndex", 0);
+              }
+            },
+            {
+              label: "2番目を選択",
+              accelerator: "2",
+              click() {
+                mainWindow.webContents.send("changeNoteTypeIndex", 1);
+              }
+            },
+            {
+              label: "3番目を選択",
+              accelerator: "3",
+              click() {
+                mainWindow.webContents.send("changeNoteTypeIndex", 2);
+              }
+            },
+            {
+              label: "4番目を選択",
+              accelerator: "4",
+              click() {
+                mainWindow.webContents.send("changeNoteTypeIndex", 3);
+              }
+            },
+            {
+              label: "5番目を選択",
+              accelerator: "5",
+              click() {
+                mainWindow.webContents.send("changeNoteTypeIndex", 4);
+              }
+            },
+            {
+              label: "6番目を選択",
+              accelerator: "6",
+              click() {
+                mainWindow.webContents.send("changeNoteTypeIndex", 5);
+              }
+            },
+            {
+              label: "7番目を選択",
+              accelerator: "7",
+              click() {
+                mainWindow.webContents.send("changeNoteTypeIndex", 6);
+              }
+            },
+            {
+              label: "8番目を選択",
+              accelerator: "8",
+              click() {
+                mainWindow.webContents.send("changeNoteTypeIndex", 7);
+              }
+            },
+            {
+              label: "9番目を選択",
+              accelerator: "9",
+              click() {
+                mainWindow.webContents.send("changeNoteTypeIndex", 8);
+              }
+            }
+          ]
         }
       ]
     }
