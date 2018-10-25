@@ -1,6 +1,6 @@
 import Lane from "./Lane";
 import LanePoint from "./LanePoint";
-import BPMChange from "./BPMChange";
+import IBPMChange from "./BPMChange";
 import SpeedChange from "./SpeedChange";
 import INote from "./Note";
 import NoteLine from "./NoteLine";
@@ -45,15 +45,15 @@ export default class Timeline {
   horizontalLaneDivision: number = 16;
 
   @observable
-  bpmChanges: IObservableArray<BPMChange> = observable([]);
+  bpmChanges: IObservableArray<IBPMChange> = observable([]);
 
   @action
-  addBPMChange(value: BPMChange) {
+  addBPMChange(value: IBPMChange) {
     this.bpmChanges.push(value);
   }
 
   @action
-  removeBpmChange(bpmChange: BPMChange) {
+  removeBpmChange(bpmChange: IBPMChange) {
     this.bpmChanges.remove(bpmChange);
   }
 

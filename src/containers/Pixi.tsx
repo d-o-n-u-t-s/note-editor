@@ -20,7 +20,7 @@ import { sortMeasure } from "../objects/Measure";
 import { OtherObjectType } from "../stores/EditorSetting";
 
 import { inject, InjectedComponent } from "../stores/inject";
-import BPMChange, { BPMRenderer, TimeCalculator } from "../objects/BPMChange";
+import IBPMChange, { BPMRenderer, TimeCalculator } from "../objects/BPMChange";
 import SpeedChange, { SpeedRenderer } from "../objects/SpeedChange";
 import { NotePointInfo } from "../objects/LaneRenderer";
 import { runInAction, transaction } from "mobx";
@@ -236,7 +236,8 @@ export default class Pixi extends InjectedComponent {
       });
     }
     const timeCalculator = new TimeCalculator(
-      chart.timeline.bpmChanges.slice().sort(sortMeasure)
+      chart.timeline.bpmChanges.slice().sort(sortMeasure),
+      chart.timeline.measures
     );
 
     // 縦に何個小節を配置するか
@@ -936,7 +937,7 @@ export default class Pixi extends InjectedComponent {
         ),
         guid: guid(),
         bpm: setting.bpm
-      } as BPMChange;
+      } as IBPMChange;
 
       if (isClick) {
         this.injected.editor.currentChart!.timeline.addBPMChange(newLanePoint);
