@@ -1,11 +1,12 @@
 import Lane from "./Lane";
 import LanePoint from "./LanePoint";
-import IBPMChange from "./BPMChange";
+import IBPMChange, { TimeCalculator } from "./BPMChange";
 import SpeedChange from "./SpeedChange";
 import INote from "./Note";
 import NoteLine from "./NoteLine";
 import { observable, observe, action, computed, IObservableArray } from "mobx";
 import Measure, { sortMeasure, IMeasureData } from "./Measure";
+import { Fraction } from "../math";
 
 export default class Timeline {
   constructor() {
@@ -17,16 +18,24 @@ export default class Timeline {
       }
 
       console.log("NoteMap を更新しました");
+
+      this.calculateTime();
+    });
+
+    observe(this.bpmChanges, () => {
+      console.log("bpm が変更");
+
+      this.calculateTime();
     });
 
     observe(this.lanes, () => {
-      console.warn("lane が更新されました", this.lanes);
-
       this.laneMap.clear();
       for (const lane of this.lanes) {
         this.laneMap.set(lane.guid, lane);
       }
       console.log("LaneMap を更新しました");
+
+      this.calculateTime();
     });
 
     observe(this.lanePoints, () => {
@@ -36,6 +45,28 @@ export default class Timeline {
       }
       console.log("lanePointMap を更新しました");
     });
+  }
+
+  timeCalculator = new TimeCalculator([], []);
+
+  /**
+   * 判定時間を更新する
+   */
+  @action
+  calculateTime() {
+    this.timeCalculator = new TimeCalculator(
+      this.bpmChanges.slice().sort(sortMeasure),
+      this.measures
+    );
+
+    for (const note of this.notes) {
+      // 判定時間を更新する
+      note.data.editorProps.time = this.timeCalculator.getTime(
+        note.data.measureIndex + Fraction.to01(note.data.measurePosition)
+      );
+    }
+
+    console.info("判定時間を更新しました");
   }
 
   /**

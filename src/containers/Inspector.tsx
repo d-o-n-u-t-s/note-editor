@@ -94,6 +94,7 @@ export default class Inspector extends InjectedComponent {
         newController.onChange((value: any) => {
           runInAction("inspectorUpdateValue", () => {
             parent[key] = value;
+            this.injected.editor.currentChart!.timeline.calculateTime();
           });
         });
 
