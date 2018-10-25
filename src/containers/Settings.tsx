@@ -25,7 +25,6 @@ const styles = (theme: Theme) =>
     },
 
     root: {
-      fontFamily: "Roboto",
       boxShadow: "none"
     },
     test: {

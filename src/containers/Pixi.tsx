@@ -322,7 +322,7 @@ export default class Pixi extends InjectedComponent {
           let text = new PIXI.Text(
             index + "/" + Fraction.to01(measure.data.beat),
             {
-              fontFamily: "Arial",
+              fontFamily: "'Noto Sans JP', sans-serif",
               fontSize: 20,
               fill: 0xffffff,
               align: "center",

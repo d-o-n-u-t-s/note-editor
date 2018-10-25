@@ -47,8 +47,7 @@ export default class AssetSetting extends InjectedComponent<Props> {
               key={index}
               style={{
                 margin: "0 .5rem",
-                fontSize: "0.8rem",
-                fontFamily: "Roboto"
+                fontSize: "0.8rem"
               }}
             >
               {audioAssetPath.split("/").pop()}
