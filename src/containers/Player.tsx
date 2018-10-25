@@ -86,6 +86,7 @@ class Player extends React.Component<Props, {}> {
           style={{
             display: "flex",
             background: "#000",
+            margin: "0 14px",
             marginBottom: "14px"
           }}
         >
@@ -162,7 +163,7 @@ class Player extends React.Component<Props, {}> {
             }}
           />
 
-          <span style={{ color: "#fff", fontFamily: "Roboto" }}>
+          <span style={{ color: "#fff" }}>
             {this.formatTime(
               safe(
                 () =>

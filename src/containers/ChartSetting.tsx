@@ -122,13 +122,17 @@ class ChartSetting extends React.Component<Props, {}> {
         </div>
 
         <Button
+          variant="outlined"
+          color="primary"
           onClick={() => {
             localStorage.setItem("chart", editor.currentChart!.toJSON());
           }}
         >
-          保存
+          一時保存
         </Button>
         <Button
+          variant="outlined"
+          color="primary"
           onClick={() => {
             editor.currentChart!.timeline.optimizeNoteLine();
             editor.currentChart!.timeline.optimiseLane();

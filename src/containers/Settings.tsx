@@ -20,6 +20,10 @@ import AssetSetting from "./AssetSetting";
 
 const styles = (theme: Theme) =>
   createStyles({
+    summary: {
+      fontSize: "14px"
+    },
+
     root: {
       fontFamily: "Roboto",
       boxShadow: "none"
@@ -80,10 +84,20 @@ class Settings extends React.Component<Props, {}> {
                 root: classes.root
               }}
             >
-              <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+              <ExpansionPanelSummary
+                expandIcon={<ExpandMoreIcon />}
+                className={classes.summary}
+              >
                 {setting.key}
               </ExpansionPanelSummary>
-              <ExpansionPanelDetails>{setting.render()}</ExpansionPanelDetails>
+              <ExpansionPanelDetails
+                style={{
+                  background: "#f5f5f5",
+                  borderTop: "solid 1px #d7d7d7"
+                }}
+              >
+                {setting.render()}
+              </ExpansionPanelDetails>
             </ExpansionPanel>
             <Divider />
           </div>

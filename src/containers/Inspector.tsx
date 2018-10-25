@@ -124,9 +124,9 @@ export default class Inspector extends InjectedComponent {
 
       gui.width = size * (1 / scale);
 
-      gui.domElement.style.marginLeft = `${(w * scale - w) / 2}`;
-      gui.domElement.style.marginTop = `${(h * scale - h) / 2}`;
-      gui.domElement.style.marginBottom = `${(h * scale - h) / 2}`;
+      gui.domElement.style.marginLeft = `${(w * scale - w) / 2}px`;
+      gui.domElement.style.marginTop = `${(h * scale - h) / 2}px`;
+      gui.domElement.style.marginBottom = `${(h * scale - h) / 2}px`;
     }, 100);
 
     this.gameCanvas!.appendChild(gui.domElement);
