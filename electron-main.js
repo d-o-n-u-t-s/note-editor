@@ -23,13 +23,21 @@ function createWindow() {
 
   if (isDevelopment) {
     mainWindow.loadURL(
-      `http://localhost:9000?aap=${audioAssetPath}&mgsp=${musicGameSystemsPath}`
+      `http://localhost:9000` //?aap=${audioAssetPath}&mgsp=${musicGameSystemsPath}`
     );
   } else {
     mainWindow.loadURL(
       `file:///resources/app.asar/dist/index.html?aap=${audioAssetPath}&mgsp=${musicGameSystemsPath}`
     );
   }
+
+  // ページが読み込まれたら assets フォルダのパスを渡す
+  mainWindow.webContents.on('did-finish-load', () => {
+    mainWindow.webContents.send("assets", {
+      aap: audioAssetPath,
+      mgsp: musicGameSystemsPath
+    });
+  });
 
   initWindowMenu();
 

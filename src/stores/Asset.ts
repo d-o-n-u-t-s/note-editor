@@ -10,10 +10,9 @@ const fs = (window as any).require("fs");
 const util = __require("util");
 const path = __require("path");
 
-import { getUrlParams } from "../utils/url";
-
 const electron = (window as any).require("electron");
 const remote = electron.remote as Electrom.Remote;
+const ipcRenderer = electron.ipcRenderer as Electrom.IpcRenderer;
 
 import {
   normalizeMusicGameSystem,
@@ -35,6 +34,12 @@ import CustomRendererUtility from "../utils/CustomRendererUtility";
 
 import MusicGameSystem from "./MusicGameSystem";
 import Chart from "./Chart";
+import { resolve } from "url";
+
+interface IAssetPath {
+  aap: string;
+  mgsp: string;
+}
 
 export default class Asset implements IStore {
   @observable
@@ -57,7 +62,7 @@ export default class Asset implements IStore {
   }
 
   async loadAssets() {
-    const urlParams = getUrlParams();
+    const urlParams = await this.getAssetPath;
 
     // 音源を読み込む
     await this.checkAudioAssetDirectory(decodeURIComponent(urlParams.aap));
@@ -248,7 +253,17 @@ export default class Asset implements IStore {
     this.addMusicGameSystem(musicGameSystems);
   }
 
+  private assetPathResolve?: ((assetPath: IAssetPath) => void);
+
+  getAssetPath = new Promise<IAssetPath>(resolve => {
+    this.assetPathResolve = resolve;
+  });
+
   constructor(debugMode: boolean) {
+    ipcRenderer.on("assets", (_: any, assetPath: IAssetPath) => {
+      this.assetPathResolve!(assetPath);
+    });
+
     (async () => {
       await this.loadAssets();
 

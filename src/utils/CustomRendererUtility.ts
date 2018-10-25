@@ -8,9 +8,10 @@ const util = __require("util");
 import * as PIXI from "pixi.js";
 import Pixi from "../containers/Pixi";
 
-import { getUrlParams } from "./url";
 import { Vector2, lerp } from "../math";
 import { defaultRender } from "../objects/NoteRenderer";
+
+import store from "../stores/stores";
 
 const textures = new Map<string, PIXI.Texture>();
 
@@ -21,9 +22,10 @@ async function getImage(imagePath: string) {
 
   loading.set(imagePath, true);
 
-  const path = getUrlParams().mgsp + "/" + imagePath;
-
-  const buffer: Buffer = await util.promisify(fs.readFile)(path);
+  const path = await store.editor.asset.getAssetPath;
+  const buffer: Buffer = await util.promisify(fs.readFile)(
+    path.mgsp + "/" + imagePath
+  );
 
   var blob = new Blob([buffer], { type: "image/jpg" });
   const p = URL.createObjectURL(blob);
