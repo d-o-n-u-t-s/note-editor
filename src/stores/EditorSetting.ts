@@ -1,4 +1,5 @@
-import { action, observable } from "mobx";
+import { action, observable, observe } from "mobx";
+import * as _ from "lodash";
 
 /**
  * 編集モード
@@ -34,6 +35,25 @@ export interface ObjectVisibility {
 }
 
 export default class EditorSetting {
+  constructor() {
+    //localStorage.clear();
+    this.load();
+    observe(this, () => {
+      localStorage.setItem("editorSetting", JSON.stringify(this));
+    });
+  }
+
+  /**
+   * エディタ設定を読み込む
+   */
+  @action
+  load() {
+    const editorSetting = localStorage.getItem("editorSetting");
+    if (editorSetting) {
+      _.assign(this, JSON.parse(editorSetting));
+    }
+  }
+
   /**
    * テーマ（仮）
    * TODO: 専用クラスを作る
