@@ -176,6 +176,26 @@ class Player extends React.Component<Props, {}> {
             )}
           </span>
 
+          <Slider
+            value={safe(() => editor!.currentChart!.speed, 0)}
+            min={0.1}
+            max={1}
+            step={0.1}
+            style={{
+              marginBottom: "4px",
+              marginLeft: "1rem",
+              width: "100px",
+              display: "inline-block"
+            }}
+            classes={{
+              track: classes.volumeSliderTrack,
+              thumb: classes.volumeSliderThumb
+            }}
+            onChange={(_, value) => {
+              editor!.currentChart!.setSpeed(value);
+            }}
+          />
+
           <IconButton
             style={{ color: "#fff", float: "right" }}
             className={classes.playerButton}

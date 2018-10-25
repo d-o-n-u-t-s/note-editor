@@ -200,6 +200,9 @@ export default class Chart implements IStore {
   volume: number = 1.0;
 
   @observable
+  speed: number = 1.0;
+
+  @observable
   startTime: number = 0.0;
 
   @action
@@ -211,6 +214,12 @@ export default class Chart implements IStore {
   setVolume(value: number) {
     this.volume = value;
     this.audio!.volume(value);
+  }
+
+  @action
+  setSpeed(value: number) {
+    this.speed = value;
+    this.audio!.rate(value);
   }
 
   @computed
@@ -254,6 +263,7 @@ export default class Chart implements IStore {
     (window as any).ps = this.audio;
 
     this.audio!.seek(this.time);
+    this.audio!.rate(this.speed);
 
     this.audio!.play();
   }
