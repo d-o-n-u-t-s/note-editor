@@ -1,17 +1,7 @@
-import TimelineObject from "./TimelineObject";
-
-import { GUID } from "../util";
-import { Fraction } from "../math";
+import { GUID, guid } from "../util";
+import { Fraction, IFraction } from "../math";
 import Pixi from "../containers/Pixi";
-import Measure from "./Measure";
-import { Graphics } from "pixi.js";
-
-enum Types {
-  Integer,
-  Float,
-  Boolean,
-  Fraction
-}
+import Measure, { sortMeasure } from "./Measure";
 
 interface IChronoObject {
   guid: GUID;
@@ -26,12 +16,12 @@ interface IChronoObject {
   measurePosition: Fraction;
 }
 
-export default interface BPMChange extends IChronoObject {
+export default interface IBPMChange extends IChronoObject {
   bpm: number;
 }
 
 class _BPMRenderer {
-  getBounds(bpmChange: BPMChange, measure: Measure): PIXI.Rectangle {
+  getBounds(bpmChange: IBPMChange, measure: Measure): PIXI.Rectangle {
     const lane = measure;
 
     const y =
@@ -42,15 +32,13 @@ class _BPMRenderer {
 
     const colliderH = 20;
 
-    // this.width = w;
-    //this.height = colliderH;
     const _x = measure.x;
     const _y = y - colliderH / 2;
 
     return new PIXI.Rectangle(_x, _y, measure.width, colliderH);
   }
 
-  render(bpm: BPMChange, graphics: PIXI.Graphics, measure: Measure) {
+  render(bpm: IBPMChange, graphics: PIXI.Graphics, measure: Measure) {
     const bounds = this.getBounds(bpm, measure);
 
     graphics
@@ -74,10 +62,10 @@ class BPMChangeData {
   unitTime: number;
   time: number;
 
-  constructor(current: BPMChange, prev: BPMChangeData) {
+  constructor(current: IBPMChangeAndBeat, prev: BPMChangeData) {
     this.measurePosition =
       current.measureIndex + current.measurePosition.to01Number();
-    this.unitTime = 240 / current.bpm;
+    this.unitTime = (240 / current.bpm) * Fraction.to01(current.beat);
     this.time = prev ? prev.getTime(this.measurePosition) : 0;
   }
 
@@ -86,11 +74,67 @@ class BPMChangeData {
   }
 }
 
+/**
+ * BPM 変更命令 + 拍子
+ */
+interface IBPMChangeAndBeat extends IBPMChange {
+  beat: IFraction;
+}
+
 export class TimeCalculator {
   data: BPMChangeData[] = [];
-  constructor(data: BPMChange[]) {
-    for (let i = 0; i < data.length; i++) {
-      this.data.push(new BPMChangeData(data[i], this.data[i - 1]));
+  constructor(data: IBPMChange[], measures: Measure[]) {
+    // 小節番号をキーにした BPM と拍子の変更命令マップ
+    const bpmAndBeatMap = new Map<number, IBPMChangeAndBeat>();
+
+    // 小節の開始位置に配置されている BPM 変更命令に拍子情報を追加
+    let bpmChanges = data
+      .map(bpmChange => {
+        const bpmAndBeat = Object.assign(
+          {
+            beat: measures[bpmChange.measureIndex].data.beat
+          },
+          bpmChange
+        ) as IBPMChangeAndBeat;
+        bpmAndBeatMap.set(bpmAndBeat.measureIndex, bpmAndBeat);
+        return bpmAndBeat;
+      })
+      .sort(sortMeasure);
+
+    // 前の小節情報
+    let prevBpm = 0;
+    let prevBeat = Fraction.none as IFraction;
+
+    for (let i = 0; i < measures.length; i++) {
+      const newBpm = bpmAndBeatMap.has(i)
+        ? bpmAndBeatMap.get(i)!
+        : {
+            guid: guid(),
+            measureIndex: i,
+            measurePosition: new Fraction(0, 1),
+            bpm: prevBpm,
+            beat: measures[i].data.beat
+          };
+
+      // 前の小節と比較して BPM か拍子が変わっているなら命令を追加する
+      if (
+        (!(
+          bpmAndBeatMap.has(i) &&
+          bpmAndBeatMap.get(i)!.measurePosition.numerator === 0
+        ) &&
+          prevBpm !== newBpm.bpm) ||
+        !Fraction.equal(prevBeat, newBpm.beat)
+      ) {
+        bpmChanges.push(newBpm);
+      }
+
+      prevBpm = newBpm.bpm;
+      prevBeat = newBpm.beat;
+    }
+    bpmChanges = bpmChanges.sort(sortMeasure);
+
+    for (let i = 0; i < bpmChanges.length; i++) {
+      this.data.push(new BPMChangeData(bpmChanges[i], this.data[i - 1]));
     }
   }
 

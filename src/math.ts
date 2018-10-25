@@ -18,6 +18,9 @@ export class Fraction {
       denominator: fraction.denominator
     };
   }
+  static equal(a: IFraction, b: IFraction) {
+    return a.denominator === b.denominator && a.numerator === b.numerator;
+  }
 
   static none = new Fraction(0, 0);
 
