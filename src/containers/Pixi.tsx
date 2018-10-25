@@ -199,6 +199,8 @@ export default class Pixi extends InjectedComponent {
     const chart = editor.currentChart!;
     const musicGameSystem = chart.musicGameSystem!;
 
+    const timeCalculator = chart.timeline.timeCalculator;
+
     const w = this.app!.renderer.width;
     const h = this.app!.renderer.height;
 
@@ -235,10 +237,6 @@ export default class Pixi extends InjectedComponent {
         bpm: 120
       });
     }
-    const timeCalculator = new TimeCalculator(
-      chart.timeline.bpmChanges.slice().sort(sortMeasure),
-      chart.timeline.measures
-    );
 
     // 縦に何個小節を配置するか
     var hC = this.injected.editor.setting!.verticalLaneCount;
@@ -991,11 +989,7 @@ export default class Pixi extends InjectedComponent {
       // 再生時間がノートの判定時間を超えたら SE を鳴らす
       for (const note of chart.timeline.notes) {
         // 判定時間
-        const judgeTime = timeCalculator.getTime(
-          note.data.measureIndex + Fraction.to01(note.data.measurePosition)
-        );
-
-        note.data.editorProps.time = judgeTime;
+        const judgeTime = note.data.editorProps.time;
 
         // 時間が巻き戻っていたら SE 再生済みフラグをリセットする
         if (currentTime < this.previousTime && currentTime < judgeTime) {
