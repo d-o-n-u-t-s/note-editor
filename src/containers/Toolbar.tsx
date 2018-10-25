@@ -6,7 +6,10 @@ import { safe } from "../util";
 
 import NewChartDialog from "../components/NewChartDialog";
 
-import { ObjectCategory, OtherObjectType } from "../stores/EditorSetting";
+import EditorSetting, {
+  ObjectCategory,
+  OtherObjectType
+} from "../stores/EditorSetting";
 import {
   withStyles,
   WithStyles,

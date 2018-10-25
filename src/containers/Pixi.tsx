@@ -243,8 +243,6 @@ export default class Pixi extends InjectedComponent {
     // 縦に何個小節を配置するか
     var hC = this.injected.editor.setting!.verticalLaneCount;
 
-    var wC = 300;
-
     const padding = this.injected.editor.setting!.padding;
 
     this.injected.editor.currentChart!.updateTime();
@@ -265,7 +263,7 @@ export default class Pixi extends InjectedComponent {
     let cy = 0;
 
     // レーンを描画
-    for (var $x = 0; $x < wC; ++$x) {
+    draw_lane: for (var $x = 0; ; ++$x) {
       for (var i = hC - 1; i >= 0; --i) {
         var hh = (h - padding * 2) / hC;
 
@@ -349,7 +347,7 @@ export default class Pixi extends InjectedComponent {
 
         text.visible = measure.isVisible;
 
-        ++index;
+        if (++index >= chart.timeline.measures.length) break draw_lane;
       }
     }
 

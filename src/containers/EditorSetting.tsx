@@ -78,6 +78,9 @@ class EditorSetting extends React.Component<Props, {}> {
               editor.setting!.setVerticalLaneCount(e.target.value | 0);
             }}
             type="number"
+            inputProps={{
+              min: "1"
+            }}
             InputLabelProps={{
               shrink: true
             }}
