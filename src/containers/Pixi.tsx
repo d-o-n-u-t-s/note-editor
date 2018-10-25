@@ -391,11 +391,11 @@ export default class Pixi extends InjectedComponent {
       const s = targetMeasure;
 
       // ターゲット小節の分割線を描画
-      for (var i = 1; i < this.injected.editor.setting!.measureDivision; ++i) {
-        const y =
-          s.y + (s.height / this.injected.editor.setting!.measureDivision) * i;
+      const div = this.injected.editor.setting!.measureDivision;
+      for (var i = 1; i < div; ++i) {
+        const y = s.y + (s.height / div) * i;
         graphics
-          .lineStyle(2, 0xffffff, 0.8)
+          .lineStyle(2, 0xffffff, (4 * i) % div === 0 ? 1 : 0.6)
           .moveTo(s.x, y)
           .lineTo(s.x + laneWidth, y);
       }
