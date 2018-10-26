@@ -80,6 +80,7 @@ class ChartSetting extends React.Component<Props, {}> {
         <TextField
           id="name"
           label="タイトル"
+          style={{ fontSize: 14, width: "100%" }}
           value={editor.currentChart.name}
           onChange={(e: any) => editor.currentChart!.setName(e.target.value)}
           margin="normal"

@@ -62,6 +62,14 @@ export default class Editor implements IStore {
     return newChart;
   }
 
+  /**
+   * 譜面を削除する
+   */
+  @action
+  removeChart(chartIndex: number) {
+    this.charts = this.charts.filter((_, index) => index !== chartIndex);
+  }
+
   @action
   setCurrentChart(chartIndex: number) {
     this.currentChartIndex = chartIndex;
