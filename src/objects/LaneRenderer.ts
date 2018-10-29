@@ -25,8 +25,6 @@ export interface NotePointInfo {
 }
 
 export function getLines(points: LinePoint[], measures: Measure[]): LineInfo[] {
-  performance.mark("getLines");
-
   const lines: LineInfo[] = [];
 
   const _points = points
@@ -71,8 +69,6 @@ export function getLines(points: LinePoint[], measures: Measure[]): LineInfo[] {
       v2 = Math.min(v2 + 1, p2.value);
     }
   }
-
-  performance.measure("getLines", "getLines");
 
   return lines;
 }
