@@ -24,6 +24,7 @@ function parseJSON(text: string) {
   try {
     return JSON.parse(text);
   } catch (e) {
+    console.error(e);
     return {};
   }
 }
