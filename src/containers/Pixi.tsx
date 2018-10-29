@@ -26,6 +26,7 @@ import { NotePointInfo } from "../objects/LaneRenderer";
 import { runInAction, transaction } from "mobx";
 import * as _ from "lodash";
 import MeasureRendererResolver from "../objects/MeasureRendererResolver";
+import * as pool from "../utils/pool";
 
 @inject
 @observer
@@ -174,6 +175,7 @@ export default class Pixi extends InjectedComponent {
    * canvas を再描画する
    */
   private renderCanvas() {
+    pool.resetAll();
     this.inspectTarget = null;
 
     if (!this.app) return;
