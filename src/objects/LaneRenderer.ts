@@ -9,6 +9,7 @@ import Pixi from "../containers/Pixi";
 
 import { LaneTemplate } from "../stores/MusicGameSystem";
 import { drawQuad } from "../utils/drawQuad";
+import { GetLineInfoFromPool, GetLinePointInfoFromPool } from "../utils/pool";
 
 interface LinePoint {
   measureIndex: number;
@@ -44,24 +45,24 @@ export function getLines(points: LinePoint[], measures: Measure[]): LineInfo[] {
     const toLinePointInfo = (measureIndex: number, value: number) => {
       const measure = measures[measureIndex];
       const p = inverseLerp(p1.value, p2.value, value);
-      return {
-        point: new Vector2(
-          measure.x + measure.width * lerp(p1.x, p2.x, p),
-          measure.y + measure.height * (measureIndex + 1 - value)
-        ),
-        width: measure.width * lerp(p1.width, p2.width, p)
-      };
+      return GetLinePointInfoFromPool(
+        measure.x + measure.width * lerp(p1.x, p2.x, p),
+        measure.y + measure.height * (measureIndex + 1 - value),
+        measure.width * lerp(p1.width, p2.width, p)
+      );
     };
 
     let v1 = p1.value;
     let v2 = Math.min(Math.floor(v1) + 1, p2.value);
     while (true) {
       const m = Math.floor(v1);
-      lines.push({
-        measure: measures[m],
-        start: toLinePointInfo(m, v1),
-        end: toLinePointInfo(m, v2)
-      });
+      lines.push(
+        GetLineInfoFromPool(
+          measures[m],
+          toLinePointInfo(m, v1),
+          toLinePointInfo(m, v2)
+        )
+      );
       if (v2 === p2.value) {
         break;
       }
