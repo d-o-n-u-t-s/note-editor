@@ -101,7 +101,7 @@ class NoteLineRenderer implements INoteLineRenderer {
     let lps = lane.points
       .map(guid => lanePointMap.get(guid)!)
       .filter(lp => {
-        const n = lp.measureIndex + lp.measurePosition.to01Number();
+        const n = lp.measureIndex + Fraction.to01(lp.measurePosition);
 
         return n > headPos && n < tailPos;
       })
@@ -124,7 +124,7 @@ class NoteLineRenderer implements INoteLineRenderer {
           */
         //  return lp;
 
-        const pos = lp.measureIndex + lp.measurePosition.to01Number();
+        const pos = lp.measureIndex + Fraction.to01(lp.measurePosition);
 
         // const bounds = lp.renderer!.
 
@@ -180,7 +180,7 @@ class NoteLineRenderer implements INoteLineRenderer {
 
         // レーンの左
         const left =
-          lp.horizontalPosition.to01Number() * measureW +
+          Fraction.to01(lp.horizontalPosition) * measureW +
           (measureW / lp.horizontalPosition.denominator) *
             lp.horizontalSize *
             s_pos;

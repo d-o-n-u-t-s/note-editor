@@ -1,6 +1,10 @@
-import * as React from "react";
-import * as _ from "lodash";
 import { GUI, GUIController } from "dat-gui";
+import * as _ from "lodash";
+import { runInAction } from "mobx";
+import { observer } from "mobx-react";
+import * as React from "react";
+import config from "../config";
+import { inject, InjectedComponent } from "../stores/inject";
 
 /**
  * フォルダを削除する GUI#removeFolder を定義
@@ -16,11 +20,6 @@ Object.defineProperty(GUI.prototype, "removeFolder", {
     this.onResize();
   }
 });
-
-import config from "../config";
-import { runInAction } from "mobx";
-import { inject, InjectedComponent } from "../stores/inject";
-import { observer } from "mobx-react";
 
 /**
  * インスペクタコンポーネント
@@ -42,13 +41,11 @@ export default class Inspector extends InjectedComponent {
   /**
    * オブジェクトをインスペクタにバインドする
    */
-  bind = (target: any) => {
+  bind(target: any) {
     if (this.previousTarget === target) return;
     this.previousTarget = target;
 
     console.log("update inspector", target);
-
-    const obj = _.cloneDeep(target);
 
     // 既存のコントローラーを削除する
     for (const controller of this.controllers) {
@@ -91,12 +88,11 @@ export default class Inspector extends InjectedComponent {
           newController = gui.add(obj, key);
         }
 
-        newController.onChange((value: any) => {
-          runInAction("inspectorUpdateValue", () => {
-            parent[key] = value;
-            this.injected.editor.currentChart!.timeline.calculateTime();
-          });
-        });
+        const setValue = newController.setValue;
+        (newController as any).setValue = (value: any) => {
+          parent[key] = value;
+          setValue.call(newController, value);
+        };
 
         if (gui === this.gui) {
           this.controllers.push(newController);
@@ -104,8 +100,8 @@ export default class Inspector extends InjectedComponent {
       }
     };
 
-    add(this.gui, obj, target);
-  };
+    add(this.gui, target, target);
+  }
 
   guiScale = 1.2;
 

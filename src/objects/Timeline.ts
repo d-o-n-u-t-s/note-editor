@@ -1,39 +1,39 @@
+import * as _ from "lodash";
+import { action, IObservableArray, observable, observe } from "mobx";
+import { Fraction } from "../math";
+import IBPMChange, { TimeCalculator } from "./BPMChange";
 import Lane from "./Lane";
 import LanePoint from "./LanePoint";
-import IBPMChange, { TimeCalculator } from "./BPMChange";
-import SpeedChange from "./SpeedChange";
-import INote from "./Note";
+import Measure, { sortMeasure } from "./Measure";
+import Note from "./Note";
 import NoteLine from "./NoteLine";
-import { observable, observe, action, computed, IObservableArray } from "mobx";
-import Measure, { sortMeasure, IMeasureData } from "./Measure";
-import { Fraction } from "../math";
+import SpeedChange from "./SpeedChange";
 
 export default class Timeline {
   constructor() {
-    observe(this.notes, () => {
+    observe(this.changed_notes, () => {
       this.noteMap.clear();
 
       for (const note of this.notes) {
         this.noteMap.set(note.data.guid, note);
       }
+      console.log("NoteMap を更新しました", this.changed_notes.count);
 
-      console.log("NoteMap を更新しました");
+      this.calculateTime();
+    });
+
+    observe(this.changed_lanes, () => {
+      this.laneMap.clear();
+      for (const lane of this.lanes) {
+        this.laneMap.set(lane.guid, lane);
+      }
+      console.log("LaneMap を更新しました", this.changed_lanes.count);
 
       this.calculateTime();
     });
 
     observe(this.bpmChanges, () => {
       console.log("bpm が変更");
-
-      this.calculateTime();
-    });
-
-    observe(this.lanes, () => {
-      this.laneMap.clear();
-      for (const lane of this.lanes) {
-        this.laneMap.set(lane.guid, lane);
-      }
-      console.log("LaneMap を更新しました");
 
       this.calculateTime();
     });
@@ -88,12 +88,26 @@ export default class Timeline {
     this.bpmChanges.remove(bpmChange);
   }
 
+  measures: Measure[] = [];
+
+  /**
+   * measures 変更通知
+   */
   @observable
-  measures: IObservableArray<Measure> = observable([]);
+  private changed_measures = { count: 0 };
+
+  /**
+   * measures 変更
+   */
+  @action
+  dirty_measures() {
+    this.changed_measures.count++;
+  }
 
   @action
   setMeasures(measures: Measure[]) {
-    this.measures.replace(measures);
+    this.measures = measures;
+    this.dirty_measures();
   }
 
   /**
@@ -118,18 +132,42 @@ export default class Timeline {
   lanePointMap = new Map<string, LanePoint>();
 
   @observable
-  notes: IObservableArray<INote> = observable([]);
-
-  noteMap = new Map<string, INote>();
-
-  @observable
   noteLines: IObservableArray<NoteLine> = observable([]);
 
+  /**
+   * ノート
+   */
+  notes: Note[] = [];
+
+  /**
+   * notes 変更
+   */
   @action
-  addNote = (note: INote) => this.notes.push(note);
+  dirty_notes() {
+    this.changed_notes.count++;
+  }
+  /**
+   * notes 変更通知
+   */
+  @observable
+  private changed_notes = { count: 0 };
+
+  noteMap = new Map<string, Note>();
 
   @action
-  removeNote(note: INote) {
+  addNote(note: Note) {
+    this.notes.push(note);
+    this.dirty_notes();
+  }
+
+  @action
+  addNotes(notes: Note[]) {
+    this.notes.push(...notes);
+    this.dirty_notes();
+  }
+
+  @action
+  removeNote(note: Note) {
     // ノートを参照しているノートラインを削除する
     for (const noteLine of this.noteLines.filter(
       noteLine =>
@@ -138,16 +176,14 @@ export default class Timeline {
       this.removeNoteLine(noteLine);
     }
 
-    this.notes.remove(note);
+    _.remove(this.notes, a => a === note);
+    this.dirty_notes();
   }
 
   @action
   removeNoteLine(noteLine: NoteLine) {
     this.noteLines.remove(noteLine);
   }
-
-  @action
-  addNotes = (notes: INote[]) => this.notes.push(...notes);
 
   @action
   addNoteLine = (noteLine: NoteLine) => this.noteLines.push(noteLine);
@@ -158,17 +194,35 @@ export default class Timeline {
   /**
    * レーン
    */
-  lanes: IObservableArray<Lane> = observable([]);
+  lanes: Lane[] = [];
+
+  /**
+   * lanes 変更通知
+   */
+  @observable
+  private changed_lanes = { count: 0 };
+
+  /**
+   * lanes 変更
+   */
+  @action
+  dirty_lanes() {
+    this.changed_lanes.count++;
+  }
 
   laneMap = new Map<string, Lane>();
 
   @action
   setLanes = (lanes: Lane[]) => {
-    this.lanes.replace(lanes); // = lanes);
+    this.lanes = lanes;
+    this.dirty_lanes();
   };
 
   @action
-  addLane = (lane: Lane) => this.lanes.push(lane);
+  addLane(lane: Lane) {
+    this.lanes.push(lane);
+    this.dirty_lanes();
+  }
 
   /**
    * ノートラインを最適化する
@@ -207,8 +261,8 @@ export default class Timeline {
         const lp1 = this.lanePoints.find(lp => lp.guid === a)!;
         const lp2 = this.lanePoints.find(lp => lp.guid === b)!;
 
-        const p1 = lp1.measureIndex + lp1.measurePosition.to01Number();
-        const p2 = lp2.measureIndex + lp2.measurePosition.to01Number();
+        const p1 = lp1.measureIndex + Fraction.to01(lp1.measurePosition);
+        const p2 = lp2.measureIndex + Fraction.to01(lp2.measurePosition);
 
         return p1 - p2;
       });

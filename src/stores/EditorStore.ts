@@ -1,17 +1,15 @@
 import { action, observable } from "mobx";
-
+import BMSImporter from "../plugins/BMSImporter";
+import { fs, __require } from "../utils/node";
+import Asset from "./Asset";
 import Chart from "./Chart";
+import EditorSetting from "./EditorSetting";
+import MusicGameSystem from "./MusicGameSystem";
 
 interface IStore {
   readonly name: string;
 }
 
-import EditorSetting from "./EditorSetting";
-import Asset from "./Asset";
-import MusicGameSystem from "./MusicGameSystem";
-
-import { __require, fs } from "../utils/node";
-import BMSImporter from "../plugins/BMSImporter";
 const { remote, ipcRenderer } = __require("electron");
 const { dialog } = remote;
 
@@ -20,14 +18,8 @@ export default class Editor implements IStore {
 
   readonly debugMode: boolean = true;
 
-  @observable
-  inspectorTarget: any = {
-    message: "Hello World２",
-    displayOutline: false,
-    maxSize: 6.0,
-    scale: 5,
-    aaa: "[1, 2, 3]"
-  };
+  @observable.ref
+  inspectorTarget: any = {};
 
   @action
   setInspectorTarget(target: any) {

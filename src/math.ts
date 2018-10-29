@@ -25,10 +25,6 @@ export class Fraction {
 
   static none = new Fraction(0, 0);
 
-  to01Number = () => (1 / this.denominator) * this.numerator;
-
-  toMathjs = () => math.fraction(this.numerator, this.denominator);
-
   clone() {
     return new Fraction(this.numerator, this.denominator);
   }

@@ -64,7 +64,7 @@ class BPMChangeData {
 
   constructor(current: IBPMChangeAndBeat, prev: BPMChangeData) {
     this.measurePosition =
-      current.measureIndex + current.measurePosition.to01Number();
+      current.measureIndex + Fraction.to01(current.measurePosition);
     this.unitTime = (240 / current.bpm) * Fraction.to01(current.beat);
     this.time = prev ? prev.getTime(this.measurePosition) : 0;
   }

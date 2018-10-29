@@ -47,8 +47,6 @@ class NoteRenderer implements INoteRenderer {
   customRender = defaultRender;
 
   render(note: Note, graphics: PIXI.Graphics, lane: Lane, measure: Measure) {
-    const measureBounds = measure.getBounds();
-
     const q = LaneRendererResolver.resolve(lane).getNotePointInfo(
       lane,
       measure,
@@ -61,17 +59,6 @@ class NoteRenderer implements INoteRenderer {
     }
 
     q.width *= note.data.horizontalSize;
-
-    /*
-    Pixi.instance!.drawTempText(
-      `${note.measureIndex}:${note.measurePosition}`,
-      q.point.x,
-      q.point.y,
-      {
-        fontSize: 12
-      }
-    );
-    */
 
     this.customRender(graphics, note, q);
   }

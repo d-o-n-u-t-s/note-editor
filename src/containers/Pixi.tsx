@@ -1,31 +1,30 @@
-import * as React from "react";
+import * as _ from "lodash";
+import { observer } from "mobx-react";
 import * as PIXI from "pixi.js";
+import * as React from "react";
 import { Fraction } from "../math";
-import { EditMode, ObjectCategory } from "../stores/EditorSetting";
+import Vector2 from "../math/Vector2";
+import IBPMChange, { BPMRenderer } from "../objects/BPMChange";
+import Lane from "../objects/Lane";
 import LanePoint from "../objects/LanePoint";
 import LanePointRenderer from "../objects/LanePointRenderer";
-import { observer } from "mobx-react";
-import Lane from "../objects/Lane";
-import Note, { INoteData } from "../objects/Note";
-import { NoteType } from "../stores/MusicGameSystem";
-import Measure, { sortMeasureData } from "../objects/Measure";
-import { guid } from "../util";
-import Vector2 from "../math/Vector2";
-import NoteLine from "../objects/NoteLine";
-import LaneRendererResolver from "../objects/LaneRendererResolver";
-import NoteRendererResolver from "../objects/NoteRendererResolver";
-import NoteLineRendererResolver from "../objects/NoteLineRendererResolver";
-import CustomRendererUtility from "../utils/CustomRendererUtility";
-import { sortMeasure } from "../objects/Measure";
-import { OtherObjectType } from "../stores/EditorSetting";
-
-import { inject, InjectedComponent } from "../stores/inject";
-import IBPMChange, { BPMRenderer, TimeCalculator } from "../objects/BPMChange";
-import SpeedChange, { SpeedRenderer } from "../objects/SpeedChange";
 import { NotePointInfo } from "../objects/LaneRenderer";
-import { runInAction, transaction } from "mobx";
-import * as _ from "lodash";
+import LaneRendererResolver from "../objects/LaneRendererResolver";
+import Measure, { sortMeasureData } from "../objects/Measure";
 import MeasureRendererResolver from "../objects/MeasureRendererResolver";
+import Note from "../objects/Note";
+import NoteLine from "../objects/NoteLine";
+import NoteLineRendererResolver from "../objects/NoteLineRendererResolver";
+import NoteRendererResolver from "../objects/NoteRendererResolver";
+import SpeedChange, { SpeedRenderer } from "../objects/SpeedChange";
+import {
+  EditMode,
+  ObjectCategory,
+  OtherObjectType
+} from "../stores/EditorSetting";
+import { inject, InjectedComponent } from "../stores/inject";
+import { guid } from "../util";
+import CustomRendererUtility from "../utils/CustomRendererUtility";
 import * as pool from "../utils/pool";
 
 @inject
@@ -500,15 +499,13 @@ export default class Pixi extends InjectedComponent {
       }
     }
 
-    runInAction("updateNoteVisible", () => {
-      // ノート更新
-      for (const note of chart.timeline.notes) {
-        const measure = chart.timeline.measures[note.data.measureIndex];
+    // ノート更新
+    for (const note of chart.timeline.notes) {
+      const measure = chart.timeline.measures[note.data.measureIndex];
 
-        // 小節が描画されているなら描画する
-        note.isVisible = measure.isVisible;
-      }
-    });
+      // 小節が描画されているなら描画する
+      note.isVisible = measure.isVisible;
+    }
 
     // ノートライン描画
     for (const noteLine of chart.timeline.noteLines) {
@@ -774,7 +771,10 @@ export default class Pixi extends InjectedComponent {
     }
 
     // 接続中のノートが削除されたら後始末
-    if (!chart.timeline.notes.find(note => note === this.connectTargetNote)) {
+    if (
+      this.connectTargetNote &&
+      !chart.timeline.notes.includes(this.connectTargetNote)
+    ) {
       this.connectTargetNote = null;
     }
 
