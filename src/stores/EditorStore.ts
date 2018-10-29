@@ -35,7 +35,7 @@ export default class Editor implements IStore {
   }
 
   @observable
-  currentChart?: Chart;
+  currentChart: Chart | null = null;
 
   @observable
   currentChartIndex: number = -1;
@@ -68,11 +68,18 @@ export default class Editor implements IStore {
   @action
   removeChart(chartIndex: number) {
     this.charts = this.charts.filter((_, index) => index !== chartIndex);
+    this.setCurrentChart(0);
   }
 
   @action
   setCurrentChart(chartIndex: number) {
     this.currentChartIndex = chartIndex;
+
+    if (!this.charts.length) {
+      this.currentChart = null;
+      return;
+    }
+
     this.currentChart = this.charts[chartIndex];
   }
 
