@@ -58,7 +58,7 @@ class _SpeedRenderer {
       .drawRect(bounds.x, bounds.y, bounds.width, bounds.height)
       .endFill();
 
-    Pixi.instance!.drawTempText(
+    Pixi.instance!.drawText(
       `speed: ${speed.speed}`,
       bounds.x + bounds.width / 6,
       bounds.y + bounds.height / 2

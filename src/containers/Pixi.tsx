@@ -88,8 +88,6 @@ export default class Pixi extends InjectedComponent {
     this.app!.stop();
   }
 
-  texts: PIXI.Text[] = [];
-
   private temporaryTexts: PIXI.Text[] = [];
 
   static debugGraphics?: PIXI.Graphics;
@@ -114,44 +112,66 @@ export default class Pixi extends InjectedComponent {
     );
   }
 
-  drawTempText(
+  drawText(
     text: string,
     x: number,
     y: number,
-    option?: PIXI.TextStyleOptions
+    option?: PIXI.TextStyleOptions,
+    maxWidth?: number
   ) {
-    if (!(this.tempTextIndex < this.temporaryTexts.length)) {
-      const t = new PIXI.Text(
-        "",
-        Object.assign(
-          {
-            fontSize: 20,
-            fill: 0xffffff,
-            dropShadow: true,
-            dropShadowBlur: 8,
-            dropShadowColor: "#000000",
-            dropShadowDistance: 0
-          },
-          option
-        )
-      );
-
-      t.anchor.x = 0.5;
-      t.anchor.y = 0.5;
-
+    if (this.tempTextIndex >= this.temporaryTexts.length) {
+      const t = new PIXI.Text();
+      t.anchor.set(0.5, 0.5);
       this.graphics!.addChild(t);
       this.temporaryTexts.push(t);
     }
 
-    const t = this.temporaryTexts[this.tempTextIndex];
+    const t: PIXI.Text & {
+      // 前フレームのスタイル
+      previousStyleOptions?: PIXI.TextStyleOptions;
+      previousMaxWidth?: number;
+    } = this.temporaryTexts[this.tempTextIndex];
+
+    // .text か .style に値を代入すると再描画処理が入るので
+    // 前フレームと比較して更新を最小限にする
+    if (
+      t.text !== text ||
+      !_.isEqual(t.previousStyleOptions, option) ||
+      t.previousMaxWidth !== maxWidth
+    ) {
+      t.text = text;
+      t.style = Object.assign(
+        {
+          fontFamily: "'Noto Sans JP', sans-serif",
+          fontSize: 20,
+          fill: 0xffffff,
+          dropShadow: true,
+          dropShadowBlur: 8,
+          dropShadowColor: "#000000",
+          dropShadowDistance: 0
+        },
+        option
+      ) as PIXI.TextStyle;
+
+      if (maxWidth !== undefined) {
+        // 拡大率をリセットして文字の横幅を算出する
+        t.scale.x = 1;
+        const w = t.width;
+
+        if (maxWidth < w) {
+          t.scale.x = maxWidth / w;
+        }
+      }
+
+      t.previousStyleOptions = option;
+      t.previousMaxWidth = maxWidth;
+    }
     t.x = x;
     t.y = y;
 
     t.visible = true;
 
-    t.text = text;
-
-    ++this.tempTextIndex;
+    this.tempTextIndex++;
   }
 
   prev: number = 0;
@@ -321,32 +341,24 @@ export default class Pixi extends InjectedComponent {
             .lineTo(x + laneWidth, $y);
         }
 
-        if (!this.texts[index]) {
-          let text = new PIXI.Text(
-            index + "/" + Fraction.to01(measure.data.beat),
-            {
-              fontFamily: "'Noto Sans JP', sans-serif",
-              fontSize: 20,
-              fill: 0xffffff,
-              align: "center",
-              // textBaseline: "middle",
-              dropShadow: true,
-              dropShadowBlur: 8,
-              dropShadowColor: "#000000",
-              dropShadowDistance: 0
-            }
+        if (measure.isVisible) {
+          // 小節番号
+          this.drawText(
+            index.toString().padStart(3, "0"),
+            x - padding / 2,
+            y + hh - 10,
+            { fontSize: 20 },
+            padding
           );
-          graphics.addChild(text);
-
-          this.texts[index] = text;
+          // 拍子
+          this.drawText(
+            Fraction.to01(measure.data.beat).toString(),
+            x - padding / 2,
+            y + hh - 30,
+            { fontSize: 20, fill: 0xcccccc },
+            padding
+          );
         }
-
-        const text = this.texts[index];
-
-        text.x = x - 15;
-        text.y = y;
-
-        text.visible = measure.isVisible;
 
         if (++index >= chart.timeline.measures.length) break draw_lane;
       }
@@ -875,9 +887,6 @@ export default class Pixi extends InjectedComponent {
 
       const vlDiv = this.injected.editor.setting!.measureDivision;
 
-      const clamp = (num: number, min: number, max: number) =>
-        num <= min ? min : num >= max ? max : num;
-
       const maxObjectSize = 16;
 
       const p = (editor.setting!.objectSize - 1) / maxObjectSize / 2;
@@ -885,7 +894,7 @@ export default class Pixi extends InjectedComponent {
       const newLanePoint = {
         measureIndex: targetMeasure.data.index,
         measurePosition: new Fraction(
-          vlDiv - 1 - clamp(Math.floor(ny * vlDiv), 0, vlDiv - 1),
+          vlDiv - 1 - _.clamp(Math.floor(ny * vlDiv), 0, vlDiv - 1),
           vlDiv
         ),
         guid: guid(),
@@ -893,7 +902,7 @@ export default class Pixi extends InjectedComponent {
         horizontalSize: editor.setting!.objectSize,
         templateName: laneTemplate.name,
         horizontalPosition: new Fraction(
-          clamp(
+          _.clamp(
             Math.floor((nx - p) * hlDiv),
             0,
             hlDiv - editor.setting!.objectSize
@@ -928,13 +937,10 @@ export default class Pixi extends InjectedComponent {
 
       const vlDiv = this.injected.editor.setting!.measureDivision;
 
-      const clamp = (num: number, min: number, max: number) =>
-        num <= min ? min : num >= max ? max : num;
-
       const newLanePoint = {
         measureIndex: targetMeasure.data.index,
         measurePosition: new Fraction(
-          vlDiv - 1 - clamp(Math.floor(ny * vlDiv), 0, vlDiv - 1),
+          vlDiv - 1 - _.clamp(Math.floor(ny * vlDiv), 0, vlDiv - 1),
           vlDiv
         ),
         guid: guid(),

@@ -47,7 +47,7 @@ class _BPMRenderer {
       .drawRect(bounds.x, bounds.y, bounds.width, bounds.height)
       .endFill();
 
-    Pixi.instance!.drawTempText(
+    Pixi.instance!.drawText(
       `bpm: ${bpm.bpm}`,
       bounds.x + bounds.width / 2,
       bounds.y + bounds.height / 2

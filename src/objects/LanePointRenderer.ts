@@ -46,7 +46,7 @@ class LanePointRenderer {
 
     return;
 
-    Pixi.instance!.drawTempText(
+    Pixi.instance!.drawText(
       `${lanePoint.measureIndex}:${lanePoint.measurePosition}`,
       bounds.x,
       bounds.y,

@@ -135,7 +135,7 @@ export default class EditorSetting {
     (this.verticalLaneCount = verifyNumber(value, 1));
 
   @observable
-  padding: number = 20;
+  padding: number = 40;
 
   @action
   setPadding = (value: number) => (this.padding = value);
