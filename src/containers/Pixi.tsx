@@ -171,6 +171,8 @@ export default class Pixi extends InjectedComponent {
     this.inspectTarget = target;
   }
 
+  seMap = new Map<string, Howl>();
+
   /**
    * canvas を再描画する
    */
@@ -985,34 +987,36 @@ export default class Pixi extends InjectedComponent {
       }
     }
 
-    runInAction("updateSE", () => {
-      const seSet = new Set<Howl>();
+    this.seMap.clear();
 
-      // 再生時間がノートの判定時間を超えたら SE を鳴らす
-      for (const note of chart.timeline.notes) {
-        // 判定時間
-        const judgeTime = note.data.editorProps.time;
+    // 再生時間がノートの判定時間を超えたら SE を鳴らす
+    for (const note of chart.timeline.notes) {
+      // 判定時間
+      const judgeTime = note.data.editorProps.time;
 
-        // 時間が巻き戻っていたら SE 再生済みフラグをリセットする
-        if (currentTime < this.previousTime && currentTime < judgeTime) {
-          note.data.editorProps.sePlayed = false;
-        }
-
-        if (!chart.isPlaying || note.data.editorProps.sePlayed) continue;
-
-        if (currentTime >= judgeTime) {
-          // SE を鳴らす
-          if (musicGameSystem.seMap.has(note.data.type)) {
-            seSet.add(musicGameSystem.seMap.get(note.data.type)!.next());
-          }
-          note.data.editorProps.sePlayed = true;
-        }
+      // 時間が巻き戻っていたら SE 再生済みフラグをリセットする
+      if (currentTime < this.previousTime && currentTime < judgeTime) {
+        note.data.editorProps.sePlayed = false;
       }
 
-      for (const se of seSet) {
-        se.play();
+      if (!chart.isPlaying || note.data.editorProps.sePlayed) continue;
+
+      if (currentTime >= judgeTime) {
+        // SE を鳴らす
+        if (
+          !this.seMap.has(note.data.type) &&
+          musicGameSystem.seMap.has(note.data.type)
+        ) {
+          this.seMap.set(
+            note.data.type,
+            musicGameSystem.seMap.get(note.data.type)!.next()
+          );
+        }
+        note.data.editorProps.sePlayed = true;
       }
-    });
+    }
+
+    for (const se of this.seMap.values()) se.play();
 
     this.previousTime = currentTime;
 
