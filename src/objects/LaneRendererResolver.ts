@@ -12,8 +12,6 @@ export default class LaneRendererResolver {
     if (laneTemplate.name === "default") return LaneRenderer;
 
     if (laneTemplate.rendererReference) {
-      //  console.log(laneTemplate.rendererReference);
-
       return {
         getNotePointInfo: LaneRenderer.getNotePointInfo,
         getNotePointInfoFromMousePosition:

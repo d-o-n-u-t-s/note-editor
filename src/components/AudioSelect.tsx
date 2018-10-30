@@ -1,66 +1,58 @@
-import * as React from "react";
-import { observer, inject } from "mobx-react";
-import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import {
-  Select,
-  TextField,
   FormControl,
-  MenuItem,
   InputLabel,
+  MenuItem,
+  Select,
   WithStyles,
-  withStyles,
-  createStyles,
-  Button
+  withStyles
 } from "@material-ui/core";
-import Editor from "../stores/EditorStore";
+import { observer } from "mobx-react";
+import * as React from "react";
+import { inject, InjectedComponent } from "../stores/inject";
+import styles from "../styles/styles";
 
-const styles = (theme: Theme) =>
-  createStyles({
-    playerButton: {}
-  });
-
-function a(ina: number) {}
-
-interface Props extends WithStyles<typeof styles> {
-  editor?: Editor;
+interface IProps extends WithStyles<typeof styles> {
   value: number | null;
   onChange: (newValue: number | null) => void;
 }
 
-@inject("editor")
+@inject
 @observer
-class AudioSelect extends React.Component<Props, {}> {
+class AudioSelect extends InjectedComponent<IProps> {
   handleAudioChange() {}
 
   render() {
-    const { editor, classes } = this.props;
+    const { editor } = this.injected;
+    const { classes } = this.props;
 
     if (!editor) return <div />;
 
     return (
-      <FormControl style={{ width: "100%" }}>
-        <InputLabel htmlFor="audio">音源</InputLabel>
-        {(() => {
-          return (
-            <Select
-              value={this.props.value === null ? -1 : this.props.value}
-              onChange={(e: any) => {
-                const v = e.target.value;
-                this.props.onChange(v === -1 ? null : v);
-              }}
-              inputProps={{ name: "currentAudio", id: "audio" }}
-            >
-              <MenuItem value={-1}>
-                <em>None</em>
-              </MenuItem>
-              {this.props.editor!.asset.audioAssetPaths.map((c, i) => (
-                <MenuItem value={i} key={i}>
-                  {c.split("/").pop()}
-                </MenuItem>
-              ))}
-            </Select>
-          );
-        })()}
+      <FormControl style={{ width: "100%", margin: "6px 0" }}>
+        <InputLabel htmlFor="audio" className={classes.label}>
+          音源
+        </InputLabel>
+        <Select
+          value={this.props.value === null ? -1 : this.props.value}
+          onChange={(e: any) => {
+            const v = e.target.value;
+            this.props.onChange(v === -1 ? null : v);
+          }}
+          inputProps={{
+            className: classes.input,
+            name: "currentAudio",
+            id: "audio"
+          }}
+        >
+          <MenuItem value={-1}>
+            <em>None</em>
+          </MenuItem>
+          {editor.asset.audioAssetPaths.map((c, i) => (
+            <MenuItem value={i} key={i}>
+              {c.split("/").pop()}
+            </MenuItem>
+          ))}
+        </Select>
       </FormControl>
     );
   }

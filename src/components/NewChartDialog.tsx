@@ -72,10 +72,7 @@ class NewChartDialog extends React.Component<{ editor?: Editor }> {
         >
           <DialogTitle id="form-dialog-title">新規譜面</DialogTitle>
           <DialogContent>
-            <DialogContentText>
-              To subscribe to this website, please enter your email address
-              here. We will send updates occasionally.
-            </DialogContentText>
+            <DialogContentText />
 
             <div style={{ marginTop: ".5rem" }}>
               <MusicGameSystemSelect

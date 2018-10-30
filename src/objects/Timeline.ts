@@ -191,6 +191,12 @@ export default class Timeline {
   @action
   addLanePoint = (value: LanePoint) => this.lanePoints.push(value);
 
+  @action
+  clearLanePoints() {
+    this.lanePoints = [];
+    this.lanePointMap.clear();
+  }
+
   /**
    * レーン
    */
@@ -222,6 +228,12 @@ export default class Timeline {
   addLane(lane: Lane) {
     this.lanes.push(lane);
     this.dirty_lanes();
+  }
+
+  @action
+  clearLanes() {
+    this.lanes = [];
+    this.laneMap.clear();
   }
 
   /**
