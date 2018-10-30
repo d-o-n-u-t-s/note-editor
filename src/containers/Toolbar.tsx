@@ -281,7 +281,7 @@ class Toolbar extends InjectedComponent<Props> {
             <ToggleButton value={ObjectCategory.Note}>
               {safe(
                 () =>
-                  this.injected.editor.currentChart!.musicGameSystem!.noteTypes[
+                  editor.currentChart!.musicGameSystem!.noteTypes[
                     setting.editNoteTypeIndex
                   ].name
               )}
@@ -294,8 +294,9 @@ class Toolbar extends InjectedComponent<Props> {
             <ToggleButton value={ObjectCategory.Lane}>
               {safe(
                 () =>
-                  this.injected.editor.currentChart!.musicGameSystem!
-                    .laneTemplates[setting.editLaneTypeIndex].name
+                  editor.currentChart!.musicGameSystem!.laneTemplates[
+                    setting.editLaneTypeIndex
+                  ].name
               )}
               <ArrowDropDownIcon
                 onClick={(e: any) =>
@@ -324,8 +325,8 @@ class Toolbar extends InjectedComponent<Props> {
           }}
         >
           {(() => {
-            if (!this.injected.editor.currentChart!.musicGameSystem) return;
-            return this.injected.editor.currentChart!.musicGameSystem!.noteTypes.map(
+            if (!editor.currentChart!.musicGameSystem) return;
+            return editor.currentChart!.musicGameSystem!.noteTypes.map(
               ({ name }, index) => (
                 <MenuItem
                   key={index}
@@ -334,7 +335,7 @@ class Toolbar extends InjectedComponent<Props> {
                     this.setState({ noteAnchorEl: null });
                   }}
                 >
-                  {name}
+                  {index + 1}: {name}
                 </MenuItem>
               )
             );
@@ -350,8 +351,8 @@ class Toolbar extends InjectedComponent<Props> {
           }}
         >
           {(() => {
-            if (!this.injected.editor.currentChart!.musicGameSystem) return;
-            return this.injected.editor.currentChart!.musicGameSystem!.laneTemplates.map(
+            if (!editor.currentChart!.musicGameSystem) return;
+            return editor.currentChart!.musicGameSystem!.laneTemplates.map(
               ({ name }, index) => (
                 <MenuItem
                   key={index}
@@ -376,7 +377,7 @@ class Toolbar extends InjectedComponent<Props> {
           }}
         >
           {(() => {
-            if (!this.injected.editor.currentChart!.musicGameSystem) return;
+            if (!editor.currentChart!.musicGameSystem) return;
 
             return getEnumKeys(OtherObjectType).map((name, index) => (
               <MenuItem

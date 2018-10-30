@@ -7,8 +7,6 @@ import MusicGameSystem, {
   IMusicGameSystemMeasureCustomProps
 } from "./MusicGameSystem";
 
-interface IStore {}
-
 import Timeline from "../objects/Timeline";
 import Editor from "./EditorStore";
 import Lane from "../objects/Lane";
@@ -18,7 +16,7 @@ import Note, { INoteData } from "../objects/Note";
 import Measure, { IMeasureData } from "../objects/Measure";
 import HotReload from "../utils/HotReload";
 
-export default class Chart implements IStore {
+export default class Chart {
   @observable
   timeline: Timeline;
 
@@ -437,17 +435,13 @@ export default class Chart implements IStore {
       return measure.data;
     });
 
-    //  for (const e of tl.bpmChanges) delete e.renderer;
-    // for (const e of tl.notes) delete e.renderer;
-
     delete chart.time;
-    //delete chart.timeline;
+    delete chart.timeline.timeCalculator;
+    delete chart.timeline.noteMap;
+    delete chart.timeline.laneMap;
+    delete chart.timeline.lanePointMap;
 
-    //console.log(chart);
-
-    const json = JSON.stringify(chart, null, 2);
-
-    //    localStorage.setItem("chart", json);
+    const json = JSON.stringify(chart);
 
     return json;
   }

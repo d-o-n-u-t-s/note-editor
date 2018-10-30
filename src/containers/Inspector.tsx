@@ -90,6 +90,9 @@ export default class Inspector extends InjectedComponent {
         (newController as any).setValue = (value: any) => {
           parent[key] = value;
           setValue.call(newController, value);
+
+          // TODO: 特定のオブジェクトの場合だけ時間を更新するようにする
+          this.injected.editor.currentChart!.timeline.calculateTime();
         };
 
         if (gui === this.gui) {

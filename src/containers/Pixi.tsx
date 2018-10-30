@@ -202,8 +202,6 @@ export default class Pixi extends InjectedComponent {
     if (!this.app) return;
     if (!this.injected.editor.currentChart) return;
 
-    // console.log("renderCanvas");
-
     CustomRendererUtility.update(this.currentFrame);
 
     Pixi.instance = this;
@@ -213,7 +211,6 @@ export default class Pixi extends InjectedComponent {
     // 一時テキストを削除
     for (const temp of this.temporaryTexts) temp.visible = false;
     this.tempTextIndex = 0;
-    // this.temporaryTexts = [];
 
     const { editor } = this.injected;
     const { setting } = editor;
@@ -414,8 +411,9 @@ export default class Pixi extends InjectedComponent {
           .lineTo(s.x + laneWidth, y);
       }
 
+      // 小節選択
       if (setting.editMode === EditMode.Select && isClick) {
-        this.inspect(chart.timeline.measures[targetMeasureIndex]);
+        this.inspect(chart.timeline.measures[targetMeasureIndex].data);
       }
 
       // レーン追加モードなら小節の横分割線を描画
@@ -717,7 +715,6 @@ export default class Pixi extends InjectedComponent {
       }
     }
 
-    const tempPoint = new PIXI.Point();
     function normalizeContainsPoint(measure: Measure, point: PIXI.Point) {
       return [
         (point.x - measure.x) / measure.width,
