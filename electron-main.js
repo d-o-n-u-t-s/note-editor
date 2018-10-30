@@ -156,6 +156,12 @@ function initWindowMenu() {
     {
       label: "編集",
       submenu: [
+        { label: "切り取り", accelerator: "CmdOrCtrl+X", selector: "cut:" },
+        { label: "コピー", accelerator: "CmdOrCtrl+C", selector: "copy:" },
+        { label: "貼り付け", accelerator: "CmdOrCtrl+V", selector: "paste:" },
+
+        { type: "separator" },
+
         {
           label: "小節分割数",
           submenu: [
@@ -230,70 +236,25 @@ function initWindowMenu() {
         {
           label: "ノートタイプ",
           submenu: [
-            {
-              label: "1番目を選択",
-              accelerator: "1",
+            ...[...Array(9)].map((_, index) => ({
+              label: `${index + 1}番目を選択`,
+              accelerator: `${index + 1}`,
               click() {
-                mainWindow.webContents.send("changeNoteTypeIndex", 0);
+                mainWindow.webContents.send("changeNoteTypeIndex", index);
               }
-            },
-            {
-              label: "2番目を選択",
-              accelerator: "2",
-              click() {
-                mainWindow.webContents.send("changeNoteTypeIndex", 1);
-              }
-            },
-            {
-              label: "3番目を選択",
-              accelerator: "3",
-              click() {
-                mainWindow.webContents.send("changeNoteTypeIndex", 2);
-              }
-            },
-            {
-              label: "4番目を選択",
-              accelerator: "4",
-              click() {
-                mainWindow.webContents.send("changeNoteTypeIndex", 3);
-              }
-            },
-            {
-              label: "5番目を選択",
-              accelerator: "5",
-              click() {
-                mainWindow.webContents.send("changeNoteTypeIndex", 4);
-              }
-            },
-            {
-              label: "6番目を選択",
-              accelerator: "6",
-              click() {
-                mainWindow.webContents.send("changeNoteTypeIndex", 5);
-              }
-            },
-            {
-              label: "7番目を選択",
-              accelerator: "7",
-              click() {
-                mainWindow.webContents.send("changeNoteTypeIndex", 6);
-              }
-            },
-            {
-              label: "8番目を選択",
-              accelerator: "8",
-              click() {
-                mainWindow.webContents.send("changeNoteTypeIndex", 7);
-              }
-            },
-            {
-              label: "9番目を選択",
-              accelerator: "9",
-              click() {
-                mainWindow.webContents.send("changeNoteTypeIndex", 8);
-              }
-            }
+            }))
           ]
+        }
+      ]
+    },
+
+    {
+      label: "選択",
+      submenu: [
+        {
+          label: "全て選択",
+          accelerator: "CmdOrCtrl+A",
+          selector: "selectAll:"
         }
       ]
     }
