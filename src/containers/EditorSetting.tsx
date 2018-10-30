@@ -11,11 +11,6 @@ import {
   createStyles
 } from "@material-ui/core";
 import { observer, inject } from "mobx-react";
-import { configure } from "mobx";
-
-configure({
-  enforceActions: "observed"
-});
 
 import Editor from "../stores/EditorStore";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";

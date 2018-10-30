@@ -1,20 +1,16 @@
-import * as React from "react";
-
+import { Button } from "@material-ui/core";
+import * as Electrom from "electron";
 import { observer } from "mobx-react";
+import * as React from "react";
+import { inject, InjectedComponent } from "../stores/inject";
 
 interface Props {
   base: number;
 }
 
-import { Button } from "@material-ui/core";
-
-import * as Electrom from "electron";
-
 const electron = (window as any).require("electron");
 const remote = electron.remote as Electrom.Remote;
 const BrowserWindow = remote.BrowserWindow;
-
-import { inject, InjectedComponent } from "../stores/inject";
 
 @inject
 @observer

@@ -1,37 +1,30 @@
-import * as React from "react";
-import { observer, inject } from "mobx-react";
-import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import {
-  Select,
-  TextField,
-  FormControl,
-  MenuItem,
-  InputLabel,
-  WithStyles,
-  withStyles,
+  Button,
   createStyles,
-  Button
+  TextField,
+  WithStyles,
+  withStyles
 } from "@material-ui/core";
-import Editor from "../stores/EditorStore";
-
+import { Theme } from "@material-ui/core/styles/createMuiTheme";
+import { observer } from "mobx-react";
+import * as React from "react";
 import AudioSelect from "../components/AudioSelect";
 import MusicGameSystemSelect from "../components/MusicGameSystemSelect";
+import { inject, InjectedComponent } from "../stores/inject";
 
 const styles = (theme: Theme) =>
   createStyles({
     playerButton: {}
   });
 
-interface Props extends WithStyles<typeof styles> {
-  editor?: Editor;
-}
+interface IProps extends WithStyles<typeof styles> {}
 
 /**
  * 譜面設定コンポーネント
  */
-@inject("editor")
+@inject
 @observer
-class ChartSetting extends React.Component<Props, {}> {
+class ChartSetting extends InjectedComponent<IProps> {
   state = {
     vV: 0,
     currentAudio: ""
@@ -42,25 +35,25 @@ class ChartSetting extends React.Component<Props, {}> {
   };
 
   private handleChartChange = (_: any, value: number) => {
-    this.props.editor!.setCurrentChart(value);
+    this.injected.editor.setCurrentChart(value);
   };
 
   handleAudioChange = async (newValue: number | null) => {
     // 音源リセット
     if (newValue === null) {
-      this.props.editor!.currentChart!.resetAudio();
+      this.injected.editor.currentChart!.resetAudio();
       return;
     }
 
-    const path = this.props.editor!.asset.audioAssetPaths[newValue];
+    const path = this.injected.editor.asset.audioAssetPaths[newValue];
 
-    // this.props.editor!.currentChart!.setAudio();
+    // this.injected.editor.currentChart!.setAudio();
 
-    const nn = await this.props.editor!.asset.loadAudioAsset(path);
+    const nn = await this.injected.editor.asset.loadAudioAsset(path);
 
     // console.warn(nn);
 
-    this.props.editor!.currentChart!.setAudio(nn, path);
+    this.injected.editor.currentChart!.setAudio(nn, path);
   };
 
   handleMusicGameSystemsChange = async (newValue: number | null) => {
@@ -68,7 +61,7 @@ class ChartSetting extends React.Component<Props, {}> {
   };
 
   render() {
-    const editor = this.props.editor;
+    const editor = this.injected.editor;
 
     // 譜面が存在しない
     if (!editor || !editor.currentChart) return <div />;

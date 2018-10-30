@@ -1,18 +1,26 @@
-import * as React from "react";
-import { AppBar, Drawer, Divider, IconButton } from "@material-ui/core";
-
+import {
+  AppBar,
+  Button,
+  createStyles,
+  Divider,
+  Drawer,
+  withStyles,
+  WithStyles
+} from "@material-ui/core";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
-
 import classNames from "classnames";
-
-import { withStyles, WithStyles, createStyles } from "@material-ui/core";
-
-import Pixi from "./Pixi";
-import Inspector from "./Inspector";
-
-import Player from "./Player";
-
+import { inject, observer, Provider } from "mobx-react";
+import * as React from "react";
 import config from "../config";
+import Editor from "../stores/EditorStore";
+import stores from "../stores/stores";
+import Empty from "./Empty";
+import Inspector from "./Inspector";
+import Pixi from "./Pixi";
+import Player from "./Player";
+import Settings from "./Settings";
+import ChartTab from "./Tab";
+import Toolbar from "./Toolbar";
 
 const drawerWidth: number = config.sidebarWidth;
 
@@ -84,28 +92,9 @@ const styles = (theme: Theme) =>
     }
   });
 
-import Editor from "../stores/EditorStore";
-
 interface Props extends WithStyles<typeof styles> {
   editor?: Editor;
 }
-
-import Menu from "./EditorSetting";
-import { Provider, inject, observer } from "mobx-react";
-
-import stores from "../stores/stores";
-import { observable } from "mobx";
-import Slider from "@material-ui/lab/Slider";
-
-import ChartTab from "./Tab";
-import Empty from "./Empty";
-
-import Toolbar from "./Toolbar";
-import Sidebar from "./Sidebar";
-import Settings from "./Settings";
-import { Button } from "@material-ui/core";
-
-import AddIcon from "@material-ui/icons/Add";
 
 @inject("editor")
 @observer
@@ -168,7 +157,6 @@ class Application extends React.Component<Props, {}> {
               anchor="left"
             >
               <Settings />
-              <Sidebar />
               <Inspector />
 
               <Button

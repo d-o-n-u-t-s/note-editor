@@ -1,6 +1,4 @@
 import { GUI, GUIController } from "dat-gui";
-import * as _ from "lodash";
-import { runInAction } from "mobx";
 import { observer } from "mobx-react";
 import * as React from "react";
 import config from "../config";

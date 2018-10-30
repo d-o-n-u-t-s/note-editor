@@ -1,30 +1,38 @@
-import * as React from "react";
-
-import { observer } from "mobx-react";
+import {
+  Badge,
+  createStyles,
+  FormGroup,
+  IconButton,
+  Menu,
+  MenuItem,
+  TextField,
+  withStyles,
+  WithStyles
+} from "@material-ui/core";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
-import { safe } from "../util";
-
+import Switch from "@material-ui/core/Switch";
+import AddIcon from "@material-ui/icons/Add";
+import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
+import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
+import ClearIcon from "@material-ui/icons/clear";
+import CreateIcon from "@material-ui/icons/create";
+import MenuIcon from "@material-ui/icons/menu";
+import PaletteIcon from "@material-ui/icons/Palette";
+import ShowChartIcon from "@material-ui/icons/ShowChart";
+import VisibilityIcon from "@material-ui/icons/Visibility";
+import ToggleButton from "@material-ui/lab/ToggleButton";
+import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
+import { observer } from "mobx-react";
+import * as React from "react";
+import { SketchPicker } from "react-color";
 import NewChartDialog from "../components/NewChartDialog";
-
 import EditorSetting, {
   ObjectCategory,
   OtherObjectType
 } from "../stores/EditorSetting";
-import {
-  withStyles,
-  WithStyles,
-  createStyles,
-  Divider,
-  TextField,
-  Menu,
-  MenuItem,
-  FormGroup
-} from "@material-ui/core";
-
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Switch from "@material-ui/core/Switch";
-
-import { SketchPicker } from "react-color";
+import { inject, InjectedComponent } from "../stores/inject";
+import { safe } from "../util";
 
 function getEnumKeys(_enum: any): string[] {
   return Object.values(_enum).filter(
@@ -41,21 +49,6 @@ enum EditMode {
   Delete,
   Connect
 }
-
-import ToggleButton from "@material-ui/lab/ToggleButton";
-import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
-
-import { IconButton, Badge, Tab } from "@material-ui/core";
-import AddIcon from "@material-ui/icons/Add";
-import MenuIcon from "@material-ui/icons/menu";
-import CreateIcon from "@material-ui/icons/create";
-import ClearIcon from "@material-ui/icons/clear";
-import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
-import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
-import ShowChartIcon from "@material-ui/icons/ShowChart";
-import VisibilityIcon from "@material-ui/icons/Visibility";
-
-import PaletteIcon from "@material-ui/icons/Palette";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -87,8 +80,6 @@ const styles = (theme: Theme) =>
   });
 
 interface Props extends WithStyles<typeof styles> {}
-
-import { inject, InjectedComponent } from "../stores/inject";
 
 @inject
 @observer
