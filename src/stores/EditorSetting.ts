@@ -1,5 +1,5 @@
-import { action, observable, observe } from "mobx";
 import * as _ from "lodash";
+import { action, observable, observe } from "mobx";
 import { verifyNumber } from "../math";
 
 /**
@@ -139,6 +139,20 @@ export default class EditorSetting {
 
   @action
   setPadding = (value: number) => (this.padding = value);
+
+  /**
+   * 小節分割数に拍子を乗算するか
+   */
+  @observable
+  measureDivisionMultiplyBeat = true;
+
+  /**
+   * 小節分割数に拍子を乗算するか
+   */
+  @action
+  setMeasureDivisionMultiplyBeat(value: boolean) {
+    this.measureDivisionMultiplyBeat = value;
+  }
 
   /**
    * 1 小節の分割数

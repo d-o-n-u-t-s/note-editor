@@ -188,6 +188,16 @@ export default class Pixi extends InjectedComponent {
 
   seMap = new Map<string, Howl>();
 
+  private getMeasureDivision(measure?: Measure) {
+    if (!measure) return 1;
+    return this.injected.editor.setting.measureDivisionMultiplyBeat
+      ? Math.round(
+          this.injected.editor.setting.measureDivision *
+            Fraction.to01(measure.data.beat)
+        )
+      : this.injected.editor.setting.measureDivision;
+  }
+
   /**
    * canvas を再描画する
    */
@@ -366,6 +376,7 @@ export default class Pixi extends InjectedComponent {
     const targetMeasure = chart.timeline.measures.find(measure =>
       measure.containsPoint(mousePosition)
     );
+    const targetMeasureDivision = this.getMeasureDivision(targetMeasure);
 
     const getLane = (note: Note) => chart.timeline.laneMap.get(note.data.lane)!;
     const getMeasure = (note: Note) =>
@@ -391,7 +402,7 @@ export default class Pixi extends InjectedComponent {
       const s = targetMeasure;
 
       // ターゲット小節の分割線を描画
-      const div = this.injected.editor.setting!.measureDivision;
+      const div = targetMeasureDivision;
       for (var i = 1; i < div; ++i) {
         const y = s.y + (s.height / div) * i;
         graphics
@@ -492,7 +503,7 @@ export default class Pixi extends InjectedComponent {
         targetNotePoint = laneRenderer.getNotePointInfoFromMousePosition(
           lane,
           targetMeasure!,
-          setting.measureDivision,
+          targetMeasureDivision,
           new Vector2(mousePosition.x, mousePosition.y)
         );
       }
@@ -673,8 +684,8 @@ export default class Pixi extends InjectedComponent {
           ),
           measureIndex: targetMeasure.data.index,
           measurePosition: new Fraction(
-            setting.measureDivision - 1 - targetNotePoint!.verticalIndex!,
-            setting.measureDivision
+            targetMeasureDivision - 1 - targetNotePoint!.verticalIndex!,
+            targetMeasureDivision
           ),
           type: newNoteType.name,
           lane: targetNotePoint!.lane.guid,
@@ -869,7 +880,7 @@ export default class Pixi extends InjectedComponent {
       const hlDiv = this.injected.editor.currentChart!.timeline
         .horizontalLaneDivision;
 
-      const vlDiv = this.injected.editor.setting!.measureDivision;
+      const vlDiv = targetMeasureDivision;
 
       const maxObjectSize = 16;
 
@@ -919,7 +930,7 @@ export default class Pixi extends InjectedComponent {
     ) {
       const [, ny] = normalizeContainsPoint(targetMeasure, mousePosition);
 
-      const vlDiv = this.injected.editor.setting!.measureDivision;
+      const vlDiv = targetMeasureDivision;
 
       const newLanePoint = {
         measureIndex: targetMeasure.data.index,
@@ -952,7 +963,7 @@ export default class Pixi extends InjectedComponent {
     ) {
       const [, ny] = normalizeContainsPoint(targetMeasure, mousePosition);
 
-      const vlDiv = this.injected.editor.setting!.measureDivision;
+      const vlDiv = targetMeasureDivision;
       const newLanePoint = {
         measureIndex: targetMeasure.data.index,
         measurePosition: new Fraction(

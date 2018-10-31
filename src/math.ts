@@ -24,14 +24,6 @@ export class Fraction {
   }
 
   static none = new Fraction(0, 0);
-
-  clone() {
-    return new Fraction(this.numerator, this.denominator);
-  }
-
-  toString() {
-    return this.numerator + "/" + this.denominator;
-  }
 }
 
 export { default as Vector2 } from "./math/Vector2";

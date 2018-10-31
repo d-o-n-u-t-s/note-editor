@@ -81,8 +81,8 @@ class NoteLineRenderer implements INoteLineRenderer {
 
     const cloneLanePoint = (lanePoint: LanePoint) => ({
       ...lanePoint,
-      horizontalPosition: lanePoint.horizontalPosition.clone(),
-      measurePosition: lanePoint.measurePosition.clone()
+      horizontalPosition: Fraction.clone(lanePoint.horizontalPosition),
+      measurePosition: Fraction.clone(lanePoint.measurePosition)
     });
 
     const headBounds = NoteRenderer.getBounds(

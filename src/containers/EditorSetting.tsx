@@ -1,39 +1,24 @@
-import * as React from "react";
-
 import {
+  createStyles,
   FormControl,
-  Select,
-  InputLabel,
-  MenuItem,
+  FormControlLabel,
+  Switch,
   TextField,
   WithStyles,
-  withStyles,
-  createStyles
+  withStyles
 } from "@material-ui/core";
-import { observer, inject } from "mobx-react";
-
-import Editor from "../stores/EditorStore";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
+import { observer } from "mobx-react";
+import * as React from "react";
+import { inject, InjectedComponent } from "../stores/inject";
 
-import AddIcon from "@material-ui/icons/Add";
+const styles = (theme: Theme) => createStyles({});
 
-const styles = (theme: Theme) =>
-  createStyles({
-    fab: {
-      position: "absolute",
-      top: theme.spacing.unit * 8,
-      right: theme.spacing.unit * 2,
-      zIndex: 1
-    }
-  });
+interface IProps extends WithStyles<typeof styles> {}
 
-interface Props extends WithStyles<typeof styles> {
-  editor?: Editor;
-}
-
-@inject("editor")
+@inject
 @observer
-class EditorSetting extends React.Component<Props, {}> {
+class EditorSetting extends InjectedComponent<IProps> {
   state = {};
 
   handleChange = (event: any) => {
@@ -41,11 +26,11 @@ class EditorSetting extends React.Component<Props, {}> {
   };
 
   render() {
-    if (!this.props.editor || !this.props.editor!.currentChart) {
+    if (!this.injected.editor || !this.injected.editor!.currentChart) {
       return <div />;
     }
 
-    const editor = this.props.editor!;
+    const editor = this.injected.editor;
     const classes = this.props.classes;
 
     return (
@@ -94,6 +79,20 @@ class EditorSetting extends React.Component<Props, {}> {
               shrink: true
             }}
             margin="normal"
+          />
+
+          <FormControlLabel
+            control={
+              <Switch
+                checked={editor.setting.measureDivisionMultiplyBeat}
+                onChange={(_, value) =>
+                  editor.setting.setMeasureDivisionMultiplyBeat(value)
+                }
+                value="checkedB"
+                color="primary"
+              />
+            }
+            label="拍子を考慮した小節分割"
           />
         </FormControl>
 
