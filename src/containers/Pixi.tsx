@@ -153,14 +153,10 @@ export default class Pixi extends InjectedComponent {
         option
       ) as PIXI.TextStyle;
 
+      // 拡大率をリセットして文字の横幅を算出する
+      t.scale.x = 1;
       if (maxWidth !== undefined) {
-        // 拡大率をリセットして文字の横幅を算出する
-        t.scale.x = 1;
-        const w = t.width;
-
-        if (maxWidth < w) {
-          t.scale.x = maxWidth / w;
-        }
+        t.scale.x = Math.min(1, maxWidth / t.width);
       }
 
       t.previousStyleOptions = option;
