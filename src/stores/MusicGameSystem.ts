@@ -1,3 +1,5 @@
+import IMusicGameSystemEventListener from "./musicGameSystem/eventListener";
+
 export interface LaneTemplate {
   name: string;
   color: string;
@@ -96,7 +98,8 @@ interface MusicGameSystem {
 
   measure: IMusicGameSystemMeasure;
 
-  converter: string;
+  eventListener: string | null;
+  eventListeners: IMusicGameSystemEventListener;
 }
 /**
  * 音ゲーシステムを正規化して不正な値を修正する
@@ -117,7 +120,10 @@ export function normalizeMusicGameSystem(
       measure: {
         renderer: "default",
         customProps: []
-      }
+      },
+
+      eventListener: null,
+      eventListeners: {}
     },
     musicGameSystem
   );
