@@ -1,10 +1,17 @@
-import { action, observable } from "mobx";
-import { guid } from "../util";
-import { CustomNoteLineRenderer, HowlPool } from "../stores/MusicGameSystem";
-
 import * as Electrom from "electron";
-
+import { action, observable } from "mobx";
+import {
+  CustomNoteLineRenderer,
+  HowlPool,
+  LaneTemplate,
+  normalizeMusicGameSystem,
+  NoteType
+} from "../stores/MusicGameSystem";
+import { guid } from "../util";
+import CustomRendererUtility from "../utils/CustomRendererUtility";
 import { __require } from "../utils/node";
+import Chart from "./Chart";
+import MusicGameSystem from "./MusicGameSystem";
 
 const fs = (window as any).require("fs");
 const util = __require("util");
@@ -13,12 +20,6 @@ const path = __require("path");
 const electron = (window as any).require("electron");
 const remote = electron.remote as Electrom.Remote;
 const ipcRenderer = electron.ipcRenderer as Electrom.IpcRenderer;
-
-import {
-  normalizeMusicGameSystem,
-  LaneTemplate,
-  NoteType
-} from "../stores/MusicGameSystem";
 
 function parseJSON(text: string) {
   try {
@@ -30,12 +31,6 @@ function parseJSON(text: string) {
 }
 
 interface IStore {}
-
-import CustomRendererUtility from "../utils/CustomRendererUtility";
-
-import MusicGameSystem from "./MusicGameSystem";
-import Chart from "./Chart";
-import { resolve } from "url";
 
 interface IAssetPath {
   aap: string;
@@ -110,6 +105,24 @@ export default class Asset implements IStore {
   }
 
   /**
+   * 外部のスクリプトをインポートする
+   * @param path *.js ファイルのパス
+   */
+  async import(path: string) {
+    const buffer: Buffer = await util.promisify(fs.readFile)(path);
+
+    const key = guid();
+
+    const source = buffer
+      .toString()
+      .replace("export default", `window["${key}"] = `);
+
+    eval(source);
+
+    return (window as any)[key];
+  }
+
+  /**
    * 音ゲーシステムを読み込む
    * @param json 対象 JSON
    * @param rootPath 音ゲーシステムのパス
@@ -157,19 +170,9 @@ export default class Asset implements IStore {
       ];
 
       for (const renderer of renderers) {
-        const _path = path.join(rootPath, directory, renderer.renderer);
-
-        const buffer: Buffer = await util.promisify(fs.readFile)(_path);
-
-        const key = guid();
-
-        const source = buffer
-          .toString()
-          .replace("export default", `window["${key}"] = `);
-
-        eval(source);
-
-        renderer.laneTemplate.rendererReference = (window as any)[key];
+        renderer.laneTemplate.rendererReference = await this.import(
+          path.join(rootPath, directory, renderer.renderer)
+        );
       }
     }
 
@@ -184,19 +187,9 @@ export default class Asset implements IStore {
       ];
 
       for (const renderer of renderers) {
-        const rendererPath = path.join(rootPath, directory, renderer.renderer);
-
-        const buffer: Buffer = await util.promisify(fs.readFile)(rendererPath);
-
-        const key = guid();
-
-        const source = buffer
-          .toString()
-          .replace("export default", `window["${key}"] = `);
-
-        eval(source);
-
-        renderer.noteTemplate.rendererReference = (window as any)[key];
+        renderer.noteTemplate.rendererReference = await this.import(
+          path.join(rootPath, directory, renderer.renderer)
+        );
       }
     }
 
@@ -209,20 +202,9 @@ export default class Asset implements IStore {
       >();
 
       for (const renderer of renderers) {
-        const rendererPath = path.join(rootPath, directory, renderer.renderer);
-
-        const buffer: Buffer = await util.promisify(fs.readFile)(rendererPath);
-        const key = guid();
-
-        const source = buffer
-          .toString()
-          .replace("export default", `window["${key}"] = `);
-
-        // console.log(source);
-
-        eval(source);
-
-        renderer.rendererReference = (window as any)[key];
+        renderer.rendererReference = await this.import(
+          path.join(rootPath, directory, renderer.renderer)
+        );
 
         musicGameSystems.customNoteLineRendererMap.set(
           renderer.target,
@@ -236,18 +218,9 @@ export default class Asset implements IStore {
       const measureRenderer = musicGameSystems.measure.renderer;
 
       if (measureRenderer !== "default") {
-        const rendererPath = path.join(rootPath, directory, measureRenderer);
-
-        const buffer: Buffer = await util.promisify(fs.readFile)(rendererPath);
-        const key = guid();
-
-        const source = buffer
-          .toString()
-          .replace("export default", `window["${key}"] = `);
-
-        eval(source);
-
-        musicGameSystems.measure.rendererReference = (window as any)[key];
+        musicGameSystems.measure.rendererReference = await this.import(
+          path.join(rootPath, directory, measureRenderer)
+        );
       }
     }
 
