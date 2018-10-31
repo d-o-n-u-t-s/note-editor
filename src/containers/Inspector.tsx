@@ -3,6 +3,7 @@ import { observer } from "mobx-react";
 import * as React from "react";
 import config from "../config";
 import { inject, InjectedComponent } from "../stores/inject";
+import { runInAction } from "mobx";
 
 /**
  * フォルダを削除する GUI#removeFolder を定義
@@ -88,11 +89,13 @@ export default class Inspector extends InjectedComponent {
 
         const setValue = newController.setValue;
         (newController as any).setValue = (value: any) => {
-          parent[key] = value;
-          setValue.call(newController, value);
+          runInAction(() => {
+            parent[key] = value;
+            setValue.call(newController, value);
 
-          // TODO: 特定のオブジェクトの場合だけ時間を更新するようにする
-          this.injected.editor.currentChart!.timeline.calculateTime();
+            // TODO: 特定のオブジェクトの場合だけ時間を更新するようにする
+            this.injected.editor.currentChart!.timeline.calculateTime();
+          });
         };
 
         if (gui === this.gui) {
