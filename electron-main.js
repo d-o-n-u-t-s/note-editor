@@ -156,9 +156,30 @@ function initWindowMenu() {
     {
       label: "編集",
       submenu: [
-        { label: "切り取り", accelerator: "CmdOrCtrl+X", selector: "cut:" },
-        { label: "コピー", accelerator: "CmdOrCtrl+C", selector: "copy:" },
-        { label: "貼り付け", accelerator: "CmdOrCtrl+V", selector: "paste:" },
+        {
+          label: "切り取り",
+          accelerator: "CmdOrCtrl+X",
+          selector: "cut:",
+          click() {
+            mainWindow.webContents.send("cut");
+          }
+        },
+        {
+          label: "コピー",
+          accelerator: "CmdOrCtrl+C",
+          selector: "copy:",
+          click() {
+            mainWindow.webContents.send("copy");
+          }
+        },
+        {
+          label: "貼り付け",
+          accelerator: "CmdOrCtrl+V",
+          selector: "paste:",
+          click() {
+            mainWindow.webContents.send("paste");
+          }
+        },
 
         { type: "separator" },
 

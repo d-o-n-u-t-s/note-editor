@@ -5,6 +5,10 @@ import AssetStore from "./Asset";
 import Chart from "./Chart";
 import EditorSetting from "./EditorSetting";
 import MusicGameSystem from "./MusicGameSystem";
+import Note from "../objects/Note";
+import Measure from "../objects/Measure";
+import _ = require("lodash");
+import { guid } from "../util";
 
 interface IStore {
   readonly name: string;
@@ -20,6 +24,8 @@ export default class Editor implements IStore {
 
   @observable.ref
   inspectorTarget: any = {};
+
+  copiedNotes: Note[] = [];
 
   @action
   setInspectorTarget(target: any) {
@@ -143,6 +149,30 @@ export default class Editor implements IStore {
   }
 
   @action
+  copy() {
+    if (this.inspectorTarget instanceof Note) {
+      this.copiedNotes = [this.inspectorTarget];
+    } else if (this.inspectorTarget instanceof Measure) {
+      this.copiedNotes = this.currentChart!.timeline.notes.filter(
+        n => n.data.measureIndex == this.inspectorTarget.data.index
+      );
+    } else {
+      this.copiedNotes = [];
+    }
+  }
+
+  @action
+  paste() {
+    if (!(this.inspectorTarget instanceof Measure)) return;
+    this.copiedNotes.forEach(note => {
+      note = _.cloneDeep(note);
+      note.data.guid = guid();
+      note.data.measureIndex = this.inspectorTarget.data.index;
+      this.currentChart!.timeline.addNote(note);
+    });
+  }
+
+  @action
   changeMeasureDivision(index: number) {
     const divs = EditorSetting.MEASURE_DIVISIONS;
     index += divs.indexOf(this.setting.measureDivision);
@@ -157,7 +187,15 @@ export default class Editor implements IStore {
     ipcRenderer.on("saveAs", () => this.saveAs());
     ipcRenderer.on("importBMS", () => BMSImporter.import());
 
-    // 編集
+    // 編集1
+    ipcRenderer.on("cut", () => {
+      this.copy();
+      this.copiedNotes.forEach(n => this.currentChart!.timeline.removeNote(n));
+    });
+    ipcRenderer.on("copy", () => this.copy());
+    ipcRenderer.on("paste", () => this.paste());
+
+    // 編集2
     ipcRenderer.on("changeMeasureDivision", (_: any, index: number) =>
       this.changeMeasureDivision(index)
     );

@@ -557,7 +557,7 @@ export default class Pixi extends InjectedComponent {
             }
             if (setting.editMode === EditMode.Select) {
               console.log("ノートを選択しました", note);
-              this.inspect(note.data);
+              this.inspect(note);
             }
           }
           break;
@@ -671,9 +671,7 @@ export default class Pixi extends InjectedComponent {
             targetNotePoint!.horizontalIndex,
             targetNotePoint!.lane.division
           ),
-          measureIndex: chart.timeline.measures.findIndex(
-            _ => _ === targetMeasure
-          )!,
+          measureIndex: targetMeasure.data.index,
           measurePosition: new Fraction(
             setting.measureDivision - 1 - targetNotePoint!.verticalIndex!,
             setting.measureDivision
