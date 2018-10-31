@@ -1,7 +1,7 @@
 import { action, observable } from "mobx";
 import BMSImporter from "../plugins/BMSImporter";
 import { fs, __require } from "../utils/node";
-import Asset from "./Asset";
+import AssetStore from "./Asset";
 import Chart from "./Chart";
 import EditorSetting from "./EditorSetting";
 import MusicGameSystem from "./MusicGameSystem";
@@ -36,7 +36,7 @@ export default class Editor implements IStore {
   setting = new EditorSetting();
 
   @observable
-  asset: Asset = new Asset(this.debugMode);
+  asset: AssetStore = new AssetStore(this.debugMode);
 
   @observable
   charts: Chart[] = [];
@@ -78,7 +78,15 @@ export default class Editor implements IStore {
   public static instance: Editor | null = null;
 
   @action
-  save() {}
+  save() {
+    if (!this.currentChart) {
+      console.warn("譜面を開いていません");
+      return;
+    }
+
+    const onSave = this.currentChart.musicGameSystem!.eventListeners.onSave;
+    if (onSave) onSave(this.currentChart);
+  }
 
   private dialogFilters = [{ name: "譜面データ", extensions: ["json"] }];
 

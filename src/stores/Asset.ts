@@ -30,14 +30,12 @@ function parseJSON(text: string) {
   }
 }
 
-interface IStore {}
-
 interface IAssetPath {
   aap: string;
   mgsp: string;
 }
 
-export default class Asset implements IStore {
+export default class AssetStore {
   @observable
   audioAssetPaths: string[] = [];
 
@@ -130,6 +128,13 @@ export default class Asset implements IStore {
    */
   async loadMusicGameSystem(json: any, rootPath: string, directory: string) {
     const musicGameSystems = normalizeMusicGameSystem(json);
+
+    // イベントリスナーを読み込む
+    if (musicGameSystems.eventListener) {
+      musicGameSystems.eventListeners = await this.import(
+        path.join(rootPath, directory, musicGameSystems.eventListener)
+      );
+    }
 
     // SE マップを生成する
     musicGameSystems.seMap = new Map<string, HowlPool>();
