@@ -143,8 +143,15 @@ class ChartSetting extends InjectedComponent<IProps> {
         </Button>
         <Button
           variant="outlined"
-          color="primary"
+          color="secondary"
           onClick={() => {
+            if (
+              !window.confirm(
+                "初期レーンを読み込んで一時譜面に上書きします\n実行しますか？"
+              )
+            )
+              return;
+
             chart.timeline.clearLanePoints();
             chart.timeline.clearLanes();
             chart.loadInitialLanes();
