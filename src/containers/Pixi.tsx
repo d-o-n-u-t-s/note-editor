@@ -557,7 +557,7 @@ export default class Pixi extends InjectedComponent {
             }
             if (setting.editMode === EditMode.Select) {
               console.log("ノートを選択しました", note);
-              this.inspect(note.data);
+              this.inspect(note);
             }
           }
           break;
