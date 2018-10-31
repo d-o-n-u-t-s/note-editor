@@ -671,9 +671,7 @@ export default class Pixi extends InjectedComponent {
             targetNotePoint!.horizontalIndex,
             targetNotePoint!.lane.division
           ),
-          measureIndex: chart.timeline.measures.findIndex(
-            _ => _ === targetMeasure
-          )!,
+          measureIndex: targetMeasure.data.index,
           measurePosition: new Fraction(
             setting.measureDivision - 1 - targetNotePoint!.verticalIndex!,
             setting.measureDivision
