@@ -1,15 +1,13 @@
-import * as React from "react";
-import { observer } from "mobx-react";
-import { inject, InjectedComponent } from "../stores/inject";
-import { Tabs, Tab, IconButton } from "@material-ui/core";
+import { IconButton, Tab, Tabs } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
+import { observer } from "mobx-react";
+import * as React from "react";
 import Chart from "../stores/Chart";
+import { inject, InjectedComponent } from "../stores/inject";
 
 @inject
 @observer
 export default class ChartTab extends InjectedComponent {
-  state = {};
-
   handleChange = (event: any) => {
     this.setState({ [event.target.name]: event.target.value });
   };
@@ -18,18 +16,12 @@ export default class ChartTab extends InjectedComponent {
     this.injected.editor!.setCurrentChart(value);
   };
 
-  tabElements: (HTMLElement | null)[] = [];
-  closeButtons: { chart: Chart; el: HTMLElement | null }[] = [];
-
-  componentWillUpdate() {
-    this.tabElements = [];
-    this.closeButtons = [];
-  }
+  tabElements: HTMLElement[] = [];
+  closeButtons: { chart: Chart; el: HTMLElement }[] = [];
 
   componentDidUpdate() {
-    for (var i = 0; i < this.tabElements.length; i++) {
-      if (!this.tabElements[i] || !this.closeButtons[i].el) continue;
-      this.tabElements[i]!.appendChild(this.closeButtons[i].el!);
+    for (let i = 0; i < this.tabElements.length; i++) {
+      this.tabElements[i].appendChild(this.closeButtons[i].el);
     }
   }
 
@@ -37,6 +29,9 @@ export default class ChartTab extends InjectedComponent {
 
   render() {
     const editor = this.injected.editor;
+
+    this.tabElements = [];
+    this.closeButtons = [];
 
     return (
       <div>
@@ -47,16 +42,16 @@ export default class ChartTab extends InjectedComponent {
               key={index}
               aria-label="Delete"
               buttonRef={el => {
+                if (!el) return;
                 this.closeButtons.push({ chart, el });
               }}
               onClick={() => {
-                document
-                  .querySelector(`#${this.closeButtonContainerId}`)!
-                  .appendChild(
-                    this.closeButtons.find(
-                      button => button.chart === chart && button.el !== null
-                    )!.el!
-                  );
+                const container = document.querySelector(
+                  `#${this.closeButtonContainerId}`
+                )!;
+                for (const button of this.closeButtons) {
+                  container.appendChild(button.el);
+                }
                 editor.removeChart(index);
               }}
             >
@@ -72,17 +67,16 @@ export default class ChartTab extends InjectedComponent {
           textColor="primary"
           scrollButtons="auto"
         >
-          {editor ? (
-            editor!.charts.map((chart, index) => (
-              <Tab
-                key={index}
-                label={chart.name}
-                buttonRef={el => this.tabElements.push(el)}
-              />
-            ))
-          ) : (
-            <div />
-          )}
+          {editor.charts.map((chart, index) => (
+            <Tab
+              key={index}
+              label={chart.name}
+              buttonRef={el => {
+                if (!el) return;
+                this.tabElements.push(el);
+              }}
+            />
+          ))}
         </Tabs>
       </div>
     );
