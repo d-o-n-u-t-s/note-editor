@@ -369,11 +369,6 @@ export default class Pixi extends InjectedComponent {
       measure.containsPoint(mousePosition)
     );
 
-    // カーソルを合わせている番号
-    const targetMeasureIndex = chart.timeline.measures.findIndex(measure =>
-      measure.containsPoint(mousePosition)
-    );
-
     const getLane = (note: Note) => chart.timeline.laneMap.get(note.data.lane)!;
     const getMeasure = (note: Note) =>
       chart.timeline.measures[note.data.measureIndex];
@@ -409,7 +404,7 @@ export default class Pixi extends InjectedComponent {
 
       // 小節選択
       if (setting.editMode === EditMode.Select && isClick) {
-        this.inspect(chart.timeline.measures[targetMeasureIndex].data);
+        this.inspect(targetMeasure);
       }
 
       // レーン追加モードなら小節の横分割線を描画
