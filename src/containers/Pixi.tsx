@@ -260,10 +260,8 @@ export default class Pixi extends InjectedComponent {
     const padding = this.injected.editor.setting!.padding;
 
     this.injected.editor.currentChart!.updateTime();
-    const currentTime = Math.max(
-      this.injected.editor.currentChart!.time - chart.startTime,
-      0
-    );
+    const currentTime =
+      this.injected.editor.currentChart!.time - chart.startTime;
 
     (window as any).g = graphics;
 
