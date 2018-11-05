@@ -44,7 +44,7 @@ export default class Editor implements IStore {
   @observable
   asset: AssetStore = new AssetStore(this.debugMode);
 
-  @observable
+  @observable.shallow
   charts: Chart[] = [];
 
   @action
@@ -155,7 +155,7 @@ export default class Editor implements IStore {
     } else if (this.inspectorTarget instanceof Measure) {
       this.copiedNotes = this.currentChart!.timeline.notes.filter(
         n => n.data.measureIndex == this.inspectorTarget.data.index
-      );
+      ).toJS();
     } else {
       this.copiedNotes = [];
     }
@@ -166,8 +166,8 @@ export default class Editor implements IStore {
     if (!(this.inspectorTarget instanceof Measure)) return;
     this.copiedNotes.forEach(note => {
       note = _.cloneDeep(note);
-      note.data.guid = guid();
-      note.data.measureIndex = this.inspectorTarget.data.index;
+      note.data.set("guid", guid());
+      note.data.set("measureIndex", this.inspectorTarget.data.index);
       this.currentChart!.timeline.addNote(note);
     });
   }

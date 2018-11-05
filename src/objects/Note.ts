@@ -2,6 +2,7 @@ import { Fraction, IFraction } from "../math";
 import Chart from "../stores/Chart";
 import { GUID } from "../util";
 import GraphicObject from "./GraphicObject";
+import { Record } from "immutable";
 
 interface INoteEditorProps {
   time: number;
@@ -10,10 +11,9 @@ interface INoteEditorProps {
   sePlayed: boolean;
 }
 
-export interface INoteData {
-  editorProps: INoteEditorProps;
-
+export type NoteData = {
   guid: GUID;
+  editorProps: INoteEditorProps;
 
   /**
    * 小節インデックス
@@ -35,15 +35,46 @@ export interface INoteData {
   lane: GUID;
 
   customProps: any;
+};
+
+const defaultNoteData: NoteData = {
+  guid: "GUID",
+  editorProps: {
+    time: 1,
+    color: 0,
+    sePlayed: false
+  },
+  measureIndex: -1,
+  measurePosition: new Fraction(0, 1),
+
+  horizontalSize: 1,
+  horizontalPosition: Fraction.none,
+
+  type: "string",
+
+  /**
+   * 所属レーンの GUID
+   */
+  lane: "GUID",
+
+  customProps: {}
+};
+
+export class NoteRecord extends Record<NoteData>(defaultNoteData) {
+  c = false;
 }
 
 export default class Note extends GraphicObject {
-  data: INoteData;
+  data: NoteRecord;
 
-  constructor(data: INoteData, chart: Chart) {
+  constructor(data: NoteData, chart: Chart) {
     super();
-    this.data = data;
+
     const noteType = chart.musicGameSystem!.noteTypeMap.get(data.type)!;
+
+    if (!noteType) {
+      console.log(data);
+    }
 
     // 不要カスタムプロパティの削除と新規カスタムプロパティの追加
     const newProps: any = {};
@@ -62,7 +93,12 @@ export default class Note extends GraphicObject {
         );
       }
     }
-    this.data.customProps = newProps;
+
+    this.data = new NoteRecord(
+      Object.assign(data, {
+        customProps: newProps
+      })
+    );
 
     // editorProps.color
     if (noteType.editorProps.color === "$laneColor") {
