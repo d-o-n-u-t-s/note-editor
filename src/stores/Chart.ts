@@ -1,6 +1,6 @@
 import { Howl } from "howler";
 import * as _ from "lodash";
-import { action, observable, computed, transaction, runInAction } from "mobx";
+import { action, observable, computed, transaction } from "mobx";
 import { Fraction } from "../math";
 import MusicGameSystem, {
   IMusicGameSystemMeasure,
@@ -12,75 +12,11 @@ import Editor from "./EditorStore";
 import Lane from "../objects/Lane";
 import LanePoint from "../objects/LanePoint";
 import { guid } from "../util";
-import Note, { NoteData, NoteRecord } from "../objects/Note";
+import Note, { INoteData } from "../objects/Note";
 import Measure, { IMeasureData } from "../objects/Measure";
 import HotReload from "../utils/HotReload";
-import { List, Record } from "immutable";
-
-const defaultNoteData: NoteData = {
-  guid: "GUID",
-  editorProps: {
-    time: 1,
-    color: 0,
-    sePlayed: false
-  },
-  measureIndex: -1,
-  measurePosition: new Fraction(0, 1),
-
-  horizontalSize: 1,
-  horizontalPosition: Fraction.none,
-
-  type: "string",
-
-  /**
-   * 所属レーンの GUID
-   */
-  lane: "GUID",
-
-  customProps: {}
-};
-
-type ChartData = {
-  name: string;
-
-  editorVersion: number;
-
-  musicGameSystem: {
-    name: string;
-    version: number;
-  };
-
-  audio: {
-    source: string;
-    startTime: number;
-  };
-
-  timeline: {
-    notes: List<NoteRecord>;
-  };
-};
-
-class ChartRecord extends Record<ChartData>({
-  name: "新規譜面",
-  editorVersion: 1,
-  musicGameSystem: {
-    name: "string",
-    version: 1
-  },
-
-  audio: {
-    source: "string",
-    startTime: 0
-  },
-
-  timeline: {
-    notes: List<NoteRecord>()
-  }
-}) {}
 
 export default class Chart {
-  data = new ChartRecord();
-
   @observable
   timeline: Timeline;
 
@@ -204,7 +140,10 @@ export default class Chart {
       }
       this.timeline.setLanes(chart.timeline.lanes);
 
-      this.timeline.$initializeNotes(chart.timeline.notes, this);
+      for (const noteData of chart.timeline.notes as INoteData[]) {
+        notes.push(new Note(noteData, this));
+      }
+      this.timeline.addNotes(notes);
 
       for (const bpmChange of chart.timeline.bpmChanges) {
         bpmChange.measurePosition = new Fraction(
@@ -347,6 +286,7 @@ export default class Chart {
     this.setAudio(audioBuffer, source);
   }
 
+  @action
   updateTime() {
     const time = this.audio!.seek() as number;
     if (this.time !== time) this.setTime(time);

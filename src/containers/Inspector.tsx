@@ -4,7 +4,6 @@ import * as React from "react";
 import config from "../config";
 import { inject, InjectedComponent } from "../stores/inject";
 import { runInAction } from "mobx";
-import { Button } from "@material-ui/core";
 
 /**
  * フォルダを削除する GUI#removeFolder を定義
@@ -61,10 +60,6 @@ export default class Inspector extends InjectedComponent {
 
     // プロパティを追加する
     const add = (gui: GUI, obj: any, parent: any) => {
-      if (obj.toJS) {
-        obj = obj.toJS();
-      }
-
       for (const key of Object.keys(obj)) {
         // オブジェクトなら再帰
         if (obj[key] instanceof Object) {
@@ -96,12 +91,7 @@ export default class Inspector extends InjectedComponent {
         const setValue = newController.setValue;
         (newController as any).setValue = (value: any) => {
           runInAction(() => {
-            if (parent.setValue) {
-              parent.setValue(key, value);
-            } else {
-              parent[key] = value;
-            }
-
+            parent[key] = value;
             setValue.call(newController, value);
 
             // TODO: 特定のオブジェクトの場合だけ時間を更新するようにする
@@ -158,35 +148,6 @@ export default class Inspector extends InjectedComponent {
         <span style={{ display: "none" }}>
           {JSON.stringify(this.injected.editor.inspectorTarget)}
         </span>
-        <Button
-          color="primary"
-          variant="fab"
-          onClick={() => this.injected.editor.currentChart!.timeline.undo()}
-        >
-          undo
-        </Button>
-        <Button
-          color="primary"
-          variant="fab"
-          onClick={() => this.injected.editor.currentChart!.timeline.redo()}
-        >
-          redo
-        </Button>{" "}
-        <Button
-          color="primary"
-          variant="fab"
-          onClick={() =>
-            console.log(
-              JSON.stringify(
-                this.injected.editor.currentChart!.timeline.history.map(p =>
-                  p.toJS()
-                )
-              )
-            )
-          }
-        >
-          history
-        </Button>
       </div>
     );
   }

@@ -8,11 +8,20 @@ import Measure, { sortMeasure } from "./Measure";
 import Note from "./Note";
 import NoteLine from "./NoteLine";
 import SpeedChange from "./SpeedChange";
-import { fromJS, List } from "immutable";
-import Chart from "../stores/Chart";
 
 export default class Timeline {
   constructor() {
+    observe(this.changed_notes, () => {
+      this.noteMap.clear();
+
+      for (const note of this.notes) {
+        this.noteMap.set(note.data.guid, note);
+      }
+      console.log("NoteMap を更新しました", this.changed_notes.count);
+
+      this.calculateTime();
+    });
+
     observe(this.changed_lanes, () => {
       this.laneMap.clear();
       for (const lane of this.lanes) {
@@ -128,108 +137,33 @@ export default class Timeline {
   /**
    * ノート
    */
-  notes = List<Note>();
-
-  history: any[] = [];
-
-  historyIndex = 0;
-
-  @action
-  save() {
-    console.log("save", this.history);
-
-    var p: any[] = [];
-
-    for (var i = 0; i < this.historyIndex + 1; i++) {
-      p = require("immutablepatch")(p, this.history[i]);
-    }
-
-    // 前回保存したときの notes
-    const prevSavedNotes = p;
-
-    this.history = this.history.slice(0, this.historyIndex + 1);
-
-    this.history.push(require("immutablediff")(p, this.notes));
-
-    this.historyIndex++;
-
-    this.undoable = true;
-  }
-
-  @observable
-  undoable = false;
-
-  @observable
-  redoable = false;
-
-  @action
-  undo() {
-    if (this.historyIndex <= 0) {
-      console.error("だめ");
-      return;
-    }
-
-    this.historyIndex--;
-
-    var p: any[] = [];
-
-    for (var i = 0; i < this.historyIndex + 1; i++) {
-      p = require("immutablepatch")(p, this.history[i]);
-    }
-
-    (this.notes as any) = p;
-
-    console.log("undo");
-
-    if (this.historyIndex <= 0) {
-      this.undoable = false;
-    }
-  }
-
-  redo() {
-    console.log("redo");
-
-    this.historyIndex++;
-
-    var p: any[] = [];
-
-    for (var i = 0; i < this.historyIndex + 1; i++) {
-      p = require("immutablepatch")(p, this.history[i]);
-    }
-
-    (this.notes as any) = p;
-  }
+  notes: Note[] = [];
 
   /**
    * notes 変更
    */
-  updateNoteMap() {
-    this.noteMap.clear();
-
-    for (const note of this.notes) {
-      this.noteMap.set(note.data.guid, note);
-    }
-    console.log("NoteMap を更新しました");
-
-    this.calculateTime();
+  @action
+  dirty_notes() {
+    this.changed_notes.count++;
   }
+  /**
+   * notes 変更通知
+   */
+  @observable
+  private changed_notes = { count: 0 };
 
   noteMap = new Map<string, Note>();
 
   @action
   addNote(note: Note) {
-    this.notes = this.notes.push(note);
-    this.updateNoteMap();
-    this.save();
+    this.notes.push(note);
+    this.dirty_notes();
   }
 
-  $initializeNotes(notes: any, chart: Chart) {
-    for (const noteData of notes) {
-      this.notes = this.notes.push(new Note(noteData, chart));
-    }
-    this.updateNoteMap();
-
-    this.history.push(require("immutablediff")([], this.notes));
+  @action
+  addNotes(notes: Note[]) {
+    this.notes.push(...notes);
+    this.dirty_notes();
   }
 
   @action
@@ -242,8 +176,8 @@ export default class Timeline {
       this.removeNoteLine(noteLine);
     }
 
-    _.remove(this.notes.toJS(), a => a === note);
-    this.updateNoteMap();
+    _.remove(this.notes, a => a === note);
+    this.dirty_notes();
   }
 
   @action
@@ -364,7 +298,7 @@ export default class Timeline {
           for (const note of this.notes.filter(
             note => note.data.lane === nextLane.guid
           )) {
-            note.data.set("lane", lane.guid);
+            note.data.lane = lane.guid;
           }
 
           const nextLaneIndex = this.lanes.findIndex(l => l === nextLane);

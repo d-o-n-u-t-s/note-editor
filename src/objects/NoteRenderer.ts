@@ -60,11 +60,6 @@ class NoteRenderer implements INoteRenderer {
 
     q.width *= note.data.horizontalSize;
 
-    note.x = q.point.x;
-    note.y = q.point.y - 6;
-    note.width = q.width;
-    note.height = 12;
-
     this.customRender(graphics, note, q);
   }
 }

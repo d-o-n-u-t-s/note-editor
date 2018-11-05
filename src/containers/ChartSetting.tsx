@@ -159,7 +159,7 @@ class ChartSetting extends InjectedComponent<IProps> {
             // ノートのレーン参照が途切れるので最初のレーンを紐付ける
             runInAction(() => {
               for (const note of chart.timeline.notes) {
-                note.data = note.data.set("lane", chart.timeline.lanes[0].guid);
+                note.data.lane = chart.timeline.lanes[0].guid;
               }
             });
 

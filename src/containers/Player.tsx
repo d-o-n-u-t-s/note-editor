@@ -100,6 +100,8 @@ class Player extends React.Component<Props, {}> {
             }}
             id="test2"
             onChange={(_, value) => {
+              console.log("TimeChange!", _);
+
               this.props.editor!.currentChart!.setTime(
                 value * this.props.editor!.currentChart!.audio!.duration(),
                 true
