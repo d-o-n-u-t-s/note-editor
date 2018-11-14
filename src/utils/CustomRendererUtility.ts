@@ -8,10 +8,11 @@ const util = __require("util");
 import * as PIXI from "pixi.js";
 import Pixi from "../containers/Pixi";
 
-import { Vector2, lerp } from "../math";
+import { Vector2, lerp, inverseLerp } from "../math";
 import { defaultRender } from "../objects/NoteRenderer";
 
 import store from "../stores/stores";
+import Note from "../objects/Note";
 
 const textures = new Map<string, PIXI.Texture>();
 
@@ -56,8 +57,47 @@ class CustomRendererUtility {
   drawQuad = drawQuad;
   Vector2 = Vector2;
   lerp = lerp;
+  inverseLerp = inverseLerp;
   Pixi: any;
   defaultNoteRender = defaultRender;
+
+  *getHead(
+    note: Note,
+    callback: (note: Note) => boolean
+  ): IterableIterator<Note> {
+    const chart = store.editor.currentChart;
+
+    if (!chart) return;
+
+    var prevNote = note;
+
+    while (true) {
+      // 対象ノートを末尾に持っているノートライン
+      var nl = chart.timeline.noteLines.find(
+        noteLine => noteLine.tail === prevNote.data.guid
+      );
+
+      if (!nl) return;
+
+      yield (prevNote = chart.timeline.noteMap.get(nl.head)!);
+    }
+  }
+  *getTail(
+    note: Note,
+    callback: (note: Note) => boolean
+  ): IterableIterator<Note> {
+    const chart = store.editor.currentChart;
+    if (!chart) return;
+    var prevNote = note;
+    while (true) {
+      // 対象ノートを先頭に持っているノートライン
+      var nl = chart.timeline.noteLines.find(
+        noteLine => noteLine.head === prevNote.data.guid
+      );
+      if (!nl) return;
+      yield (prevNote = chart.timeline.noteMap.get(nl.tail)!);
+    }
+  }
 
   getSprite(target: any, imagePath: string): PIXI.Sprite | null {
     getImage(imagePath);

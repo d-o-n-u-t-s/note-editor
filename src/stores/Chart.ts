@@ -501,6 +501,8 @@ export default class Chart {
     delete chart.timeline.laneMap;
     delete chart.timeline.lanePointMap;
 
+    chart.timeline.measures = chart.timeline.measures.slice(0, 1000);
+
     const json = JSON.stringify(chart);
 
     return json;

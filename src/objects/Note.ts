@@ -62,6 +62,10 @@ const defaultNoteData: NoteData = {
 
 export class NoteRecord extends Record<NoteData>(defaultNoteData) {
   c = false;
+
+  getMeasurePosition() {
+    return this.measureIndex + Fraction.to01(this.measurePosition);
+  }
 }
 
 export default class Note extends GraphicObject {
