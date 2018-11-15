@@ -24,21 +24,24 @@ export default class Editor implements IStore {
 
   @observable.ref
   inspectorTarget: any = {};
-  inspectedNotes: Note[] = [];
+
   copiedNotes: Note[] = [];
 
   @action
   setInspectorTarget(target: any) {
     this.inspectorTarget = target;
-    if (target instanceof Note) {
-      this.inspectedNotes = [target];
-    } else if (target instanceof Measure) {
-      this.inspectedNotes = this.currentChart!.timeline.notes.filter(
-        n => n.data.measureIndex == target.data.index
-      );
-    } else {
-      this.inspectedNotes = [];
+  }
+
+  getInspectNotes() {
+    if (this.inspectorTarget instanceof Note) {
+      return [this.inspectorTarget];
     }
+    if (this.inspectorTarget instanceof Measure) {
+      return this.currentChart!.timeline.notes.filter(
+        n => n.data.measureIndex == this.inspectorTarget.data.index
+      );
+    }
+    return [];
   }
 
   @observable
@@ -159,7 +162,7 @@ export default class Editor implements IStore {
 
   @action
   copy() {
-    this.copiedNotes = this.inspectedNotes.slice();
+    this.copiedNotes = this.getInspectNotes();
   }
 
   @action
@@ -184,7 +187,7 @@ export default class Editor implements IStore {
   @action
   moveLane(indexer: (i: number) => number) {
     const lanes = this.currentChart!.timeline.lanes;
-    this.inspectedNotes.forEach(note => {
+    this.getInspectNotes().forEach(note => {
       // 移動先レーンを取得
       const lane =
         lanes[indexer(lanes.findIndex(lane => lane.guid === note.data.lane))];
