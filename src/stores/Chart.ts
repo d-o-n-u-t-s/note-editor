@@ -12,7 +12,7 @@ import Editor from "./EditorStore";
 import Lane from "../objects/Lane";
 import LanePoint from "../objects/LanePoint";
 import { guid } from "../util";
-import Note, { NoteData, NoteRecord } from "../objects/Note";
+import Note, { NoteData } from "../objects/Note";
 import Measure, { IMeasureData } from "../objects/Measure";
 import HotReload from "../utils/HotReload";
 import { List, Record } from "immutable";
@@ -56,7 +56,7 @@ type ChartData = {
   };
 
   timeline: {
-    notes: List<NoteRecord>;
+    notes: List<Note>;
   };
 };
 
@@ -74,7 +74,7 @@ class ChartRecord extends Record<ChartData>({
   },
 
   timeline: {
-    notes: List<NoteRecord>()
+    notes: List<Note>()
   }
 }) {}
 

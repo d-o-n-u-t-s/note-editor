@@ -11,6 +11,8 @@ import SpeedChange from "./SpeedChange";
 import { fromJS, List } from "immutable";
 import Chart from "../stores/Chart";
 
+import * as immutablediff from "immutablediff";
+
 export default class Timeline {
   constructor() {
     observe(this.changed_lanes, () => {
@@ -149,7 +151,7 @@ export default class Timeline {
 
     this.history = this.history.slice(0, this.historyIndex + 1);
 
-    this.history.push(require("immutablediff")(p, this.notes));
+    this.history.push(immutablediff(p, this.notes));
 
     this.historyIndex++;
 
@@ -229,7 +231,7 @@ export default class Timeline {
     }
     this.updateNoteMap();
 
-    this.history.push(require("immutablediff")([], this.notes));
+    this.history.push(immutablediff([], this.notes));
   }
 
   @action

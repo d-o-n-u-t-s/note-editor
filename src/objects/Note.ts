@@ -3,6 +3,8 @@ import Chart from "../stores/Chart";
 import { GUID } from "../util";
 import GraphicObject from "./GraphicObject";
 import { Record } from "immutable";
+import _ = require("lodash");
+import Pixi from "../containers/Pixi";
 
 interface INoteEditorProps {
   time: number;
@@ -60,59 +62,91 @@ const defaultNoteData: NoteData = {
   customProps: {}
 };
 
-export class NoteRecord extends Record<NoteData>(defaultNoteData) {
+interface IChartObject {
+  x: number;
+}
+
+export default class Note extends Record<NoteData>(defaultNoteData)
+  implements IChartObject {
+  isVisible = false;
+
+  x = 0;
+  y = 0;
+  width = 0;
+  height = 0;
+
   c = false;
+
+  get data() {
+    return this;
+  }
 
   getMeasurePosition() {
     return this.measureIndex + Fraction.to01(this.measurePosition);
   }
-}
 
-export default class Note extends GraphicObject {
-  data: NoteRecord;
+  containsPoint(point: { x: number; y: number }) {
+    return (
+      _.inRange(point.x, this.x, this.x + this.width) &&
+      _.inRange(point.y, this.y, this.y + this.height)
+    );
+  }
+
+  getBounds() {
+    return new PIXI.Rectangle(
+      this.x + Pixi.debugGraphics!.x,
+
+      this.y,
+      this.width,
+      this.height
+    );
+  }
 
   constructor(data: NoteData, chart: Chart) {
-    super();
+    super(
+      (() => {
+        const noteType = chart.musicGameSystem!.noteTypeMap.get(data.type)!;
 
-    const noteType = chart.musicGameSystem!.noteTypeMap.get(data.type)!;
+        if (!noteType) {
+          console.log(data);
+        }
 
-    if (!noteType) {
-      console.log(data);
-    }
+        // 不要カスタムプロパティの削除と新規カスタムプロパティの追加
+        const newProps: any = {};
+        for (const prop of noteType.customProps) {
+          if (prop.key in data.customProps) {
+            newProps[prop.key] = data.customProps[prop.key];
+          } else if (
+            typeof prop.defaultValue !== "string" ||
+            prop.defaultValue.indexOf("return") === -1
+          ) {
+            newProps[prop.key] = prop.defaultValue;
+          } else {
+            newProps[prop.key] = new Function(
+              "chart",
+              "data",
+              prop.defaultValue
+            )(chart, data);
+          }
+        }
 
-    // 不要カスタムプロパティの削除と新規カスタムプロパティの追加
-    const newProps: any = {};
-    for (const prop of noteType.customProps) {
-      if (prop.key in data.customProps) {
-        newProps[prop.key] = data.customProps[prop.key];
-      } else if (
-        typeof prop.defaultValue !== "string" ||
-        prop.defaultValue.indexOf("return") === -1
-      ) {
-        newProps[prop.key] = prop.defaultValue;
-      } else {
-        newProps[prop.key] = new Function("chart", "data", prop.defaultValue)(
-          chart,
-          data
-        );
-      }
-    }
+        data.customProps = Object.assign(data.customProps, newProps);
 
-    this.data = new NoteRecord(
-      Object.assign(data, {
-        customProps: newProps
-      })
+        // editorProps.color
+        if (noteType.editorProps.color === "$laneColor") {
+          data.editorProps.color = Number(
+            chart.musicGameSystem!.laneTemplateMap.get(
+              chart.timeline.laneMap.get(data.lane)!.templateName
+            )!.color
+          );
+        } else {
+          data.editorProps.color = Number(noteType.editorProps.color);
+        }
+
+        return data;
+      })()
     );
 
-    // editorProps.color
-    if (noteType.editorProps.color === "$laneColor") {
-      this.data.editorProps.color = Number(
-        chart.musicGameSystem!.laneTemplateMap.get(
-          chart.timeline.laneMap.get(data.lane)!.templateName
-        )!.color
-      );
-    } else {
-      this.data.editorProps.color = Number(noteType.editorProps.color);
-    }
+    //    this.customProps = newProps;
   }
 }

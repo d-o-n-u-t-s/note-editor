@@ -38,15 +38,15 @@ class NoteLineRenderer implements INoteLineRenderer {
         Vector2.add(line.end.point, new Vector2(line.end.width, 0)),
         line.end.point,
 
-        head.data.editorProps.color
+        head.editorProps.color
       );
 
       graphics
-        .lineStyle(1, head.data.editorProps.color, 1)
+        .lineStyle(1, head.editorProps.color, 1)
         .moveTo(line.start.point.x, line.start.point.y)
         .lineTo(line.end.point.x, line.end.point.y);
       graphics
-        .lineStyle(1, head.data.editorProps.color, 1)
+        .lineStyle(1, head.editorProps.color, 1)
         .moveTo(line.start.point.x + line.start.width, line.start.point.y)
         .lineTo(line.end.point.x + line.start.width, line.end.point.y);
     }
@@ -68,14 +68,12 @@ class NoteLineRenderer implements INoteLineRenderer {
     // head, tail をソート
     [head, tail] = [head, tail].sort(sortMeasureData);
 
-    const lane = laneMap.get(head.data.lane)!;
+    const lane = laneMap.get(head.lane)!;
 
     if (!lane) console.error(laneMap);
 
-    const headPos =
-      head.data.measureIndex + Fraction.to01(head.data.measurePosition);
-    const tailPos =
-      tail.data.measureIndex + Fraction.to01(tail.data.measurePosition);
+    const headPos = head.measureIndex + Fraction.to01(head.measurePosition);
+    const tailPos = tail.measureIndex + Fraction.to01(tail.measurePosition);
 
     const length = tailPos - headPos;
 
@@ -88,13 +86,13 @@ class NoteLineRenderer implements INoteLineRenderer {
     const headBounds = NoteRenderer.getBounds(
       head,
       lane,
-      measures[head.data.measureIndex]
+      measures[head.measureIndex]
     );
 
     const tailBounds = NoteRenderer.getBounds(
       tail,
-      laneMap.get(tail.data.lane)!,
-      measures[tail.data.measureIndex]
+      laneMap.get(tail.lane)!,
+      measures[tail.measureIndex]
     );
 
     // 先頭ノートと末尾ノートの間にあるレーン中間ポイントを取得する
@@ -136,25 +134,25 @@ class NoteLineRenderer implements INoteLineRenderer {
 
         // 先頭ノートが配置してある位置のレーンの横幅
         const headNoteLaneWidth =
-          (headBounds.width / head.data.horizontalSize) *
-          head.data.horizontalPosition.denominator;
+          (headBounds.width / head.horizontalSize) *
+          head.horizontalPosition.denominator;
 
         // 末尾ノートが配置してある位置のレーンの横幅
         const tailNoteLaneWidth =
-          (tailBounds.width / tail.data.horizontalSize) *
-          tail.data.horizontalPosition.denominator;
+          (tailBounds.width / tail.horizontalSize) *
+          tail.horizontalPosition.denominator;
 
         // 先頭ノートが配置してあるレーンの左座標
         const headNoteLaneLeft =
           headBounds.x -
-          (headNoteLaneWidth / head.data.horizontalPosition.denominator) *
-            head.data.horizontalPosition.numerator;
+          (headNoteLaneWidth / head.horizontalPosition.denominator) *
+            head.horizontalPosition.numerator;
 
         // 末尾ノートが配置してあるレーンの左座標
         const tailNoteLaneLeft =
           tailBounds.x -
-          (tailNoteLaneWidth / tail.data.horizontalPosition.denominator) *
-            tail.data.horizontalPosition.numerator;
+          (tailNoteLaneWidth / tail.horizontalPosition.denominator) *
+            tail.horizontalPosition.numerator;
 
         const headLaneNormalizedHorizontalPos =
           (headBounds.x - headNoteLaneLeft) / headNoteLaneWidth;
@@ -195,11 +193,11 @@ class NoteLineRenderer implements INoteLineRenderer {
       return {
         horizontalSize: noteBounds.width,
         horizontalPosition: new Fraction(
-          noteBounds.x - measures[note.data.measureIndex].x,
-          measures[note.data.measureIndex].width
+          noteBounds.x - measures[note.measureIndex].x,
+          measures[note.measureIndex].width
         ),
-        measureIndex: note.data.measureIndex,
-        measurePosition: Fraction.clone(note.data.measurePosition)
+        measureIndex: note.measureIndex,
+        measurePosition: Fraction.clone(note.measurePosition)
       } as LanePoint;
     };
 

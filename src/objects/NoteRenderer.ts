@@ -22,7 +22,7 @@ export function defaultRender(
   area: LinePointInfo
 ) {
   graphics
-    .lineStyle(6, note.data.editorProps.color)
+    .lineStyle(6, note.editorProps.color)
     .moveTo(area.point.x, area.point.y)
     .lineTo(area.point.x + area.width, area.point.y);
 }
@@ -32,14 +32,14 @@ class NoteRenderer implements INoteRenderer {
     const q = LaneRendererResolver.resolve(lane).getNotePointInfo(
       lane,
       measure,
-      note.data.horizontalPosition,
-      note.data.measurePosition
+      note.horizontalPosition,
+      note.measurePosition
     )!;
 
     return new PIXI.Rectangle(
       q.point.x,
       q.point.y - 5,
-      q.width * note.data.horizontalSize,
+      q.width * note.horizontalSize,
       10
     );
   }
@@ -50,15 +50,15 @@ class NoteRenderer implements INoteRenderer {
     const q = LaneRendererResolver.resolve(lane).getNotePointInfo(
       lane,
       measure,
-      note.data.horizontalPosition,
-      note.data.measurePosition
+      note.horizontalPosition,
+      note.measurePosition
     );
 
     if (!q) {
       return console.error("ノートの描画範囲が計算できません");
     }
 
-    q.width *= note.data.horizontalSize;
+    q.width *= note.horizontalSize;
 
     note.x = q.point.x;
     note.y = q.point.y - 6;

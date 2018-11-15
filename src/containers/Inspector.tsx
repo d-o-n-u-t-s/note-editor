@@ -5,6 +5,7 @@ import config from "../config";
 import { inject, InjectedComponent } from "../stores/inject";
 import { runInAction } from "mobx";
 import { Button } from "@material-ui/core";
+import { Record } from "immutable";
 
 /**
  * フォルダを削除する GUI#removeFolder を定義
@@ -96,7 +97,18 @@ export default class Inspector extends InjectedComponent {
         const setValue = newController.setValue;
         (newController as any).setValue = (value: any) => {
           runInAction(() => {
-            if (parent.setValue) {
+            if (parent instanceof Record) {
+              // HACK: immutable なレコードを強制的に書き換える
+              console.log(
+                key,
+                parent,
+                parent._indices[key],
+                parent._values._tail.array[parent._indices[key]]
+              );
+
+              parent._values._tail.array[parent._indices[key]] = value;
+              console.log(key, parent);
+            } else if (parent.setValue) {
               parent.setValue(key, value);
             } else {
               parent[key] = value;

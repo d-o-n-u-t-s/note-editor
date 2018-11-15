@@ -7,7 +7,7 @@ export default class NoteRendererResolver {
 
   static resolve(note: INote): INoteRenderer {
     const noteType = Pixi.instance!.injected.editor!.currentChart!.musicGameSystem!.noteTypeMap.get(
-      note.data.type
+      note.type
     )!;
 
     // デフォルトレンダラー
