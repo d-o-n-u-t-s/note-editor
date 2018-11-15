@@ -106,15 +106,7 @@ function send(name, value) {
 
 function initWindowMenu() {
   const template = [
-    {
-      label: "",
-      submenu: [
-        {
-          label: "test",
-          click() {}
-        }
-      ]
-    },
+    { label: "", submenu: [{ label: "test", click() {} }] },
     {
       label: "ファイル",
       submenu: [
@@ -125,9 +117,7 @@ function initWindowMenu() {
             mainWindow.webContents.send("open");
           }
         },
-        {
-          type: "separator"
-        },
+        { type: "separator" },
         {
           label: "保存",
           accelerator: "CmdOrCtrl+S",
@@ -142,9 +132,7 @@ function initWindowMenu() {
             mainWindow.webContents.send("saveAs");
           }
         },
-        {
-          type: "separator"
-        },
+        { type: "separator" },
         {
           label: "BMS 譜面をインポート",
           click() {
@@ -177,9 +165,33 @@ function initWindowMenu() {
             mainWindow.webContents.send("paste");
           }
         },
-
         { type: "separator" },
-
+        {
+          label: "ノートを左に移動",
+          accelerator: "Left",
+          click() {
+            mainWindow.webContents.send("moveLane", -1);
+          }
+        },
+        {
+          label: "ノートを右に移動",
+          accelerator: "Right",
+          click() {
+            mainWindow.webContents.send("moveLane", 1);
+          }
+        },
+        {
+          label: "ノートの位置を反転",
+          accelerator: "CmdOrCtrl+F",
+          click() {
+            mainWindow.webContents.send("flipLane");
+          }
+        }
+      ]
+    },
+    {
+      label: "選択",
+      submenu: [
         {
           label: "小節分割数",
           submenu: [

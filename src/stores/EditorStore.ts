@@ -24,12 +24,21 @@ export default class Editor implements IStore {
 
   @observable.ref
   inspectorTarget: any = {};
-
+  inspectedNotes: Note[] = [];
   copiedNotes: Note[] = [];
 
   @action
   setInspectorTarget(target: any) {
     this.inspectorTarget = target;
+    if (target instanceof Note) {
+      this.inspectedNotes = [target];
+    } else if (target instanceof Measure) {
+      this.inspectedNotes = this.currentChart!.timeline.notes.filter(
+        n => n.data.measureIndex == target.data.index
+      );
+    } else {
+      this.inspectedNotes = [];
+    }
   }
 
   @observable
@@ -150,15 +159,7 @@ export default class Editor implements IStore {
 
   @action
   copy() {
-    if (this.inspectorTarget instanceof Note) {
-      this.copiedNotes = [this.inspectorTarget];
-    } else if (this.inspectorTarget instanceof Measure) {
-      this.copiedNotes = this.currentChart!.timeline.notes.filter(
-        n => n.data.measureIndex == this.inspectorTarget.data.index
-      );
-    } else {
-      this.copiedNotes = [];
-    }
+    this.copiedNotes = this.inspectedNotes.slice();
   }
 
   @action
@@ -180,6 +181,24 @@ export default class Editor implements IStore {
     this.setting.measureDivision = divs[index];
   }
 
+  @action
+  moveLane(indexer: (i: number) => number) {
+    const lanes = this.currentChart!.timeline.lanes;
+    this.inspectedNotes.forEach(note => {
+      // 移動先レーンを取得
+      const lane =
+        lanes[indexer(lanes.findIndex(lane => lane.guid === note.data.lane))];
+      if (lane === undefined) return;
+
+      // 置けないならやめる
+      const typeMap = this.currentChart!.musicGameSystem!.noteTypeMap;
+      const excludeLanes = typeMap.get(note.data.type)!.excludeLanes || [];
+      if (excludeLanes.includes(lane.templateName)) return;
+
+      note.data.lane = lane.guid;
+    });
+  }
+
   constructor() {
     // ファイル
     ipcRenderer.on("open", () => this.open());
@@ -194,8 +213,14 @@ export default class Editor implements IStore {
     });
     ipcRenderer.on("copy", () => this.copy());
     ipcRenderer.on("paste", () => this.paste());
+    ipcRenderer.on("moveLane", (_: any, index: number) =>
+      this.moveLane(i => i + index)
+    );
+    ipcRenderer.on("flipLane", () =>
+      this.moveLane(i => this.currentChart!.timeline.lanes.length - i - 1)
+    );
 
-    // 編集2
+    // 選択
     ipcRenderer.on("changeMeasureDivision", (_: any, index: number) =>
       this.changeMeasureDivision(index)
     );
