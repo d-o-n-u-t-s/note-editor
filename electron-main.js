@@ -159,7 +159,6 @@ function initWindowMenu() {
         {
           label: "切り取り",
           accelerator: "CmdOrCtrl+X",
-          selector: "cut:",
           click() {
             mainWindow.webContents.send("cut");
           }
@@ -167,7 +166,6 @@ function initWindowMenu() {
         {
           label: "コピー",
           accelerator: "CmdOrCtrl+C",
-          selector: "copy:",
           click() {
             mainWindow.webContents.send("copy");
           }
@@ -175,7 +173,6 @@ function initWindowMenu() {
         {
           label: "貼り付け",
           accelerator: "CmdOrCtrl+V",
-          selector: "paste:",
           click() {
             mainWindow.webContents.send("paste");
           }
@@ -265,17 +262,6 @@ function initWindowMenu() {
               }
             }))
           ]
-        }
-      ]
-    },
-
-    {
-      label: "選択",
-      submenu: [
-        {
-          label: "全て選択",
-          accelerator: "CmdOrCtrl+A",
-          selector: "selectAll:"
         }
       ]
     }
