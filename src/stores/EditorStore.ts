@@ -77,6 +77,7 @@ export default class Editor implements IStore {
    */
   @action
   removeChart(chartIndex: number) {
+    this.saveConfirm(chartIndex);
     this.charts = this.charts.filter((_, index) => index !== chartIndex);
     this.setCurrentChart(0);
   }
@@ -139,6 +140,16 @@ export default class Editor implements IStore {
         this.save();
       }
     });
+  }
+
+  saveConfirm(chartIndex: number) {
+    if (
+      this.charts[chartIndex].filePath &&
+      confirm(this.charts[chartIndex].name + " を保存しますか？")
+    ) {
+      this.setCurrentChart(chartIndex);
+      this.save();
+    }
   }
 
   @action
@@ -248,6 +259,7 @@ export default class Editor implements IStore {
     */
 
     ipcRenderer.on("close", () => {
+      for (let i = 0; i < this.charts.length; i++) this.saveConfirm(i);
       localStorage.setItem(
         "filePaths",
         JSON.stringify(this.charts.map(c => c.filePath).filter(p => p))
