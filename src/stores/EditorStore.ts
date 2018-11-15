@@ -20,8 +20,6 @@ const { dialog } = remote;
 export default class Editor implements IStore {
   readonly name = "editor";
 
-  readonly debugMode: boolean = true;
-
   @observable.ref
   inspectorTarget: any = {};
 
@@ -54,7 +52,9 @@ export default class Editor implements IStore {
   setting = new EditorSetting();
 
   @observable
-  asset: AssetStore = new AssetStore(this.debugMode);
+  asset: AssetStore = new AssetStore(() =>
+    this.openFiles(JSON.parse(localStorage.getItem("filePaths") || "[]"))
+  );
 
   @observable
   charts: Chart[] = [];
@@ -148,14 +148,16 @@ export default class Editor implements IStore {
         properties: ["openFile", "multiSelections"],
         filters: this.dialogFilters
       },
-      async (filePaths: string[]) => {
-        for (const filePath of filePaths) {
-          const file = await fs.readFile(filePath);
-          Chart.fromJSON(file.toString());
-          this.currentChart!.filePath = filePath;
-        }
-      }
+      this.openFiles
     );
+  }
+
+  async openFiles(filePaths: string[]) {
+    for (const filePath of filePaths) {
+      const file = await fs.readFile(filePath);
+      Chart.fromJSON(file.toString());
+      this.currentChart!.filePath = filePath;
+    }
   }
 
   @action
@@ -244,6 +246,13 @@ export default class Editor implements IStore {
       }, 1000);
     }
     */
+
+    ipcRenderer.on("close", () => {
+      localStorage.setItem(
+        "filePaths",
+        JSON.stringify(this.charts.map(c => c.filePath).filter(p => p))
+      );
+    });
 
     Editor.instance = this;
 

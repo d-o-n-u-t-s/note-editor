@@ -117,60 +117,7 @@ class ChartSetting extends InjectedComponent<IProps> {
             overflow: "scroll",
             background: "#eee"
           }}
-        >
-          {/*editor.currentChart!.toJSON()*/}
-        </div>
-        <Button
-          variant="outlined"
-          color="primary"
-          onClick={() => {
-            localStorage.setItem("chart", editor.currentChart!.toJSON());
-          }}
-          style={{ marginRight: 6 }}
-        >
-          一時保存
-        </Button>
-        <Button
-          variant="outlined"
-          color="primary"
-          onClick={() => {
-            editor.currentChart!.timeline.optimizeNoteLine();
-            editor.currentChart!.timeline.optimiseLane();
-          }}
-          style={{ marginRight: 6, marginBottom: 6 }}
-        >
-          最適化
-        </Button>
-        <Button
-          variant="outlined"
-          color="secondary"
-          onClick={() => {
-            if (
-              !window.confirm(
-                "初期レーンを読み込んで一時譜面に上書きします\n実行しますか？"
-              )
-            )
-              return;
-
-            chart.timeline.clearLanePoints();
-            chart.timeline.clearLanes();
-            chart.loadInitialLanes();
-
-            // ノートのレーン参照が途切れるので最初のレーンを紐付ける
-            runInAction(() => {
-              for (const note of chart.timeline.notes) {
-                note.data.lane = chart.timeline.lanes[0].guid;
-              }
-            });
-
-            console.warn(editor.currentChart!.toJSON());
-            localStorage.setItem("chart", editor.currentChart!.toJSON());
-            location.reload();
-          }}
-          style={{ marginRight: 6 }}
-        >
-          初期レーン再読み込み
-        </Button>
+        />
       </div>
     );
   }
