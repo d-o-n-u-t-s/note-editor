@@ -128,13 +128,6 @@ export default class Chart {
 
       const notes: any[] = [];
 
-      // 小節を読み込む
-      for (const measureData of (chart.timeline.measures ||
-        []) as IMeasureData[]) {
-        const measure = new Measure(measureData);
-        measures.push(measure);
-      }
-
       for (const noteLine of chart.timeline.noteLines) {
         this.timeline.addNoteLine(noteLine);
       }
