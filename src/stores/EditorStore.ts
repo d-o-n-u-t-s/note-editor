@@ -102,6 +102,23 @@ export default class Editor implements IStore {
       return;
     }
 
+    if (!this.currentChart!.filePath) {
+      this.saveAs();
+      return;
+    }
+
+    // 譜面を最適化する
+    this.currentChart!.timeline.optimise();
+
+    // 保存
+    const data = this.currentChart!.toJSON();
+    fs.writeFile(this.currentChart!.filePath, data, "utf8", function(err: any) {
+      if (err) {
+        return console.log(err);
+      }
+    });
+
+    // イベント発火
     const onSave = this.currentChart.musicGameSystem!.eventListeners.onSave;
     if (onSave) onSave(this.currentChart);
   }
@@ -110,38 +127,18 @@ export default class Editor implements IStore {
 
   @action
   saveAs() {
-    // 譜面を最適化する
-    this.currentChart!.timeline.optimise();
-
-    var fs = __require("fs");
-
     var window = remote.getCurrentWindow();
     var options = {
       title: "タイトル",
       filters: this.dialogFilters,
       properties: ["openFile", "createDirectory"]
     };
-    dialog.showSaveDialog(
-      window,
-      options,
-      // コールバック関数
-      function(filename: any) {
-        if (filename) {
-          writeFile(filename);
-        }
+    dialog.showSaveDialog(window, options, (filePath: any) => {
+      if (filePath) {
+        this.currentChart!.filePath = filePath;
+        this.save();
       }
-    );
-    console.log("saved!");
-
-    const writeFile = (path: any) => {
-      const data = this.currentChart!.toJSON();
-
-      fs.writeFile(path, data, "utf8", function(err: any) {
-        if (err) {
-          return console.log(err);
-        }
-      });
-    };
+    });
   }
 
   @action
@@ -151,10 +148,11 @@ export default class Editor implements IStore {
         properties: ["openFile", "multiSelections"],
         filters: this.dialogFilters
       },
-      async (filenames: string[]) => {
-        for (const filename of filenames) {
-          const file = await fs.readFile(filename);
+      async (filePaths: string[]) => {
+        for (const filePath of filePaths) {
+          const file = await fs.readFile(filePath);
           Chart.fromJSON(file.toString());
+          this.currentChart!.filePath = filePath;
         }
       }
     );

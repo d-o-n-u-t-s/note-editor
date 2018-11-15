@@ -20,6 +20,9 @@ export default class Chart {
   @observable
   timeline: Timeline;
 
+  @observable
+  filePath: string | null = null;
+
   static fromJSON(json: string) {
     const editor = Editor.instance!;
 
@@ -400,6 +403,7 @@ export default class Chart {
 
     const chart = Object.assign({}, this);
 
+    delete chart.filePath;
     delete chart.audio;
     delete chart.audioBuffer;
     delete chart.isPlaying;
