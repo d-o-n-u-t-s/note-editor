@@ -148,7 +148,7 @@ export default class Editor implements IStore {
         properties: ["openFile", "multiSelections"],
         filters: this.dialogFilters
       },
-      this.openFiles
+      (paths: any) => this.openFiles(paths)
     );
   }
 
