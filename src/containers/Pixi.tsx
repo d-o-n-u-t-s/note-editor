@@ -27,19 +27,6 @@ import { guid } from "../util";
 import CustomRendererUtility from "../utils/CustomRendererUtility";
 import * as pool from "../utils/pool";
 
-interface IRect {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
-class GraphicUtility {
-  static drawRect(graphics: PIXI.Graphics, rect: IRect) {
-    return graphics.drawRect(rect.x, rect.y, rect.width, rect.height);
-  }
-}
-
 @inject
 @observer
 export default class Pixi extends InjectedComponent {
@@ -193,14 +180,10 @@ export default class Pixi extends InjectedComponent {
    */
   previousTime = 0.0;
 
-  inspectTargetP: any = null;
   inspectTarget: any = null;
 
   private inspect(target: any) {
-    this.inspectTargetP = target;
-    if (target.data) {
-      this.inspectTarget = target.data;
-    }
+    this.inspectTarget = target;
   }
 
   seMap = new Map<string, Howl>();
@@ -539,7 +522,7 @@ export default class Pixi extends InjectedComponent {
       NoteLineRendererResolver.resolve(noteLine).render(
         noteLine,
         graphics,
-        chart.timeline.notes.toJS()
+        chart.timeline.notes
       );
     }
 
@@ -842,7 +825,7 @@ export default class Pixi extends InjectedComponent {
             NoteLineRendererResolver.resolve(newNoteLine).render(
               newNoteLine,
               graphics,
-              chart.timeline.notes.toJS()
+              chart.timeline.notes
             );
 
             if (isClick) {
@@ -1040,23 +1023,6 @@ export default class Pixi extends InjectedComponent {
 
     if (this.inspectTarget) {
       editor.setInspectorTarget(this.inspectTarget);
-    }
-
-    if (this.inspectTargetP) {
-      /*
-      GraphicUtility.drawRect(
-        graphics.lineStyle(6, 0xffffff),
-        this.inspectTargetP
-      );
-      */
-      GraphicUtility.drawRect(
-        graphics.lineStyle(
-          theme.targetMeasureBorderWidth,
-          theme.targetMeasureBorderColor,
-          theme.targetMeasureBorderAlpha
-        ),
-        this.inspectTargetP
-      );
     }
   }
 
