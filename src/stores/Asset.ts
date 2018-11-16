@@ -46,15 +46,6 @@ export default class AssetStore {
   addMusicGameSystem = (value: MusicGameSystem) =>
     this.musicGameSystems.push(value);
 
-  /**
-   * ローカルストレージから譜面を読み込む
-   */
-  async debugInitialize() {
-    if (localStorage.getItem("chart")) {
-      Chart.fromJSON(localStorage.getItem("chart")!);
-    }
-  }
-
   async loadAssets() {
     const urlParams = await this.getAssetPath;
 
@@ -238,17 +229,14 @@ export default class AssetStore {
     this.assetPathResolve = resolve;
   });
 
-  constructor(debugMode: boolean) {
+  constructor(initializer: () => void) {
     ipcRenderer.on("assets", (_: any, assetPath: IAssetPath) => {
       this.assetPathResolve!(assetPath);
     });
 
     (async () => {
       await this.loadAssets();
-
-      if (debugMode) {
-        this.debugInitialize();
-      }
+      initializer();
     })();
   }
 

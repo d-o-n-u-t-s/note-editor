@@ -84,6 +84,9 @@ export default class Chart {
   @observable
   timeline: Timeline;
 
+  @observable
+  filePath: string | null = null;
+
   static fromJSON(json: string) {
     const editor = Editor.instance!;
 
@@ -191,13 +194,6 @@ export default class Chart {
       }
 
       const notes: any[] = [];
-
-      // 小節を読み込む
-      for (const measureData of (chart.timeline.measures ||
-        []) as IMeasureData[]) {
-        const measure = new Measure(measureData);
-        measures.push(measure);
-      }
 
       for (const noteLine of chart.timeline.noteLines) {
         this.timeline.addNoteLine(noteLine);
@@ -467,6 +463,7 @@ export default class Chart {
 
     const chart = Object.assign({}, this);
 
+    delete chart.filePath;
     delete chart.audio;
     delete chart.audioBuffer;
     delete chart.isPlaying;

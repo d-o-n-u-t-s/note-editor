@@ -56,16 +56,10 @@ function createWindow() {
 
   mainWindow.webContents.openDevTools();
 
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
-
-  // Emitted when the window is closed.
-  mainWindow.on("closed", function() {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    mainWindow = null;
+  mainWindow.on("close", e => {
+    mainWindow.webContents.send("close");
   });
+  mainWindow.on("closed", () => (mainWindow = null));
 }
 
 app.setName("NoteEditor");
@@ -106,15 +100,7 @@ function send(name, value) {
 
 function initWindowMenu() {
   const template = [
-    {
-      label: "",
-      submenu: [
-        {
-          label: "test",
-          click() {}
-        }
-      ]
-    },
+    { label: "", submenu: [{ label: "test", click() {} }] },
     {
       label: "ファイル",
       submenu: [
@@ -125,9 +111,7 @@ function initWindowMenu() {
             mainWindow.webContents.send("open");
           }
         },
-        {
-          type: "separator"
-        },
+        { type: "separator" },
         {
           label: "保存",
           accelerator: "CmdOrCtrl+S",
@@ -142,9 +126,7 @@ function initWindowMenu() {
             mainWindow.webContents.send("saveAs");
           }
         },
-        {
-          type: "separator"
-        },
+        { type: "separator" },
         {
           label: "BMS 譜面をインポート",
           click() {
@@ -159,7 +141,6 @@ function initWindowMenu() {
         {
           label: "切り取り",
           accelerator: "CmdOrCtrl+X",
-          selector: "cut:",
           click() {
             mainWindow.webContents.send("cut");
           }
@@ -167,7 +148,6 @@ function initWindowMenu() {
         {
           label: "コピー",
           accelerator: "CmdOrCtrl+C",
-          selector: "copy:",
           click() {
             mainWindow.webContents.send("copy");
           }
@@ -175,14 +155,37 @@ function initWindowMenu() {
         {
           label: "貼り付け",
           accelerator: "CmdOrCtrl+V",
-          selector: "paste:",
           click() {
             mainWindow.webContents.send("paste");
           }
         },
-
         { type: "separator" },
-
+        {
+          label: "ノートを左に移動",
+          accelerator: "Left",
+          click() {
+            mainWindow.webContents.send("moveLane", -1);
+          }
+        },
+        {
+          label: "ノートを右に移動",
+          accelerator: "Right",
+          click() {
+            mainWindow.webContents.send("moveLane", 1);
+          }
+        },
+        {
+          label: "ノートの位置を反転",
+          accelerator: "CmdOrCtrl+F",
+          click() {
+            mainWindow.webContents.send("flipLane");
+          }
+        }
+      ]
+    },
+    {
+      label: "選択",
+      submenu: [
         {
           label: "小節分割数",
           submenu: [
@@ -265,17 +268,6 @@ function initWindowMenu() {
               }
             }))
           ]
-        }
-      ]
-    },
-
-    {
-      label: "選択",
-      submenu: [
-        {
-          label: "全て選択",
-          accelerator: "CmdOrCtrl+A",
-          selector: "selectAll:"
         }
       ]
     }

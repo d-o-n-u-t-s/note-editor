@@ -20,8 +20,6 @@ const { dialog } = remote;
 export default class Editor implements IStore {
   readonly name = "editor";
 
-  readonly debugMode: boolean = true;
-
   @observable.ref
   inspectorTarget: any = {};
 
@@ -30,6 +28,18 @@ export default class Editor implements IStore {
   @action
   setInspectorTarget(target: any) {
     this.inspectorTarget = target;
+  }
+
+  getInspectNotes() {
+    if (this.inspectorTarget instanceof Note) {
+      return [this.inspectorTarget];
+    }
+    if (this.inspectorTarget instanceof Measure) {
+      return this.currentChart!.timeline.notes.filter(
+        n => n.data.measureIndex == this.inspectorTarget.data.index
+      );
+    }
+    return [];
   }
 
   @observable
@@ -42,7 +52,9 @@ export default class Editor implements IStore {
   setting = new EditorSetting();
 
   @observable
-  asset: AssetStore = new AssetStore(this.debugMode);
+  asset: AssetStore = new AssetStore(() =>
+    this.openFiles(JSON.parse(localStorage.getItem("filePaths") || "[]"))
+  );
 
   @observable
   charts: Chart[] = [];
@@ -65,6 +77,7 @@ export default class Editor implements IStore {
    */
   @action
   removeChart(chartIndex: number) {
+    this.saveConfirm(chartIndex);
     this.charts = this.charts.filter((_, index) => index !== chartIndex);
     this.setCurrentChart(0);
   }
@@ -90,6 +103,23 @@ export default class Editor implements IStore {
       return;
     }
 
+    if (!this.currentChart!.filePath) {
+      this.saveAs();
+      return;
+    }
+
+    // 譜面を最適化する
+    this.currentChart!.timeline.optimise();
+
+    // 保存
+    const data = this.currentChart!.toJSON();
+    fs.writeFile(this.currentChart!.filePath, data, "utf8", function(err: any) {
+      if (err) {
+        return console.log(err);
+      }
+    });
+
+    // イベント発火
     const onSave = this.currentChart.musicGameSystem!.eventListeners.onSave;
     if (onSave) onSave(this.currentChart);
   }
@@ -98,38 +128,28 @@ export default class Editor implements IStore {
 
   @action
   saveAs() {
-    // 譜面を最適化する
-    this.currentChart!.timeline.optimise();
-
-    var fs = __require("fs");
-
     var window = remote.getCurrentWindow();
     var options = {
       title: "タイトル",
       filters: this.dialogFilters,
       properties: ["openFile", "createDirectory"]
     };
-    dialog.showSaveDialog(
-      window,
-      options,
-      // コールバック関数
-      function(filename: any) {
-        if (filename) {
-          writeFile(filename);
-        }
+    dialog.showSaveDialog(window, options, (filePath: any) => {
+      if (filePath) {
+        this.currentChart!.filePath = filePath;
+        this.save();
       }
-    );
-    console.log("saved!");
+    });
+  }
 
-    const writeFile = (path: any) => {
-      const data = this.currentChart!.toJSON();
-
-      fs.writeFile(path, data, "utf8", function(err: any) {
-        if (err) {
-          return console.log(err);
-        }
-      });
-    };
+  saveConfirm(chartIndex: number) {
+    if (
+      this.charts[chartIndex].filePath &&
+      confirm(this.charts[chartIndex].name + " を保存しますか？")
+    ) {
+      this.setCurrentChart(chartIndex);
+      this.save();
+    }
   }
 
   @action
@@ -139,26 +159,21 @@ export default class Editor implements IStore {
         properties: ["openFile", "multiSelections"],
         filters: this.dialogFilters
       },
-      async (filenames: string[]) => {
-        for (const filename of filenames) {
-          const file = await fs.readFile(filename);
-          Chart.fromJSON(file.toString());
-        }
-      }
+      (paths: any) => this.openFiles(paths)
     );
+  }
+
+  async openFiles(filePaths: string[]) {
+    for (const filePath of filePaths) {
+      const file = await fs.readFile(filePath);
+      Chart.fromJSON(file.toString());
+      this.currentChart!.filePath = filePath;
+    }
   }
 
   @action
   copy() {
-    if (this.inspectorTarget instanceof Note) {
-      this.copiedNotes = [this.inspectorTarget];
-    } else if (this.inspectorTarget instanceof Measure) {
-      this.copiedNotes = this.currentChart!.timeline.notes.filter(
-        n => n.data.measureIndex == this.inspectorTarget.data.index
-      );
-    } else {
-      this.copiedNotes = [];
-    }
+    this.copiedNotes = this.getInspectNotes();
   }
 
   @action
@@ -180,6 +195,24 @@ export default class Editor implements IStore {
     this.setting.measureDivision = divs[index];
   }
 
+  @action
+  moveLane(indexer: (i: number) => number) {
+    const lanes = this.currentChart!.timeline.lanes;
+    this.getInspectNotes().forEach(note => {
+      // 移動先レーンを取得
+      const lane =
+        lanes[indexer(lanes.findIndex(lane => lane.guid === note.data.lane))];
+      if (lane === undefined) return;
+
+      // 置けないならやめる
+      const typeMap = this.currentChart!.musicGameSystem!.noteTypeMap;
+      const excludeLanes = typeMap.get(note.data.type)!.excludeLanes || [];
+      if (excludeLanes.includes(lane.templateName)) return;
+
+      note.data.lane = lane.guid;
+    });
+  }
+
   constructor() {
     // ファイル
     ipcRenderer.on("open", () => this.open());
@@ -194,8 +227,14 @@ export default class Editor implements IStore {
     });
     ipcRenderer.on("copy", () => this.copy());
     ipcRenderer.on("paste", () => this.paste());
+    ipcRenderer.on("moveLane", (_: any, index: number) =>
+      this.moveLane(i => i + index)
+    );
+    ipcRenderer.on("flipLane", () =>
+      this.moveLane(i => this.currentChart!.timeline.lanes.length - i - 1)
+    );
 
-    // 編集2
+    // 選択
     ipcRenderer.on("changeMeasureDivision", (_: any, index: number) =>
       this.changeMeasureDivision(index)
     );
@@ -218,6 +257,14 @@ export default class Editor implements IStore {
       }, 1000);
     }
     */
+
+    ipcRenderer.on("close", () => {
+      for (let i = 0; i < this.charts.length; i++) this.saveConfirm(i);
+      localStorage.setItem(
+        "filePaths",
+        JSON.stringify(this.charts.map(c => c.filePath).filter(p => p))
+      );
+    });
 
     Editor.instance = this;
 
