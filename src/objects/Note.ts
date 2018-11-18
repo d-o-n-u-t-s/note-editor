@@ -66,7 +66,8 @@ export type Note = Mutable<NoteRecord>;
 
 export class NoteRecord extends Record<NoteData>(defaultNoteData) {
   static new(data: NoteData, chart: Chart): Note {
-    return new NoteRecord(data, chart).asMutable();
+    const note = new NoteRecord(data, chart);
+    return Object.assign(note, note.asMutable());
   }
 
   isVisible = false;

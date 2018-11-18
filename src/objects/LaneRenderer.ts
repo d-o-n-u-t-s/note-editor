@@ -4,7 +4,7 @@ import { sortMeasure } from "../objects/Measure";
 import { LaneTemplate } from "../stores/MusicGameSystem";
 import { drawQuad } from "../utils/drawQuad";
 import { GetLineInfoFromPool, GetLinePointInfoFromPool } from "../utils/pool";
-import Lane, { LineInfo, LinePointInfo } from "./Lane";
+import { Lane, LineInfo, LinePointInfo } from "./Lane";
 import { LanePoint } from "./LanePoint";
 import { Measure } from "./Measure";
 

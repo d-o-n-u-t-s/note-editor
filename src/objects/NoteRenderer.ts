@@ -1,4 +1,4 @@
-import Lane, { LinePointInfo } from "./Lane";
+import { Lane, LinePointInfo } from "./Lane";
 import LaneRendererResolver from "./LaneRendererResolver";
 import { Measure } from "./Measure";
 import { Note } from "./Note";

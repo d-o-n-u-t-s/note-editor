@@ -4,18 +4,33 @@ import { action, IObservableArray, observable } from "mobx";
 import { Mutable } from "src/utils/mutable";
 import { Fraction } from "../math";
 import Chart from "../stores/Chart";
-import { BpmChange, TimeCalculator } from "./BPMChange";
-import Lane from "./Lane";
-import { LanePoint } from "./LanePoint";
-import { Measure, sortMeasure } from "./Measure";
+import {
+  BpmChange,
+  BpmChangeData,
+  BpmChangeRecord,
+  TimeCalculator
+} from "./BPMChange";
+import { Lane, LaneData, LaneRecord } from "./Lane";
+import { LanePoint, LanePointData, LanePointRecord } from "./LanePoint";
+import { Measure, MeasureData, MeasureRecord, sortMeasure } from "./Measure";
 import { Note, NoteData, NoteRecord } from "./Note";
 import { NoteLine, NoteLineData, NoteLineRecord } from "./NoteLine";
 import SpeedChange from "./SpeedChange";
+
+export type TimelineJsonData = {
+  notes: NoteData[];
+  noteLines: NoteLineData[];
+  measures: MeasureData[];
+  lanePoints: LanePointData[];
+  bpmChanges: BpmChangeData[];
+  lanes: LaneData[];
+};
 
 export type TimelineData = {
   notes: Note[];
   noteLines: NoteLine[];
   measures: Measure[];
+  lanes: Lane[];
   lanePoints: LanePoint[];
   bpmChanges: BpmChange[];
 };
@@ -24,6 +39,7 @@ const defaultTimelineData: TimelineData = {
   notes: [],
   noteLines: [],
   measures: [],
+  lanes: [],
   lanePoints: [],
   bpmChanges: []
 };
@@ -31,17 +47,41 @@ const defaultTimelineData: TimelineData = {
 export type Timeline = Mutable<TimelineRecord>;
 
 export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
-  static new(): Timeline {
-    const timeline = new TimelineRecord();
+  static new(chart: Chart, data?: TimelineData): Timeline {
+    let timeline = new TimelineRecord(chart, data);
+    timeline = Object.assign(timeline, timeline.asMutable());
+
+    // 各 Record を mutable に変換する
+    timeline.mutable.notes = timeline.notes.map(note =>
+      NoteRecord.new(note, chart)
+    );
+    timeline.mutable.noteLines = timeline.noteLines.map(noteLine =>
+      NoteLineRecord.new(noteLine)
+    );
+    timeline.mutable.measures = timeline.measures.map(measure =>
+      MeasureRecord.new(measure)
+    );
+    timeline.mutable.lanes = timeline.lanes.map(lane => LaneRecord.new(lane));
+    timeline.mutable.lanePoints = timeline.lanePoints.map(lanePoint =>
+      LanePointRecord.new(lanePoint)
+    );
+    timeline.mutable.bpmChanges = timeline.bpmChanges.map(bpmChange =>
+      BpmChangeRecord.new(bpmChange)
+    );
+
+    timeline.updateNoteMap();
+    timeline.updateLanePointMap();
+    timeline.updateLaneMap();
+
+    return timeline;
+  }
+
+  static newnew(chart: Chart, data?: TimelineData): Timeline {
+    const timeline = new TimelineRecord(chart, data);
     return Object.assign(timeline, timeline.asMutable());
   }
 
-  static newnew(data: TimelineData): Timeline {
-    const timeline = new TimelineRecord(data);
-    return Object.assign(timeline, timeline.asMutable());
-  }
-
-  private constructor(data?: TimelineData) {
+  private constructor(chart: Chart, data?: TimelineData) {
     super(data);
   }
 
@@ -53,7 +93,7 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
   @action
   calculateTime() {
     this.timeCalculator = new TimeCalculator(
-      this.bpmChanges.slice().sort(sortMeasure),
+      [...this.bpmChanges].sort(sortMeasure),
       this.measures
     );
 
@@ -246,6 +286,11 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
     );
   }
 
+  $initializeLanes(lanes: LaneData[]) {
+    this.mutable.lanes = lanes.map(lane => LaneRecord.new(lane));
+    this.updateLaneMap();
+  }
+
   addNote(note: Note) {
     this.notes.push(note);
     this.updateNoteMap();
@@ -302,8 +347,6 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
   /**
    * レーン
    */
-  lanes: Lane[] = [];
-
   laneMap = new Map<string, Lane>();
 
   updateLaneMap() {
@@ -312,14 +355,14 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
     for (const lane of this.lanes) {
       this.laneMap.set(lane.guid, lane);
     }
-    console.log("LaneMap を更新しました");
+    console.log("LaneMap を更新しました", this.laneMap);
 
     this.calculateTime();
   }
 
   @action
   setLanes(lanes: Lane[]) {
-    this.lanes = lanes;
+    this.mutable.lanes = lanes;
     this.updateLaneMap();
   }
 
@@ -331,7 +374,7 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
 
   @action
   clearLanes() {
-    this.lanes = [];
+    this.mutable.lanes = [];
     this.laneMap.clear();
   }
 

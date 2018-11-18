@@ -3,11 +3,16 @@ import { List, Record } from "immutable";
 import * as _ from "lodash";
 import { action, computed, observable, transaction } from "mobx";
 import { Fraction } from "../math";
-import Lane from "../objects/Lane";
+import { Lane } from "../objects/Lane";
 import { LanePoint } from "../objects/LanePoint";
 import { Measure, MeasureData, MeasureRecord } from "../objects/Measure";
 import { Note } from "../objects/Note";
-import { Timeline, TimelineRecord } from "../objects/Timeline";
+import {
+  Timeline,
+  TimelineRecord,
+  TimelineData,
+  TimelineJsonData
+} from "../objects/Timeline";
 import { guid } from "../util";
 import HotReload from "../utils/HotReload";
 import Editor from "./EditorStore";
@@ -56,7 +61,6 @@ class ChartRecord extends Record<ChartData>({
 export default class Chart {
   data = new ChartRecord();
 
-  @observable
   timeline: Timeline;
 
   @observable
@@ -118,11 +122,35 @@ export default class Chart {
 
   @action
   load(json: string) {
-    const chart = JSON.parse(json);
-    console.log("譜面を読み込みます", chart);
+    const chartData = JSON.parse(json);
+    console.log("譜面を読み込みます", chartData);
 
-    this.setName(chart.name);
-    this.setStartTime(chart.startTime);
+    const timelineData: TimelineJsonData = chartData.timeline;
+
+    // 1000 小節まで生成する
+    for (let i = timelineData.measures.length; i <= 999; i++) {
+      timelineData.measures.push({
+        index: i,
+        beat: new Fraction(4, 4),
+        editorProps: { time: 0 },
+        customProps: {}
+      });
+    }
+
+    // 小節のカスタムプロパティを生成する
+    for (const [index, measure] of timelineData.measures.entries()) {
+      measure.customProps = Object.assign(
+        this.createMeasure(index).data.customProps,
+        measure.customProps
+      );
+    }
+
+    this.timeline = TimelineRecord.new(this, timelineData as TimelineData);
+
+    this.setName(chartData.name);
+    this.setStartTime(chartData.startTime);
+
+    /*
     transaction(() => {
       const measures: Measure[] = [];
 
@@ -168,13 +196,13 @@ export default class Chart {
         this.timeline.addLanePoint(lanePoint);
       }
 
-      const notes: any[] = [];
-
-      this.timeline.setLanes(chart.timeline.lanes);
-
+      this.timeline.$initializeLanes(timeline.lanes);
       this.timeline.$initializeNotes(chart.timeline.notes, this);
       this.timeline.$initializeNoteLines(chart.timeline.noteLines, this);
+      
+
       this.timeline.save();
+
 
       for (const bpmChange of chart.timeline.bpmChanges) {
         bpmChange.measurePosition = new Fraction(
@@ -192,10 +220,11 @@ export default class Chart {
         this.timeline.addSpeedChange(speedChange);
       }
     });
+    */
   }
 
   constructor(musicGameSystem: MusicGameSystem, audioSource: string) {
-    this.timeline = TimelineRecord.new();
+    this.timeline = TimelineRecord.new(this);
 
     console.log(this.timeline);
 
@@ -450,13 +479,11 @@ export default class Chart {
 
     chart.audioSource = (chart.audioSource || "").split("/").pop();
 
-    const tl = (chart.timeline = Object.assign({}, chart.timeline));
+    //  const tl = (chart.timeline = Object.assign({}, chart.timeline));
 
-    console.log(tl);
+    //console.log(tl);
 
-    var p = TimelineRecord.newnew(tl);
-
-    Object.assign(chart.timeline, p.toJS());
+    chart.timeline = TimelineRecord.newnew(this, chart.timeline.toJS());
 
     delete chart.time;
 

@@ -5,8 +5,6 @@ import { Measure, sortMeasure } from "./Measure";
 import { Record } from "immutable";
 import { Mutable } from "src/utils/mutable";
 
-interface IChronoObject {}
-
 export type BpmChangeData = {
   bpm: number;
   guid: GUID;
@@ -19,7 +17,7 @@ export type BpmChangeData = {
    * 小節内の位置
    */
   measurePosition: Fraction;
-} & IChronoObject;
+};
 
 const defaultBpmChangeData: BpmChangeData = {
   guid: "GUID",
@@ -36,7 +34,7 @@ export class BpmChangeRecord extends Record<BpmChangeData>(
 ) {
   static new(data: BpmChangeData): BpmChange {
     const bpmChange = new BpmChangeRecord(data);
-    return new BpmChangeRecord(data).asMutable();
+    return Object.assign(bpmChange, bpmChange.asMutable());
   }
 
   private constructor(data: BpmChangeData) {
@@ -118,12 +116,9 @@ export class TimeCalculator {
     // 小節の開始位置に配置されている BPM 変更命令に拍子情報を追加
     let bpmChanges = data
       .map(bpmChange => {
-        const bpmAndBeat = Object.assign(
-          {
-            beat: measures[bpmChange.measureIndex].data.beat
-          },
-          bpmChange.toJS()
-        ) as IBPMChangeAndBeat;
+        const bpmAndBeat = Object.assign(bpmChange, {
+          beat: measures[bpmChange.measureIndex].data.beat
+        }) as IBPMChangeAndBeat;
         bpmAndBeatMap.set(bpmAndBeat.measureIndex, bpmAndBeat);
 
         console.log(bpmAndBeat);

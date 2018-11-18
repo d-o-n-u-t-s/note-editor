@@ -69,7 +69,7 @@ class NoteLineRenderer implements INoteLineRenderer {
 
     const lane = laneMap.get(head.lane)!;
 
-    if (!lane) console.error(laneMap);
+    if (!lane) console.error(laneMap, head);
 
     const headPos = head.measureIndex + Fraction.to01(head.measurePosition);
     const tailPos = tail.measureIndex + Fraction.to01(tail.measurePosition);

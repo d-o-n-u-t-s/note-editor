@@ -36,7 +36,8 @@ export type Measure = Mutable<MeasureRecord>;
  */
 export class MeasureRecord extends Record<MeasureData>(defaultMeasureData) {
   static new(data: MeasureData): Measure {
-    return new MeasureRecord(data).asMutable();
+    const measure = new MeasureRecord(data);
+    return Object.assign(measure, measure.asMutable());
   }
 
   private constructor(data: MeasureData) {

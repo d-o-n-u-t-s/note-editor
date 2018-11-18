@@ -1,4 +1,4 @@
-import Lane from "./Lane";
+import { Lane } from "./Lane";
 import LaneRenderer, { ILaneRenderer } from "./LaneRenderer";
 import Pixi from "../containers/Pixi";
 

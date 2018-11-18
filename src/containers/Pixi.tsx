@@ -4,8 +4,8 @@ import * as PIXI from "pixi.js";
 import * as React from "react";
 import { Fraction } from "../math";
 import Vector2 from "../math/Vector2";
-import { BpmChange, BPMRenderer, BpmChangeRecord } from "../objects/BPMChange";
-import Lane from "../objects/Lane";
+import { BpmChangeRecord, BPMRenderer } from "../objects/BPMChange";
+import { Lane } from "../objects/Lane";
 import { LanePoint } from "../objects/LanePoint";
 import LanePointRenderer from "../objects/LanePointRenderer";
 import { NotePointInfo } from "../objects/LaneRenderer";
@@ -13,7 +13,7 @@ import LaneRendererResolver from "../objects/LaneRendererResolver";
 import { Measure, sortMeasureData } from "../objects/Measure";
 import MeasureRendererResolver from "../objects/MeasureRendererResolver";
 import { Note, NoteRecord } from "../objects/Note";
-import { NoteLine, NoteLineRecord } from "../objects/NoteLine";
+import { NoteLineRecord } from "../objects/NoteLine";
 import NoteLineRendererResolver from "../objects/NoteLineRendererResolver";
 import NoteRendererResolver from "../objects/NoteRendererResolver";
 import SpeedChange, { SpeedRenderer } from "../objects/SpeedChange";
@@ -946,7 +946,7 @@ export default class Pixi extends InjectedComponent {
       });
 
       if (isClick) {
-        this.injected.editor.currentChart!.timeline.addBPMChange(newBpmChange);
+        chart.timeline.addBPMChange(newBpmChange);
       } else {
         // プレビュー
         BPMRenderer.render(

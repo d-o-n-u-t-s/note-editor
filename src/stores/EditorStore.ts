@@ -9,6 +9,7 @@ import { Note, NoteRecord } from "../objects/Note";
 import { Measure, MeasureRecord } from "../objects/Measure";
 import _ = require("lodash");
 import { guid } from "../util";
+import { TimelineData } from "../objects/Timeline";
 
 interface IStore {
   readonly name: string;
@@ -66,7 +67,11 @@ export default class Editor implements IStore {
    * 新規譜面を作成する
    */
   @action
-  newChart(musicGameSystem: MusicGameSystem, audioSource: string) {
+  newChart(
+    musicGameSystem: MusicGameSystem,
+    audioSource: string,
+    data?: TimelineData
+  ) {
     const newChart = new Chart(musicGameSystem, audioSource);
     this.charts.push(newChart);
     return newChart;
