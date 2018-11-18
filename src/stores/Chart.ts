@@ -1,17 +1,17 @@
 import { Howl } from "howler";
 import { List, Record } from "immutable";
 import * as _ from "lodash";
-import { action, computed, observable, transaction } from "mobx";
+import { action, computed, observable } from "mobx";
 import { Fraction } from "../math";
 import { Lane } from "../objects/Lane";
 import { LanePoint } from "../objects/LanePoint";
-import { Measure, MeasureData, MeasureRecord } from "../objects/Measure";
+import { MeasureRecord } from "../objects/Measure";
 import { Note } from "../objects/Note";
 import {
   Timeline,
-  TimelineRecord,
   TimelineData,
-  TimelineJsonData
+  TimelineJsonData,
+  TimelineRecord
 } from "../objects/Timeline";
 import { guid } from "../util";
 import HotReload from "../utils/HotReload";
@@ -65,6 +65,17 @@ export default class Chart {
 
   @observable
   filePath: string | null = null;
+
+  @observable
+  undoable = false;
+
+  @observable
+  redoable = false;
+
+  @action
+  save() {
+    this.timeline.save();
+  }
 
   static fromJSON(json: string) {
     const editor = Editor.instance!;

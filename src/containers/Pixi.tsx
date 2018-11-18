@@ -264,6 +264,7 @@ export default class Pixi extends InjectedComponent {
           bpm: 120
         })
       );
+      chart.save();
     }
 
     // 縦に何個小節を配置するか
@@ -567,6 +568,7 @@ export default class Pixi extends InjectedComponent {
           if (isClick) {
             if (setting.editMode === EditMode.Delete) {
               chart.timeline.removeNote(note);
+              chart.save();
             }
             if (setting.editMode === EditMode.Select) {
               console.log("ノートを選択しました", note);
@@ -630,6 +632,7 @@ export default class Pixi extends InjectedComponent {
 
           if (isClick) {
             chart.timeline.removeBpmChange(bpmChange);
+            chart.save();
           }
         }
       }
@@ -659,6 +662,7 @@ export default class Pixi extends InjectedComponent {
 
           if (isClick) {
             chart.timeline.removeSpeedChange(bpmChange);
+            chart.save();
           }
         }
       }
@@ -705,6 +709,7 @@ export default class Pixi extends InjectedComponent {
 
       if (isClick) {
         chart.timeline.addNote(newNote);
+        chart.save();
       } else {
         NoteRendererResolver.resolve(newNote).render(
           newNote,
@@ -837,6 +842,8 @@ export default class Pixi extends InjectedComponent {
                 this.connectTargetNote = null;
               } else {
                 chart.timeline.addNoteLine(newNoteLine);
+                chart.save();
+
                 console.log("接続 2");
 
                 this.connectTargetNote = note;
@@ -913,6 +920,7 @@ export default class Pixi extends InjectedComponent {
 
       if (isClick) {
         this.injected.editor.currentChart!.timeline.addLanePoint(newLanePoint);
+        chart.save();
       } else {
         // プレビュー
 
@@ -947,6 +955,7 @@ export default class Pixi extends InjectedComponent {
 
       if (isClick) {
         chart.timeline.addBPMChange(newBpmChange);
+        chart.save();
       } else {
         // プレビュー
         BPMRenderer.render(
@@ -981,6 +990,7 @@ export default class Pixi extends InjectedComponent {
         this.injected.editor.currentChart!.timeline.addSpeedChange(
           newLanePoint
         );
+        chart.save();
       } else {
         // プレビュー
         SpeedRenderer.render(

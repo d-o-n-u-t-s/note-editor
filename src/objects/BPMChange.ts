@@ -121,8 +121,6 @@ export class TimeCalculator {
         }) as IBPMChangeAndBeat;
         bpmAndBeatMap.set(bpmAndBeat.measureIndex, bpmAndBeat);
 
-        console.log(bpmAndBeat);
-
         return bpmAndBeat;
       })
       .sort(sortMeasure);

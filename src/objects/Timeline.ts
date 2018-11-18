@@ -1,5 +1,6 @@
-import { fromJS, Record } from "immutable";
+import { Record } from "immutable";
 import * as immutablediff from "immutablediff";
+import * as _ from "lodash";
 import { action, IObservableArray, observable } from "mobx";
 import { Mutable } from "src/utils/mutable";
 import { Fraction } from "../math";
@@ -51,29 +52,39 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
     let timeline = new TimelineRecord(chart, data);
     timeline = Object.assign(timeline, timeline.asMutable());
 
-    // 各 Record を mutable に変換する
-    timeline.mutable.notes = timeline.notes.map(note =>
-      NoteRecord.new(note, chart)
+    timeline.chart = chart;
+
+    timeline.toMutable(timeline);
+
+    timeline.save();
+
+    return timeline;
+  }
+
+  /**
+   * 各 Record を mutable に変換する
+   */
+  private toMutable(data: TimelineJsonData) {
+    this.mutable.notes = data.notes.map(note =>
+      NoteRecord.new(note, this.chart!)
     );
-    timeline.mutable.noteLines = timeline.noteLines.map(noteLine =>
+    this.mutable.noteLines = data.noteLines.map(noteLine =>
       NoteLineRecord.new(noteLine)
     );
-    timeline.mutable.measures = timeline.measures.map(measure =>
+    this.mutable.measures = data.measures.map(measure =>
       MeasureRecord.new(measure)
     );
-    timeline.mutable.lanes = timeline.lanes.map(lane => LaneRecord.new(lane));
-    timeline.mutable.lanePoints = timeline.lanePoints.map(lanePoint =>
+    this.mutable.lanes = data.lanes.map(lane => LaneRecord.new(lane));
+    this.mutable.lanePoints = data.lanePoints.map(lanePoint =>
       LanePointRecord.new(lanePoint)
     );
-    timeline.mutable.bpmChanges = timeline.bpmChanges.map(bpmChange =>
+    this.mutable.bpmChanges = data.bpmChanges.map(bpmChange =>
       BpmChangeRecord.new(bpmChange)
     );
 
-    timeline.updateNoteMap();
-    timeline.updateLanePointMap();
-    timeline.updateLaneMap();
-
-    return timeline;
+    this.updateNoteMap();
+    this.updateLanePointMap();
+    this.updateLaneMap();
   }
 
   static newnew(chart: Chart, data?: TimelineData): Timeline {
@@ -117,14 +128,12 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
   addBPMChange(value: BpmChange) {
     this.bpmChanges.push(value);
     this.calculateTime();
-    this.save();
   }
 
   @action
   removeBpmChange(bpmChange: BpmChange) {
     this.mutable.bpmChanges = this.bpmChanges.filter(bc => bc !== bpmChange);
     this.calculateTime();
-    this.save();
   }
 
   @action
@@ -154,57 +163,29 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
 
   @action
   save() {
+    let data = _.cloneDeep(defaultTimelineData);
+
     // 初回
-    if (!this.history[0]) {
-      this.history.push(
-        immutablediff(
-          {},
-          {
-            notes: this.notes,
-            noteLines: this.noteLines
-          }
-        )
-      );
+    if (this.history.length === 0) {
+      this.history.push(_.cloneDeep(immutablediff(data, this.toJS())));
+      this.historyIndex++;
+      return;
     }
 
-    console.log("save", this.history);
-
-    var p = fromJS({
-      notes: [],
-      noteLines: []
-    });
-
-    for (var i = 0; i < this.historyIndex + 1; i++) {
-      console.log(i, p, this.history);
-
-      p = require("immutablepatch")(p, this.history[i]);
+    // 1 つ前の状態に復元する
+    for (let i = 0; i < this.historyIndex; i++) {
+      data = require("immutablepatch")(data, this.history[i]);
     }
 
-    // 前回保存したときの notes
-    const prevSavedNotes = p;
+    this.history = this.history.slice(0, this.historyIndex);
 
-    this.history = this.history.slice(0, this.historyIndex + 1);
-
-    this.history.push(
-      immutablediff(
-        p,
-        fromJS({
-          notes: this.notes,
-          noteLines: this.noteLines
-        })
-      )
-    );
+    this.history.push(immutablediff((data as any).toJS(), this.toJS()));
 
     this.historyIndex++;
 
-    this.undoable = true;
+    this.chart!.undoable = true;
+    this.chart!.redoable = false;
   }
-
-  @observable
-  undoable = false;
-
-  @observable
-  redoable = false;
 
   private get mutable() {
     return this as Mutable<TimelineRecord>;
@@ -212,46 +193,34 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
 
   @action
   undo() {
-    if (this.historyIndex <= 0) {
-      console.error("だめ");
-      return;
-    }
-
     this.historyIndex--;
 
-    var p = {
-      notes: [],
-      noteLines: []
-    };
+    let data = _.cloneDeep(defaultTimelineData);
 
-    for (var i = 0; i < this.historyIndex + 1; i++) {
-      p = require("immutablepatch")(p, this.history[i]);
+    for (let i = 0; i < this.historyIndex; i++) {
+      data = require("immutablepatch")(data, this.history[i]);
     }
 
-    p = (p as any).toJS();
+    this.toMutable((data as any).toJS() as TimelineJsonData);
 
-    this.mutable.notes = p.notes.map(note => NoteRecord.new(note, this.chart!));
-    this.mutable.noteLines = p.noteLines.map(note => NoteLineRecord.new(note));
-
-    console.log("undo", p);
-
-    if (this.historyIndex <= 0) {
-      this.undoable = false;
-    }
+    this.chart!.redoable = true;
+    this.chart!.undoable = this.historyIndex > 1;
   }
 
+  @action
   redo() {
-    console.log("redo");
-
     this.historyIndex++;
 
-    var p: any[] = [];
+    let data = _.cloneDeep(defaultTimelineData);
 
-    for (var i = 0; i < this.historyIndex + 1; i++) {
-      p = require("immutablepatch")(p, this.history[i]);
+    for (let i = 0; i < this.historyIndex; i++) {
+      data = require("immutablepatch")(data, this.history[i]);
     }
 
-    (this.notes as any) = p;
+    this.toMutable((data as any).toJS() as TimelineJsonData);
+
+    this.chart!.undoable = true;
+    this.chart!.redoable = this.historyIndex < this.history.length;
   }
 
   /**
@@ -272,29 +241,9 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
 
   private chart: Chart | null = null;
 
-  $initializeNotes(notes: NoteData[], chart: Chart) {
-    this.chart = chart;
-    for (const noteData of notes) {
-      this.notes.push(NoteRecord.new(noteData, chart));
-    }
-    this.updateNoteMap();
-  }
-
-  $initializeNoteLines(noteLines: NoteLineData[], chart: Chart) {
-    this.mutable.noteLines = noteLines.map(noteLine =>
-      NoteLineRecord.new(noteLine)
-    );
-  }
-
-  $initializeLanes(lanes: LaneData[]) {
-    this.mutable.lanes = lanes.map(lane => LaneRecord.new(lane));
-    this.updateLaneMap();
-  }
-
   addNote(note: Note) {
     this.notes.push(note);
     this.updateNoteMap();
-    this.save();
   }
 
   removeNote(note: Note) {
@@ -311,17 +260,14 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
     );
 
     this.updateNoteMap();
-    this.save();
   }
 
   addNoteLine(noteLine: NoteLine) {
     this.noteLines.push(noteLine);
-    this.save();
   }
 
   removeNoteLine(noteLine: NoteLine) {
     this.mutable.noteLines = this.noteLines.filter(_note => _note != noteLine);
-    this.save();
   }
 
   lanePointMap = new Map<string, LanePoint>();

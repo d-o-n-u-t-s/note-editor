@@ -102,7 +102,7 @@ export class NoteRecord extends Record<NoteData>(defaultNoteData) {
     );
   }
 
-  constructor(data: NoteData, chart: Chart) {
+  private constructor(data: NoteData, chart: Chart) {
     super(
       (() => {
         const noteType = chart.musicGameSystem!.noteTypeMap.get(data.type)!;

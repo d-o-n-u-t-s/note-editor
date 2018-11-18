@@ -13,12 +13,15 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import Switch from "@material-ui/core/Switch";
 import AddIcon from "@material-ui/icons/Add";
+import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
+import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import ClearIcon from "@material-ui/icons/clear";
 import CreateIcon from "@material-ui/icons/create";
 import MenuIcon from "@material-ui/icons/menu";
 import PaletteIcon from "@material-ui/icons/Palette";
+import RefreshIcon from "@material-ui/icons/Refresh";
 import ShowChartIcon from "@material-ui/icons/ShowChart";
 import VisibilityIcon from "@material-ui/icons/Visibility";
 import ToggleButton from "@material-ui/lab/ToggleButton";
@@ -171,14 +174,35 @@ class Toolbar extends InjectedComponent<Props> {
 
     if (!editor.currentChart) return <div />;
 
+    const chart = editor.currentChart!;
+
     return (
       <div
         style={{
           display: "flex",
           flexDirection: "row"
-          //margin: "-12px 0"
         }}
       >
+        {/* Undo */}
+        <IconButton
+          disabled={!chart.undoable}
+          onClick={() => chart!.timeline.undo()}
+        >
+          <ArrowBackIcon />
+        </IconButton>
+        {/* Redo */}
+        <IconButton
+          disabled={!chart.redoable}
+          onClick={() => chart!.timeline.redo()}
+        >
+          <ArrowForwardIcon />
+        </IconButton>
+        {/* リロードボタン */}
+        <IconButton onClick={() => location.reload()}>
+          <RefreshIcon />
+        </IconButton>
+
+        <div style={{ width: 1, background: "#ddd" }} />
         <Badge
           badgeContent={setting.measureDivision}
           color="primary"
@@ -188,7 +212,6 @@ class Toolbar extends InjectedComponent<Props> {
             <MenuIcon />
           </IconButton>
         </Badge>
-
         <Badge
           badgeContent={setting.objectSize}
           color="primary"
@@ -203,7 +226,6 @@ class Toolbar extends InjectedComponent<Props> {
             <MenuIcon />
           </IconButton>
         </Badge>
-
         <Menu
           id="simple-menu"
           anchorEl={anchorEl}
@@ -222,7 +244,6 @@ class Toolbar extends InjectedComponent<Props> {
             </MenuItem>
           ))}
         </Menu>
-
         {/* 配置オブジェクトサイズ */}
         <Menu
           anchorEl={this.state.objectSizeAnchorEl}
@@ -244,7 +265,6 @@ class Toolbar extends InjectedComponent<Props> {
               </MenuItem>
             ))}
         </Menu>
-
         <div className={classes.toggleContainer}>
           <ToggleButtonGroup
             value={setting.editMode}
@@ -268,7 +288,6 @@ class Toolbar extends InjectedComponent<Props> {
             </ToggleButton>
           </ToggleButtonGroup>
         </div>
-
         <div className={classes.toggleContainer}>
           <ToggleButtonGroup
             value={setting.editObjectCategory}
@@ -315,7 +334,6 @@ class Toolbar extends InjectedComponent<Props> {
             </ToggleButton>
           </ToggleButtonGroup>
         </div>
-
         {/* 配置ノートタイプ */}
         <Menu
           anchorEl={this.state.noteAnchorEl}
@@ -341,7 +359,6 @@ class Toolbar extends InjectedComponent<Props> {
             );
           })()}
         </Menu>
-
         {/* 配置レーンタイプ */}
         <Menu
           anchorEl={this.state.laneAnchorEl}
@@ -367,7 +384,6 @@ class Toolbar extends InjectedComponent<Props> {
             );
           })()}
         </Menu>
-
         {/* その他オブジェクトメニュー */}
         <Menu
           anchorEl={this.state.otherAnchorEl}
@@ -392,13 +408,11 @@ class Toolbar extends InjectedComponent<Props> {
             ));
           })()}
         </Menu>
-
         {Array.from({ length: 0 }).map((_, index) => (
           <IconButton key={index} aria-label="Delete">
             <AddIcon />
           </IconButton>
         ))}
-
         {/* 表示設定 */}
         <IconButton
           onClick={event => {
@@ -441,7 +455,6 @@ class Toolbar extends InjectedComponent<Props> {
             ))}
           </FormGroup>
         </Menu>
-
         <div style={{ width: 1, background: "#ddd" }} />
         {/* カスタムパレット */}
         <IconButton
@@ -470,7 +483,6 @@ class Toolbar extends InjectedComponent<Props> {
             }}
           />
         </Menu>
-
         <NewChartDialog />
       </div>
     );

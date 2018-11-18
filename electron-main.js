@@ -19,10 +19,9 @@ function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 800,
-    height: 600
+    height: 600,
+    title: "NoteEditor"
   });
-
-  mainWindow.setTitle("ChartEditor");
 
   if (isDevelopment) {
     mainWindow.loadURL(`http://localhost:9000`);
@@ -100,7 +99,6 @@ function send(name, value) {
 
 function initWindowMenu() {
   const template = [
-    { label: "", submenu: [{ label: "test", click() {} }] },
     {
       label: "ファイル",
       submenu: [

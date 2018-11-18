@@ -1,11 +1,9 @@
 import { GUI, GUIController } from "dat-gui";
+import { runInAction } from "mobx";
 import { observer } from "mobx-react";
 import * as React from "react";
 import config from "../config";
 import { inject, InjectedComponent } from "../stores/inject";
-import { runInAction } from "mobx";
-import { Button } from "@material-ui/core";
-import { Record } from "immutable";
 
 /**
  * フォルダを削除する GUI#removeFolder を定義
@@ -156,38 +154,6 @@ export default class Inspector extends InjectedComponent {
             component.gameCanvas = thisDiv!;
           }}
         />
-        <span style={{ display: "none" }}>
-          {JSON.stringify(this.injected.editor.inspectorTarget)}
-        </span>
-        <Button
-          color="primary"
-          variant="fab"
-          onClick={() => this.injected.editor.currentChart!.timeline.undo()}
-        >
-          undo
-        </Button>
-        <Button
-          color="primary"
-          variant="fab"
-          onClick={() => this.injected.editor.currentChart!.timeline.redo()}
-        >
-          redo
-        </Button>{" "}
-        <Button
-          color="primary"
-          variant="fab"
-          onClick={() =>
-            console.log(
-              JSON.stringify(
-                this.injected.editor.currentChart!.timeline.history.map(p =>
-                  p.toJS()
-                )
-              )
-            )
-          }
-        >
-          history
-        </Button>
       </div>
     );
   }

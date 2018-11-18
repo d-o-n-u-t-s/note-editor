@@ -1,26 +1,19 @@
 import { action, observable } from "mobx";
+import { MeasureRecord } from "../objects/Measure";
+import { Note, NoteRecord } from "../objects/Note";
+import { TimelineData } from "../objects/Timeline";
 import BMSImporter from "../plugins/BMSImporter";
+import { guid } from "../util";
 import { fs, __require } from "../utils/node";
 import AssetStore from "./Asset";
 import Chart from "./Chart";
 import EditorSetting from "./EditorSetting";
 import MusicGameSystem from "./MusicGameSystem";
-import { Note, NoteRecord } from "../objects/Note";
-import { Measure, MeasureRecord } from "../objects/Measure";
-import _ = require("lodash");
-import { guid } from "../util";
-import { TimelineData } from "../objects/Timeline";
-
-interface IStore {
-  readonly name: string;
-}
 
 const { remote, ipcRenderer } = __require("electron");
 const { dialog } = remote;
 
-export default class Editor implements IStore {
-  readonly name = "editor";
-
+export default class Editor {
   @observable.ref
   inspectorTarget: any = {};
 
