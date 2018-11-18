@@ -1,11 +1,11 @@
-import INote from "./Note";
-import NoteRenderer, { INoteRenderer } from "./NoteRenderer";
 import Pixi from "../containers/Pixi";
+import { Note } from "./Note";
+import NoteRenderer, { INoteRenderer } from "./NoteRenderer";
 
 export default class NoteRendererResolver {
   private static renderers = new WeakMap<any, any>();
 
-  static resolve(note: INote): INoteRenderer {
+  static resolve(note: Note): INoteRenderer {
     const noteType = Pixi.instance!.injected.editor!.currentChart!.musicGameSystem!.noteTypeMap.get(
       note.type
     )!;

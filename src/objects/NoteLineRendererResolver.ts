@@ -1,7 +1,6 @@
-import Lane from "./Lane";
-import NoteLine from "./NoteLine";
-import NoteLineRenderer, { INoteLineRenderer } from "./NoteLineRenderer";
 import Pixi from "../containers/Pixi";
+import { NoteLine } from "./NoteLine";
+import NoteLineRenderer, { INoteLineRenderer } from "./NoteLineRenderer";
 
 export default class NoteLineRendererResolver {
   static resolve(noteLine: NoteLine): INoteLineRenderer {

@@ -5,8 +5,8 @@ import AssetStore from "./Asset";
 import Chart from "./Chart";
 import EditorSetting from "./EditorSetting";
 import MusicGameSystem from "./MusicGameSystem";
-import Note from "../objects/Note";
-import Measure from "../objects/Measure";
+import { Note, NoteRecord } from "../objects/Note";
+import { Measure, MeasureRecord } from "../objects/Measure";
 import _ = require("lodash");
 import { guid } from "../util";
 
@@ -30,11 +30,11 @@ export default class Editor implements IStore {
     this.inspectorTarget = target;
   }
 
-  getInspectNotes() {
-    if (this.inspectorTarget instanceof Note) {
+  getInspectNotes(): Note[] {
+    if (this.inspectorTarget instanceof NoteRecord) {
       return [this.inspectorTarget];
     }
-    if (this.inspectorTarget instanceof Measure) {
+    if (this.inspectorTarget instanceof MeasureRecord) {
       return this.currentChart!.timeline.notes.filter(
         n => n.data.measureIndex == this.inspectorTarget.data.index
       );
@@ -178,12 +178,15 @@ export default class Editor implements IStore {
 
   @action
   paste() {
-    if (!(this.inspectorTarget instanceof Measure)) return;
+    if (!(this.inspectorTarget instanceof MeasureRecord)) return;
     this.copiedNotes.forEach(note => {
-      note = _.cloneDeep(note);
-      note.data.guid = guid();
-      note.data.measureIndex = this.inspectorTarget.data.index;
-      this.currentChart!.timeline.addNote(note);
+      //   note.guid = guid();
+
+      this.currentChart!.timeline.addNote(
+        note
+          .set("guid", guid())
+          .set("measureIndex", this.inspectorTarget.data.index)
+      );
     });
   }
 
@@ -198,6 +201,7 @@ export default class Editor implements IStore {
   @action
   moveLane(indexer: (i: number) => number) {
     const lanes = this.currentChart!.timeline.lanes;
+
     this.getInspectNotes().forEach(note => {
       // 移動先レーンを取得
       const lane =
@@ -209,7 +213,7 @@ export default class Editor implements IStore {
       const excludeLanes = typeMap.get(note.data.type)!.excludeLanes || [];
       if (excludeLanes.includes(lane.templateName)) return;
 
-      note.data.lane = lane.guid;
+      //note.data.lane = lane.guid;
     });
   }
 

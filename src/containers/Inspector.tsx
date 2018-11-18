@@ -97,18 +97,7 @@ export default class Inspector extends InjectedComponent {
         const setValue = newController.setValue;
         (newController as any).setValue = (value: any) => {
           runInAction(() => {
-            if (parent instanceof Record) {
-              // HACK: immutable なレコードを強制的に書き換える
-              console.log(
-                key,
-                parent,
-                parent._indices[key],
-                parent._values._tail.array[parent._indices[key]]
-              );
-
-              parent._values._tail.array[parent._indices[key]] = value;
-              console.log(key, parent);
-            } else if (parent.setValue) {
+            if (parent.setValue) {
               parent.setValue(key, value);
             } else {
               parent[key] = value;

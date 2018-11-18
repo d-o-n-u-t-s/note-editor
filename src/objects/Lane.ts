@@ -1,8 +1,6 @@
-import TimelineObject from "./TimelineObject";
-import LanePoint from "./LanePoint";
-import Measure from "./Measure";
-
+import { Vector2 } from "../math";
 import { GUID } from "../util";
+import { Measure } from "./Measure";
 
 export default interface Lane {
   guid: GUID;
@@ -16,8 +14,6 @@ export default interface Lane {
    */
   division: number; //= 3;
 }
-
-import { Fraction, Vector2 } from "../math";
 
 export interface LinePointInfo {
   point: Vector2;

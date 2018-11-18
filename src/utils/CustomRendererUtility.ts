@@ -12,7 +12,7 @@ import { Vector2, lerp, inverseLerp } from "../math";
 import { defaultRender } from "../objects/NoteRenderer";
 
 import store from "../stores/stores";
-import Note from "../objects/Note";
+import { Note } from "../objects/Note";
 
 const textures = new Map<string, PIXI.Texture>();
 

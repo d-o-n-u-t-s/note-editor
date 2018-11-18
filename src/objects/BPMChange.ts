@@ -1,9 +1,14 @@
 import { GUID, guid } from "../util";
 import { Fraction, IFraction } from "../math";
 import Pixi from "../containers/Pixi";
-import Measure, { sortMeasure } from "./Measure";
+import { Measure, sortMeasure } from "./Measure";
+import { Record } from "immutable";
+import { Mutable } from "src/utils/mutable";
 
-interface IChronoObject {
+interface IChronoObject {}
+
+export type BpmChangeData = {
+  bpm: number;
   guid: GUID;
 
   /**
@@ -14,14 +19,37 @@ interface IChronoObject {
    * 小節内の位置
    */
   measurePosition: Fraction;
-}
+} & IChronoObject;
 
-export default interface IBPMChange extends IChronoObject {
-  bpm: number;
+const defaultBpmChangeData: BpmChangeData = {
+  guid: "GUID",
+
+  measureIndex: 0,
+  measurePosition: Fraction.none,
+  bpm: 0
+};
+
+export type BpmChange = Mutable<BpmChangeRecord>;
+
+export class BpmChangeRecord extends Record<BpmChangeData>(
+  defaultBpmChangeData
+) {
+  static new(data: BpmChangeData): BpmChange {
+    const bpmChange = new BpmChangeRecord(data);
+    return new BpmChangeRecord(data).asMutable();
+  }
+
+  private constructor(data: BpmChangeData) {
+    super(data);
+  }
+
+  get data(): BpmChange {
+    return this;
+  }
 }
 
 class _BPMRenderer {
-  getBounds(bpmChange: IBPMChange, measure: Measure): PIXI.Rectangle {
+  getBounds(bpmChange: BpmChange, measure: Measure): PIXI.Rectangle {
     const lane = measure;
 
     const y =
@@ -38,7 +66,7 @@ class _BPMRenderer {
     return new PIXI.Rectangle(_x, _y, measure.width, colliderH);
   }
 
-  render(bpm: IBPMChange, graphics: PIXI.Graphics, measure: Measure) {
+  render(bpm: BpmChange, graphics: PIXI.Graphics, measure: Measure) {
     const bounds = this.getBounds(bpm, measure);
 
     graphics
@@ -77,13 +105,13 @@ class BPMChangeData {
 /**
  * BPM 変更命令 + 拍子
  */
-interface IBPMChangeAndBeat extends IBPMChange {
+interface IBPMChangeAndBeat extends BpmChangeData {
   beat: IFraction;
 }
 
 export class TimeCalculator {
   data: BPMChangeData[] = [];
-  constructor(data: IBPMChange[], measures: Measure[]) {
+  constructor(data: BpmChange[], measures: Measure[]) {
     // 小節番号をキーにした BPM と拍子の変更命令マップ
     const bpmAndBeatMap = new Map<number, IBPMChangeAndBeat>();
 
@@ -94,9 +122,12 @@ export class TimeCalculator {
           {
             beat: measures[bpmChange.measureIndex].data.beat
           },
-          bpmChange
+          bpmChange.toJS()
         ) as IBPMChangeAndBeat;
         bpmAndBeatMap.set(bpmAndBeat.measureIndex, bpmAndBeat);
+
+        console.log(bpmAndBeat);
+
         return bpmAndBeat;
       })
       .sort(sortMeasure);

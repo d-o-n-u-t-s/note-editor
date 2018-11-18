@@ -1,33 +1,32 @@
-import { Fraction } from "../math";
-import { LineInfo } from "./Lane";
-import { drawQuad } from "../utils/drawQuad";
-import { sortMeasure, sortMeasureData } from "./Measure";
-import INote from "./Note";
-import NoteRenderer from "./NoteRenderer";
-import NoteLine from "./NoteLine";
 import Pixi from "../containers/Pixi";
+import { Fraction } from "../math";
+import Vector2 from "../math/Vector2";
+import { drawQuad } from "../utils/drawQuad";
+import { LineInfo } from "./Lane";
+import { LanePoint } from "./LanePoint";
+import { getLines } from "./LaneRenderer";
+import { sortMeasure, sortMeasureData } from "./Measure";
+import { Note } from "./Note";
+import { NoteLine } from "./NoteLine";
+import NoteRenderer from "./NoteRenderer";
 
 export interface INoteLineRenderer {
   customRender(
     graphics: PIXI.Graphics,
     lines: LineInfo[],
-    head: INote,
-    tail: INote
+    head: Note,
+    tail: Note
   ): void;
 
-  render(noteLine: NoteLine, graphics: PIXI.Graphics, notes: INote[]): void;
+  render(noteLine: NoteLine, graphics: PIXI.Graphics, notes: Note[]): void;
 }
-
-import { getLines } from "./LaneRenderer";
-import LanePoint from "./LanePoint";
-import Vector2 from "../math/Vector2";
 
 class NoteLineRenderer implements INoteLineRenderer {
   customRender(
     graphics: PIXI.Graphics,
     lines: LineInfo[],
-    head: INote,
-    tail: INote
+    head: Note,
+    tail: Note
   ) {
     for (const line of lines) {
       drawQuad(
@@ -52,7 +51,7 @@ class NoteLineRenderer implements INoteLineRenderer {
     }
   }
 
-  render(noteLine: NoteLine, graphics: PIXI.Graphics, notes: INote[]) {
+  render(noteLine: NoteLine, graphics: PIXI.Graphics, notes: Note[]) {
     const {
       lanePointMap,
       noteMap,
@@ -189,7 +188,7 @@ class NoteLineRenderer implements INoteLineRenderer {
       });
     // console.log(head, tail);
 
-    const noteToLanePoint = (note: INote, noteBounds: PIXI.Rectangle) => {
+    const noteToLanePoint = (note: Note, noteBounds: PIXI.Rectangle) => {
       return {
         horizontalSize: noteBounds.width,
         horizontalPosition: new Fraction(

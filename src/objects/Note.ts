@@ -1,10 +1,10 @@
+import { Record } from "immutable";
+import * as _ from "lodash";
+import { Mutable } from "src/utils/mutable";
+import Pixi from "../containers/Pixi";
 import { Fraction, IFraction } from "../math";
 import Chart from "../stores/Chart";
 import { GUID } from "../util";
-import GraphicObject from "./GraphicObject";
-import { Record } from "immutable";
-import _ = require("lodash");
-import Pixi from "../containers/Pixi";
 
 interface INoteEditorProps {
   time: number;
@@ -62,20 +62,19 @@ const defaultNoteData: NoteData = {
   customProps: {}
 };
 
-interface IChartObject {
-  x: number;
-}
+export type Note = Mutable<NoteRecord>;
 
-export default class Note extends Record<NoteData>(defaultNoteData)
-  implements IChartObject {
+export class NoteRecord extends Record<NoteData>(defaultNoteData) {
+  static new(data: NoteData, chart: Chart): Note {
+    return new NoteRecord(data, chart).asMutable();
+  }
+
   isVisible = false;
 
   x = 0;
   y = 0;
   width = 0;
   height = 0;
-
-  c = false;
 
   get data() {
     return this;
@@ -132,7 +131,6 @@ export default class Note extends Record<NoteData>(defaultNoteData)
 
         data.customProps = Object.assign(data.customProps, newProps);
 
-        // editorProps.color
         if (noteType.editorProps.color === "$laneColor") {
           data.editorProps.color = Number(
             chart.musicGameSystem!.laneTemplateMap.get(
@@ -146,7 +144,5 @@ export default class Note extends Record<NoteData>(defaultNoteData)
         return data;
       })()
     );
-
-    //    this.customProps = newProps;
   }
 }

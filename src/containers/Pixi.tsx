@@ -4,16 +4,16 @@ import * as PIXI from "pixi.js";
 import * as React from "react";
 import { Fraction } from "../math";
 import Vector2 from "../math/Vector2";
-import IBPMChange, { BPMRenderer } from "../objects/BPMChange";
+import { BpmChange, BPMRenderer, BpmChangeRecord } from "../objects/BPMChange";
 import Lane from "../objects/Lane";
-import LanePoint from "../objects/LanePoint";
+import { LanePoint } from "../objects/LanePoint";
 import LanePointRenderer from "../objects/LanePointRenderer";
 import { NotePointInfo } from "../objects/LaneRenderer";
 import LaneRendererResolver from "../objects/LaneRendererResolver";
-import Measure, { sortMeasureData } from "../objects/Measure";
+import { Measure, sortMeasureData } from "../objects/Measure";
 import MeasureRendererResolver from "../objects/MeasureRendererResolver";
-import Note from "../objects/Note";
-import NoteLine from "../objects/NoteLine";
+import { Note, NoteRecord } from "../objects/Note";
+import { NoteLine, NoteLineRecord } from "../objects/NoteLine";
 import NoteLineRendererResolver from "../objects/NoteLineRendererResolver";
 import NoteRendererResolver from "../objects/NoteRendererResolver";
 import SpeedChange, { SpeedRenderer } from "../objects/SpeedChange";
@@ -256,12 +256,14 @@ export default class Pixi extends InjectedComponent {
 
     // BPM が 1 つも存在しなかったら仮 BPM を先頭に配置する
     if (!chart.timeline.bpmChanges.length) {
-      chart.timeline.addBPMChange({
-        guid: guid(),
-        measureIndex: 0,
-        measurePosition: new Fraction(0, 1),
-        bpm: 120
-      });
+      chart.timeline.addBPMChange(
+        BpmChangeRecord.new({
+          guid: guid(),
+          measureIndex: 0,
+          measurePosition: new Fraction(0, 1),
+          bpm: 120
+        })
+      );
     }
 
     // 縦に何個小節を配置するか
@@ -674,7 +676,7 @@ export default class Pixi extends InjectedComponent {
       ];
 
       // 新規ノート
-      const newNote = new Note(
+      const newNote = NoteRecord.new(
         {
           guid: guid(),
           horizontalSize: editor.setting!.objectSize,
@@ -816,10 +818,11 @@ export default class Pixi extends InjectedComponent {
               sortMeasureData
             );
 
-            const newNoteLine: NoteLine = {
+            const newNoteLine = NoteLineRecord.new({
+              guid: guid(),
               head: head.data.guid,
               tail: tail.data.guid
-            };
+            });
 
             // ノートラインプレビュー
             NoteLineRendererResolver.resolve(newNoteLine).render(
@@ -932,7 +935,7 @@ export default class Pixi extends InjectedComponent {
 
       const vlDiv = targetMeasureDivision;
 
-      const newLanePoint = {
+      const newBpmChange = BpmChangeRecord.new({
         measureIndex: targetMeasure.data.index,
         measurePosition: new Fraction(
           vlDiv - 1 - _.clamp(Math.floor(ny * vlDiv), 0, vlDiv - 1),
@@ -940,16 +943,16 @@ export default class Pixi extends InjectedComponent {
         ),
         guid: guid(),
         bpm: setting.bpm
-      } as IBPMChange;
+      });
 
       if (isClick) {
-        this.injected.editor.currentChart!.timeline.addBPMChange(newLanePoint);
+        this.injected.editor.currentChart!.timeline.addBPMChange(newBpmChange);
       } else {
         // プレビュー
         BPMRenderer.render(
-          newLanePoint,
+          newBpmChange,
           graphics,
-          chart.timeline.measures[newLanePoint.measureIndex]
+          chart.timeline.measures[newBpmChange.measureIndex]
         );
       }
     }

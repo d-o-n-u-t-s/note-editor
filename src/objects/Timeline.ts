@@ -1,43 +1,48 @@
-import * as _ from "lodash";
-import { action, IObservableArray, observable, observe } from "mobx";
-import { Fraction } from "../math";
-import IBPMChange, { TimeCalculator } from "./BPMChange";
-import Lane from "./Lane";
-import LanePoint from "./LanePoint";
-import Measure, { sortMeasure } from "./Measure";
-import Note from "./Note";
-import NoteLine from "./NoteLine";
-import SpeedChange from "./SpeedChange";
-import { fromJS, List } from "immutable";
-import Chart from "../stores/Chart";
-
+import { fromJS, Record } from "immutable";
 import * as immutablediff from "immutablediff";
+import { action, IObservableArray, observable } from "mobx";
+import { Mutable } from "src/utils/mutable";
+import { Fraction } from "../math";
+import Chart from "../stores/Chart";
+import { BpmChange, TimeCalculator } from "./BPMChange";
+import Lane from "./Lane";
+import { LanePoint } from "./LanePoint";
+import { Measure, sortMeasure } from "./Measure";
+import { Note, NoteData, NoteRecord } from "./Note";
+import { NoteLine, NoteLineData, NoteLineRecord } from "./NoteLine";
+import SpeedChange from "./SpeedChange";
 
-export default class Timeline {
-  constructor() {
-    observe(this.changed_lanes, () => {
-      this.laneMap.clear();
-      for (const lane of this.lanes) {
-        this.laneMap.set(lane.guid, lane);
-      }
-      console.log("LaneMap を更新しました", this.changed_lanes.count);
+export type TimelineData = {
+  notes: Note[];
+  noteLines: NoteLine[];
+  measures: Measure[];
+  lanePoints: LanePoint[];
+  bpmChanges: BpmChange[];
+};
 
-      this.calculateTime();
-    });
+const defaultTimelineData: TimelineData = {
+  notes: [],
+  noteLines: [],
+  measures: [],
+  lanePoints: [],
+  bpmChanges: []
+};
 
-    observe(this.bpmChanges, () => {
-      console.log("bpm が変更");
+export type Timeline = Mutable<TimelineRecord>;
 
-      this.calculateTime();
-    });
+export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
+  static new(): Timeline {
+    const timeline = new TimelineRecord();
+    return Object.assign(timeline, timeline.asMutable());
+  }
 
-    observe(this.lanePoints, () => {
-      this.lanePointMap.clear();
-      for (const lanePoint of this.lanePoints) {
-        this.lanePointMap.set(lanePoint.guid, lanePoint);
-      }
-      console.log("lanePointMap を更新しました");
-    });
+  static newnew(data: TimelineData): Timeline {
+    const timeline = new TimelineRecord(data);
+    return Object.assign(timeline, timeline.asMutable());
+  }
+
+  private constructor(data?: TimelineData) {
+    super(data);
   }
 
   timeCalculator = new TimeCalculator([], []);
@@ -68,39 +73,23 @@ export default class Timeline {
   @observable
   horizontalLaneDivision: number = 16;
 
-  @observable
-  bpmChanges: IObservableArray<IBPMChange> = observable([]);
-
   @action
-  addBPMChange(value: IBPMChange) {
+  addBPMChange(value: BpmChange) {
     this.bpmChanges.push(value);
+    this.calculateTime();
+    this.save();
   }
 
   @action
-  removeBpmChange(bpmChange: IBPMChange) {
-    this.bpmChanges.remove(bpmChange);
-  }
-
-  measures: Measure[] = [];
-
-  /**
-   * measures 変更通知
-   */
-  @observable
-  private changed_measures = { count: 0 };
-
-  /**
-   * measures 変更
-   */
-  @action
-  dirty_measures() {
-    this.changed_measures.count++;
+  removeBpmChange(bpmChange: BpmChange) {
+    this.mutable.bpmChanges = this.bpmChanges.filter(bc => bc !== bpmChange);
+    this.calculateTime();
+    this.save();
   }
 
   @action
   setMeasures(measures: Measure[]) {
-    this.measures = measures;
-    this.dirty_measures();
+    this.mutable.measures = measures;
   }
 
   /**
@@ -119,30 +108,35 @@ export default class Timeline {
     this.speedChanges.remove(speedChange);
   }
 
-  @observable
-  lanePoints: LanePoint[] = [];
-
-  lanePointMap = new Map<string, LanePoint>();
-
-  @observable
-  noteLines: IObservableArray<NoteLine> = observable([]);
-
-  /**
-   * ノート
-   */
-  notes = List<Note>();
-
   history: any[] = [];
 
   historyIndex = 0;
 
   @action
   save() {
+    // 初回
+    if (!this.history[0]) {
+      this.history.push(
+        immutablediff(
+          {},
+          {
+            notes: this.notes,
+            noteLines: this.noteLines
+          }
+        )
+      );
+    }
+
     console.log("save", this.history);
 
-    var p: any[] = [];
+    var p = fromJS({
+      notes: [],
+      noteLines: []
+    });
 
     for (var i = 0; i < this.historyIndex + 1; i++) {
+      console.log(i, p, this.history);
+
       p = require("immutablepatch")(p, this.history[i]);
     }
 
@@ -151,7 +145,15 @@ export default class Timeline {
 
     this.history = this.history.slice(0, this.historyIndex + 1);
 
-    this.history.push(immutablediff(p, this.notes));
+    this.history.push(
+      immutablediff(
+        p,
+        fromJS({
+          notes: this.notes,
+          noteLines: this.noteLines
+        })
+      )
+    );
 
     this.historyIndex++;
 
@@ -164,6 +166,10 @@ export default class Timeline {
   @observable
   redoable = false;
 
+  private get mutable() {
+    return this as Mutable<TimelineRecord>;
+  }
+
   @action
   undo() {
     if (this.historyIndex <= 0) {
@@ -173,15 +179,21 @@ export default class Timeline {
 
     this.historyIndex--;
 
-    var p: any[] = [];
+    var p = {
+      notes: [],
+      noteLines: []
+    };
 
     for (var i = 0; i < this.historyIndex + 1; i++) {
       p = require("immutablepatch")(p, this.history[i]);
     }
 
-    (this.notes as any) = p;
+    p = (p as any).toJS();
 
-    console.log("undo");
+    this.mutable.notes = p.notes.map(note => NoteRecord.new(note, this.chart!));
+    this.mutable.noteLines = p.noteLines.map(note => NoteLineRecord.new(note));
+
+    console.log("undo", p);
 
     if (this.historyIndex <= 0) {
       this.undoable = false;
@@ -218,23 +230,28 @@ export default class Timeline {
 
   noteMap = new Map<string, Note>();
 
-  @action
+  private chart: Chart | null = null;
+
+  $initializeNotes(notes: NoteData[], chart: Chart) {
+    this.chart = chart;
+    for (const noteData of notes) {
+      this.notes.push(NoteRecord.new(noteData, chart));
+    }
+    this.updateNoteMap();
+  }
+
+  $initializeNoteLines(noteLines: NoteLineData[], chart: Chart) {
+    this.mutable.noteLines = noteLines.map(noteLine =>
+      NoteLineRecord.new(noteLine)
+    );
+  }
+
   addNote(note: Note) {
-    this.notes = this.notes.push(note);
+    this.notes.push(note);
     this.updateNoteMap();
     this.save();
   }
 
-  $initializeNotes(notes: any, chart: Chart) {
-    for (const noteData of notes) {
-      this.notes = this.notes.push(new Note(noteData, chart));
-    }
-    this.updateNoteMap();
-
-    this.history.push(immutablediff([], this.notes));
-  }
-
-  @action
   removeNote(note: Note) {
     // ノートを参照しているノートラインを削除する
     for (const noteLine of this.noteLines.filter(
@@ -244,25 +261,42 @@ export default class Timeline {
       this.removeNoteLine(noteLine);
     }
 
-    _.remove(this.notes.toJS(), a => a === note);
+    (this as Mutable<TimelineRecord>).notes = this.notes.filter(
+      _note => _note != note
+    );
+
     this.updateNoteMap();
+    this.save();
   }
 
-  @action
+  addNoteLine(noteLine: NoteLine) {
+    this.noteLines.push(noteLine);
+    this.save();
+  }
+
   removeNoteLine(noteLine: NoteLine) {
-    this.noteLines.remove(noteLine);
+    this.mutable.noteLines = this.noteLines.filter(_note => _note != noteLine);
+    this.save();
   }
 
-  @action
-  addNoteLine = (noteLine: NoteLine) => this.noteLines.push(noteLine);
+  lanePointMap = new Map<string, LanePoint>();
 
-  @action
-  addLanePoint = (value: LanePoint) => this.lanePoints.push(value);
-
-  @action
-  clearLanePoints() {
-    this.lanePoints = [];
+  updateLanePointMap() {
     this.lanePointMap.clear();
+    for (const lanePoint of this.lanePoints) {
+      this.lanePointMap.set(lanePoint.guid, lanePoint);
+    }
+    console.log("lanePointMap を更新しました");
+  }
+
+  addLanePoint(value: LanePoint) {
+    this.lanePoints.push(value);
+    this.updateLanePointMap();
+  }
+
+  clearLanePoints() {
+    this.mutable.lanePoints = [];
+    this.updateLanePointMap();
   }
 
   /**
@@ -270,32 +304,29 @@ export default class Timeline {
    */
   lanes: Lane[] = [];
 
-  /**
-   * lanes 変更通知
-   */
-  @observable
-  private changed_lanes = { count: 0 };
-
-  /**
-   * lanes 変更
-   */
-  @action
-  dirty_lanes() {
-    this.changed_lanes.count++;
-  }
-
   laneMap = new Map<string, Lane>();
 
+  updateLaneMap() {
+    console.log(this);
+    this.laneMap.clear();
+    for (const lane of this.lanes) {
+      this.laneMap.set(lane.guid, lane);
+    }
+    console.log("LaneMap を更新しました");
+
+    this.calculateTime();
+  }
+
   @action
-  setLanes = (lanes: Lane[]) => {
+  setLanes(lanes: Lane[]) {
     this.lanes = lanes;
-    this.dirty_lanes();
-  };
+    this.updateLaneMap();
+  }
 
   @action
   addLane(lane: Lane) {
     this.lanes.push(lane);
-    this.dirty_lanes();
+    this.updateLaneMap();
   }
 
   @action

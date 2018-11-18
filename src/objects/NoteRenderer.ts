@@ -1,9 +1,7 @@
-import Measure from "./Measure";
-import Note from "./Note";
-import Pixi from "../containers/Pixi";
 import Lane, { LinePointInfo } from "./Lane";
-
 import LaneRendererResolver from "./LaneRendererResolver";
+import { Measure } from "./Measure";
+import { Note } from "./Note";
 
 export interface INoteRenderer {
   getBounds(note: Note, lane: Lane, measure: Measure): PIXI.Rectangle;

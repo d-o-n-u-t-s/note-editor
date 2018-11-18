@@ -1,4 +1,4 @@
-import Measure from "./Measure";
+import { Measure } from "./Measure";
 
 export interface IMeasureRenderer {
   render(graphics: PIXI.Graphics, measure: Measure, measures: Measure[]): void;
