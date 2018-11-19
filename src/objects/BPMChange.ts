@@ -40,10 +40,6 @@ export class BpmChangeRecord extends Record<BpmChangeData>(
   private constructor(data: BpmChangeData) {
     super(data);
   }
-
-  get data(): BpmChange {
-    return this;
-  }
 }
 
 class _BPMRenderer {
@@ -117,7 +113,7 @@ export class TimeCalculator {
     let bpmChanges = data
       .map(bpmChange => {
         const bpmAndBeat = Object.assign(bpmChange, {
-          beat: measures[bpmChange.measureIndex].data.beat
+          beat: measures[bpmChange.measureIndex].beat
         }) as IBPMChangeAndBeat;
         bpmAndBeatMap.set(bpmAndBeat.measureIndex, bpmAndBeat);
 
@@ -137,7 +133,7 @@ export class TimeCalculator {
             measureIndex: i,
             measurePosition: new Fraction(0, 1),
             bpm: prevBpm,
-            beat: measures[i].data.beat
+            beat: measures[i].beat
           };
 
       // 前の小節と比較して BPM か拍子が変わっているなら命令を追加する

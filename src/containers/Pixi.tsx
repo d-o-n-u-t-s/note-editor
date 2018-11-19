@@ -193,7 +193,7 @@ export default class Pixi extends InjectedComponent {
     return this.injected.editor.setting.measureDivisionMultiplyBeat
       ? Math.round(
           this.injected.editor.setting.measureDivision *
-            Fraction.to01(measure.data.beat)
+            Fraction.to01(measure.beat)
         )
       : this.injected.editor.setting.measureDivision;
   }
@@ -356,7 +356,7 @@ export default class Pixi extends InjectedComponent {
           );
           // 拍子
           this.drawText(
-            Fraction.to01(measure.data.beat).toString(),
+            Fraction.to01(measure.beat).toString(),
             x - padding / 2,
             y + hh - 30,
             { fontSize: 20, fill: 0xcccccc },
@@ -381,9 +381,9 @@ export default class Pixi extends InjectedComponent {
     );
     const targetMeasureDivision = this.getMeasureDivision(targetMeasure);
 
-    const getLane = (note: Note) => chart.timeline.laneMap.get(note.data.lane)!;
+    const getLane = (note: Note) => chart.timeline.laneMap.get(note.lane)!;
     const getMeasure = (note: Note) =>
-      chart.timeline.measures[note.data.measureIndex];
+      chart.timeline.measures[note.measureIndex];
 
     const getLanePointRenderer = (lanePoint: LanePoint) => LanePointRenderer;
 
@@ -514,7 +514,7 @@ export default class Pixi extends InjectedComponent {
 
     // ノート更新
     for (const note of chart.timeline.notes) {
-      const measure = chart.timeline.measures[note.data.measureIndex];
+      const measure = chart.timeline.measures[note.measureIndex];
 
       // 小節が描画されているなら描画する
       note.isVisible = measure.isVisible;
@@ -535,8 +535,8 @@ export default class Pixi extends InjectedComponent {
       NoteRendererResolver.resolve(note).render(
         note,
         graphics,
-        chart.timeline.laneMap.get(note.data.lane)!,
-        chart.timeline.measures[note.data.measureIndex]
+        chart.timeline.laneMap.get(note.lane)!,
+        chart.timeline.measures[note.measureIndex]
       );
     }
 
@@ -688,7 +688,7 @@ export default class Pixi extends InjectedComponent {
             targetNotePoint!.horizontalIndex,
             targetNotePoint!.lane.division
           ),
-          measureIndex: targetMeasure.data.index,
+          measureIndex: targetMeasure.index,
           measurePosition: new Fraction(
             targetMeasureDivision - 1 - targetNotePoint!.verticalIndex!,
             targetMeasureDivision
@@ -715,7 +715,7 @@ export default class Pixi extends InjectedComponent {
           newNote,
           graphics,
           targetNotePoint!.lane,
-          chart.timeline.measures[newNote.data.measureIndex]
+          chart.timeline.measures[newNote.measureIndex]
         );
       }
     }
@@ -814,10 +814,10 @@ export default class Pixi extends InjectedComponent {
           if (
             this.connectTargetNote &&
             // 同じノートタイプか接続可能なノートタイプなら
-            (this.connectTargetNote.data.type === note.data.type ||
+            (this.connectTargetNote.type === note.type ||
               musicGameSystem.noteTypeMap
-                .get(this.connectTargetNote.data.type)!
-                .connectableTypes.includes(note.data.type))
+                .get(this.connectTargetNote.type)!
+                .connectableTypes.includes(note.type))
           ) {
             const [head, tail] = [this.connectTargetNote, note].sort(
               sortMeasureData
@@ -825,8 +825,8 @@ export default class Pixi extends InjectedComponent {
 
             const newNoteLine = NoteLineRecord.new({
               guid: guid(),
-              head: head.data.guid,
-              tail: tail.data.guid
+              head: head.guid,
+              tail: tail.guid
             });
 
             // ノートラインプレビュー
@@ -897,7 +897,7 @@ export default class Pixi extends InjectedComponent {
       const p = (editor.setting!.objectSize - 1) / maxObjectSize / 2;
 
       const newLanePoint = {
-        measureIndex: targetMeasure.data.index,
+        measureIndex: targetMeasure.index,
         measurePosition: new Fraction(
           vlDiv - 1 - _.clamp(Math.floor(ny * vlDiv), 0, vlDiv - 1),
           vlDiv
@@ -944,7 +944,7 @@ export default class Pixi extends InjectedComponent {
       const vlDiv = targetMeasureDivision;
 
       const newBpmChange = BpmChangeRecord.new({
-        measureIndex: targetMeasure.data.index,
+        measureIndex: targetMeasure.index,
         measurePosition: new Fraction(
           vlDiv - 1 - _.clamp(Math.floor(ny * vlDiv), 0, vlDiv - 1),
           vlDiv
@@ -977,7 +977,7 @@ export default class Pixi extends InjectedComponent {
 
       const vlDiv = targetMeasureDivision;
       const newLanePoint = {
-        measureIndex: targetMeasure.data.index,
+        measureIndex: targetMeasure.index,
         measurePosition: new Fraction(
           vlDiv - 1 - _.clamp(Math.floor(ny * vlDiv), 0, vlDiv - 1),
           vlDiv
@@ -1006,27 +1006,27 @@ export default class Pixi extends InjectedComponent {
     // 再生時間がノートの判定時間を超えたら SE を鳴らす
     for (const note of chart.timeline.notes) {
       // 判定時間
-      const judgeTime = note.data.editorProps.time;
+      const judgeTime = note.editorProps.time;
 
       // 時間が巻き戻っていたら SE 再生済みフラグをリセットする
       if (currentTime < this.previousTime && currentTime < judgeTime) {
-        note.data.editorProps.sePlayed = false;
+        note.editorProps.sePlayed = false;
       }
 
-      if (!chart.isPlaying || note.data.editorProps.sePlayed) continue;
+      if (!chart.isPlaying || note.editorProps.sePlayed) continue;
 
       if (currentTime >= judgeTime) {
         // SE を鳴らす
         if (
-          !this.seMap.has(note.data.type) &&
-          musicGameSystem.seMap.has(note.data.type)
+          !this.seMap.has(note.type) &&
+          musicGameSystem.seMap.has(note.type)
         ) {
           this.seMap.set(
-            note.data.type,
-            musicGameSystem.seMap.get(note.data.type)!.next()
+            note.type,
+            musicGameSystem.seMap.get(note.type)!.next()
           );
         }
-        note.data.editorProps.sePlayed = true;
+        note.editorProps.sePlayed = true;
       }
     }
 

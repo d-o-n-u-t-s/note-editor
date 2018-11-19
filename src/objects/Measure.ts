@@ -44,10 +44,6 @@ export class MeasureRecord extends Record<MeasureData>(defaultMeasureData) {
     super(data);
   }
 
-  get data(): Measure {
-    return this;
-  }
-
   isVisible = false;
 
   x = 0;
