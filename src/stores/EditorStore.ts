@@ -208,12 +208,25 @@ export default class Editor {
   @action
   paste() {
     if (!(this.inspectorTarget instanceof MeasureRecord)) return;
+
+    const guidMap = new Map<string, string>();
     this.copiedNotes.forEach(note => {
+      guidMap.set(note.guid, guid());
       note = _.cloneDeep(note);
-      note.guid = guid();
+      note.guid = guidMap.get(note.guid)!;
       note.measureIndex = this.inspectorTarget.index;
       this.currentChart!.timeline.addNote(note);
     });
+
+    this.currentChart!.timeline.noteLines.forEach(line => {
+      if (guidMap.has(line.head) && guidMap.has(line.tail)) {
+        line = _.cloneDeep(line);
+        line.head = guidMap.get(line.head)!;
+        line.tail = guidMap.get(line.tail)!;
+        this.currentChart!.timeline.addNoteLine(line);
+      }
+    });
+
     if (this.copiedNotes.length > 0) this.currentChart!.save();
   }
 
