@@ -9,6 +9,7 @@ import AssetStore from "./Asset";
 import Chart from "./Chart";
 import EditorSetting from "./EditorSetting";
 import MusicGameSystem from "./MusicGameSystem";
+import _ = require("lodash");
 
 const { remote, ipcRenderer } = __require("electron");
 const { dialog } = remote;
@@ -178,14 +179,12 @@ export default class Editor {
   paste() {
     if (!(this.inspectorTarget instanceof MeasureRecord)) return;
     this.copiedNotes.forEach(note => {
-      //   note.guid = guid();
-
-      this.currentChart!.timeline.addNote(
-        note
-          .set("guid", guid())
-          .set("measureIndex", this.inspectorTarget.data.index)
-      );
+      note = _.cloneDeep(note);
+      note.guid = guid();
+      note.measureIndex = this.inspectorTarget.index;
+      this.currentChart!.timeline.addNote(note);
     });
+    if (this.copiedNotes.length > 0) this.currentChart!.save();
   }
 
   @action
@@ -199,8 +198,9 @@ export default class Editor {
   @action
   moveLane(indexer: (i: number) => number) {
     const lanes = this.currentChart!.timeline.lanes;
+    const notes = this.getInspectNotes();
 
-    this.getInspectNotes().forEach(note => {
+    notes.forEach(note => {
       // 移動先レーンを取得
       const lane =
         lanes[indexer(lanes.findIndex(lane => lane.guid === note.data.lane))];
@@ -211,8 +211,9 @@ export default class Editor {
       const excludeLanes = typeMap.get(note.data.type)!.excludeLanes || [];
       if (excludeLanes.includes(lane.templateName)) return;
 
-      //note.data.lane = lane.guid;
+      note.lane = lane.guid;
     });
+    if (notes.length > 0) this.currentChart!.save();
   }
 
   constructor() {
@@ -228,6 +229,7 @@ export default class Editor {
     ipcRenderer.on("cut", () => {
       this.copy();
       this.copiedNotes.forEach(n => this.currentChart!.timeline.removeNote(n));
+      if (this.copiedNotes.length > 0) this.currentChart!.save();
     });
     ipcRenderer.on("copy", () => this.copy());
     ipcRenderer.on("paste", () => this.paste());
