@@ -31,8 +31,4 @@ export class NoteLineRecord extends Record<NoteLineData>(defaultNoteLineData) {
   y = 0;
   width = 0;
   height = 0;
-
-  get data() {
-    return this;
-  }
 }

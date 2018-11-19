@@ -151,7 +151,7 @@ export default class Chart {
     // 小節のカスタムプロパティを生成する
     for (const [index, measure] of timelineData.measures.entries()) {
       measure.customProps = Object.assign(
-        this.createMeasure(index).data.customProps,
+        this.createMeasure(index).customProps,
         measure.customProps
       );
     }
@@ -186,9 +186,9 @@ export default class Chart {
 
       // HACK: テスト
       for (const [index, measure] of measures.entries()) {
-        measure.data.customProps = Object.assign(
-          this.createMeasure(index).data.customProps,
-          measure.data.customProps
+        measure.customProps = Object.assign(
+          this.createMeasure(index).customProps,
+          measure.customProps
         );
       }
 

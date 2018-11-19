@@ -39,10 +39,6 @@ export class SpeedChangeRecord extends Record<SpeedChangeData>(
   private constructor(data: SpeedChangeData) {
     super(data);
   }
-
-  get data(): SpeedChange {
-    return this;
-  }
 }
 
 class _SpeedRenderer {

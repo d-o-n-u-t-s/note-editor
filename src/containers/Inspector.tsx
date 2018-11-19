@@ -41,7 +41,6 @@ export default class Inspector extends InjectedComponent {
    * オブジェクトをインスペクタにバインドする
    */
   bind(target: any) {
-    if ("data" in target) target = target.data;
     if (this.previousTarget === target) return;
     this.previousTarget = target;
 

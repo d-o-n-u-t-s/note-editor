@@ -77,10 +77,6 @@ export class NoteRecord extends Record<NoteData>(defaultNoteData) {
   width = 0;
   height = 0;
 
-  get data() {
-    return this;
-  }
-
   getMeasurePosition() {
     return this.measureIndex + Fraction.to01(this.measurePosition);
   }

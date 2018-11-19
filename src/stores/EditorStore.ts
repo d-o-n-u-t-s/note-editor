@@ -31,7 +31,7 @@ export default class Editor {
     }
     if (this.inspectorTarget instanceof MeasureRecord) {
       return this.currentChart!.timeline.notes.filter(
-        n => n.data.measureIndex == this.inspectorTarget.data.index
+        n => n.measureIndex == this.inspectorTarget.index
       );
     }
     return [];
@@ -203,12 +203,12 @@ export default class Editor {
     notes.forEach(note => {
       // 移動先レーンを取得
       const lane =
-        lanes[indexer(lanes.findIndex(lane => lane.guid === note.data.lane))];
+        lanes[indexer(lanes.findIndex(lane => lane.guid === note.lane))];
       if (lane === undefined) return;
 
       // 置けないならやめる
       const typeMap = this.currentChart!.musicGameSystem!.noteTypeMap;
-      const excludeLanes = typeMap.get(note.data.type)!.excludeLanes || [];
+      const excludeLanes = typeMap.get(note.type)!.excludeLanes || [];
       if (excludeLanes.includes(lane.templateName)) return;
 
       note.lane = lane.guid;

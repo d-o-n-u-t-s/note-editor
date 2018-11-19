@@ -116,8 +116,8 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
 
     for (const note of this.notes) {
       // 判定時間を更新する
-      note.data.editorProps.time = this.timeCalculator.getTime(
-        note.data.measureIndex + Fraction.to01(note.data.measurePosition)
+      note.editorProps.time = this.timeCalculator.getTime(
+        note.measureIndex + Fraction.to01(note.measurePosition)
       );
     }
 
@@ -232,7 +232,7 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
     this.noteMap.clear();
 
     for (const note of this.notes) {
-      this.noteMap.set(note.data.guid, note);
+      this.noteMap.set(note.guid, note);
     }
     console.log("NoteMap を更新しました");
 
@@ -251,8 +251,7 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
   removeNote(note: Note) {
     // ノートを参照しているノートラインを削除する
     for (const noteLine of this.noteLines.filter(
-      noteLine =>
-        noteLine.head === note.data.guid || noteLine.tail === note.data.guid
+      noteLine => noteLine.head === note.guid || noteLine.tail === note.guid
     )) {
       this.removeNoteLine(noteLine);
     }
@@ -334,8 +333,8 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
     for (const noteLine of this.noteLines) {
       // 先頭と末尾をソートして正しい順序にする
       const [head, tail] = [
-        this.noteMap.get(noteLine.head)!.data,
-        this.noteMap.get(noteLine.tail)!.data
+        this.noteMap.get(noteLine.head)!,
+        this.noteMap.get(noteLine.tail)!
       ].sort(sortMeasure);
 
       noteLine.head = head.guid;
@@ -386,9 +385,9 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
         if (nextLane) {
           // 古いレーンを参照していたノートのレーン情報を更新
           for (const note of this.notes.filter(
-            note => note.data.lane === nextLane.guid
+            note => note.lane === nextLane.guid
           )) {
-            note.data.set("lane", lane.guid);
+            note.lane = lane.guid;
           }
 
           const nextLaneIndex = this.lanes.findIndex(l => l === nextLane);
