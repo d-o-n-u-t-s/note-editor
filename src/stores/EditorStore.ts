@@ -12,6 +12,7 @@ import Chart from "./Chart";
 import EditorSetting from "./EditorSetting";
 import MusicGameSystem from "./MusicGameSystem";
 import _ = require("lodash");
+import { Fraction } from "../math";
 
 const { remote, ipcRenderer } = __require("electron");
 const { dialog } = remote;
@@ -259,6 +260,26 @@ export default class Editor {
     if (notes.length > 0) this.currentChart!.save();
   }
 
+  @action
+  moveDivision(index: number) {
+    const frac = new Fraction(index, this.setting.measureDivision);
+    const notes = this.getInspectNotes();
+
+    notes.forEach(note => {
+      const p = Fraction.add(note.measurePosition, frac);
+      if (p.numerator < 0 && note.measureIndex != 0) {
+        note.measureIndex--;
+        p.numerator += p.denominator;
+      }
+      if (p.numerator >= p.denominator) {
+        note.measureIndex++;
+        p.numerator -= p.denominator;
+      }
+      note.measurePosition = p;
+    });
+    if (notes.length > 0) this.currentChart!.save();
+  }
+
   constructor() {
     // ファイル
     ipcRenderer.on("open", () => this.open());
@@ -276,6 +297,9 @@ export default class Editor {
     });
     ipcRenderer.on("copy", () => this.copy());
     ipcRenderer.on("paste", () => this.paste());
+    ipcRenderer.on("moveDivision", (_: any, index: number) =>
+      this.moveDivision(index)
+    );
     ipcRenderer.on("moveLane", (_: any, index: number) =>
       this.moveLane(i => i + index)
     );

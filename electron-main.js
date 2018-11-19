@@ -174,6 +174,20 @@ function initWindowMenu() {
         },
         { type: "separator" },
         {
+          label: "ノートを上に移動",
+          accelerator: "Up",
+          click() {
+            mainWindow.webContents.send("moveDivision", 1);
+          }
+        },
+        {
+          label: "ノートを下に移動",
+          accelerator: "Down",
+          click() {
+            mainWindow.webContents.send("moveDivision", -1);
+          }
+        },
+        {
           label: "ノートを左に移動",
           accelerator: "Left",
           click() {

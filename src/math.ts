@@ -14,11 +14,25 @@ export class Fraction {
   }
 
   static clone(fraction: IFraction) {
-    return {
-      numerator: fraction.numerator,
-      denominator: fraction.denominator
-    };
+    return { numerator: fraction.numerator, denominator: fraction.denominator };
   }
+
+  static add(a: IFraction, b: IFraction) {
+    const fraction = {
+      numerator: a.numerator * b.denominator + b.numerator * a.denominator,
+      denominator: a.denominator * b.denominator
+    };
+    this.reduce(fraction);
+    return fraction;
+  }
+
+  // 約分
+  static reduce(fraction: IFraction) {
+    const div = math.gcd(fraction.numerator, fraction.denominator);
+    fraction.numerator /= div;
+    fraction.denominator /= div;
+  }
+
   static equal(a: IFraction, b: IFraction) {
     return a.denominator === b.denominator && a.numerator === b.numerator;
   }
