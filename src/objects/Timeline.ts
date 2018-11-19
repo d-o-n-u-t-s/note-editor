@@ -191,6 +191,8 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
 
   @action
   undo() {
+    if (!this.chart!.undoable) return;
+
     this.historyIndex--;
 
     let data = _.cloneDeep(defaultTimelineData);
@@ -207,6 +209,8 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
 
   @action
   redo() {
+    if (!this.chart!.redoable) return;
+
     this.historyIndex++;
 
     let data = _.cloneDeep(defaultTimelineData);

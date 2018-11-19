@@ -222,7 +222,9 @@ export default class Editor {
     ipcRenderer.on("saveAs", () => this.saveAs());
     ipcRenderer.on("importBMS", () => BMSImporter.import());
 
-    // 編集1
+    // 編集
+    ipcRenderer.on("undo", () => this.currentChart!.timeline.undo());
+    ipcRenderer.on("redo", () => this.currentChart!.timeline.redo());
     ipcRenderer.on("cut", () => {
       this.copy();
       this.copiedNotes.forEach(n => this.currentChart!.timeline.removeNote(n));
