@@ -5,6 +5,7 @@ import { action, observable } from "mobx";
 import { Mutable } from "src/utils/mutable";
 import { Fraction } from "../math";
 import Chart from "../stores/Chart";
+import Editor from "../stores/EditorStore";
 import {
   BpmChange,
   BpmChangeData,
@@ -205,6 +206,8 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
 
     this.chart!.redoable = true;
     this.chart!.undoable = this.historyIndex > 1;
+
+    Editor.instance!.updateInspector();
   }
 
   @action
@@ -223,6 +226,8 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
 
     this.chart!.undoable = true;
     this.chart!.redoable = this.historyIndex < this.history.length;
+
+    Editor.instance!.updateInspector();
   }
 
   /**

@@ -1,6 +1,8 @@
 import { action, observable } from "mobx";
+import { BpmChangeRecord } from "../objects/BPMChange";
 import { MeasureRecord } from "../objects/Measure";
 import { Note, NoteRecord } from "../objects/Note";
+import { SpeedChangeRecord } from "../objects/SpeedChange";
 import { TimelineData } from "../objects/Timeline";
 import BMSImporter from "../plugins/BMSImporter";
 import { guid } from "../util";
@@ -120,6 +122,38 @@ export default class Editor {
     // イベント発火
     const onSave = this.currentChart.musicGameSystem!.eventListeners.onSave;
     if (onSave) onSave(this.currentChart);
+  }
+
+  /**
+   * インスペクタの対象を更新する
+   */
+  @action
+  updateInspector() {
+    if (!this.inspectorTarget) {
+      this.inspectorTarget = null;
+      return;
+    }
+
+    // ノート
+    if (this.inspectorTarget instanceof NoteRecord) {
+      this.inspectorTarget = this.currentChart!.timeline.noteMap.get(
+        this.inspectorTarget.guid
+      );
+    }
+
+    // BPM 変更
+    if (this.inspectorTarget instanceof BpmChangeRecord) {
+      this.inspectorTarget = this.currentChart!.timeline.bpmChanges.find(
+        bpmChange => bpmChange.guid === this.inspectorTarget.guid
+      );
+    }
+
+    // 速度変更
+    if (this.inspectorTarget instanceof SpeedChangeRecord) {
+      this.inspectorTarget = this.currentChart!.timeline.speedChanges.find(
+        speedChange => speedChange.guid === this.inspectorTarget.guid
+      );
+    }
   }
 
   private dialogFilters = [{ name: "譜面データ", extensions: ["json"] }];
