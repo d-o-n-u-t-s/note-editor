@@ -72,8 +72,10 @@ class _SpeedRenderer {
 
     Pixi.instance!.drawText(
       `speed: ${speed.speed}`,
-      bounds.x + bounds.width / 6,
-      bounds.y + bounds.height / 2
+      bounds.x + bounds.width / 2,
+      bounds.y + bounds.height / 2,
+      {},
+      measure.width
     );
   }
 }

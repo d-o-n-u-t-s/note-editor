@@ -72,7 +72,9 @@ class _BPMRenderer {
     Pixi.instance!.drawText(
       `bpm: ${bpm.bpm}`,
       bounds.x + bounds.width / 2,
-      bounds.y + bounds.height / 2
+      bounds.y + bounds.height / 2,
+      {},
+      measure.width
     );
   }
 }
