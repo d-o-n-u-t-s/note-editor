@@ -108,6 +108,11 @@ export default class Inspector extends InjectedComponent {
           });
         };
 
+        // 値を更新したら保存
+        newController.onFinishChange(() => {
+          this.injected.editor.currentChart!.save();
+        });
+
         if (gui === this.gui) {
           this.controllers.push(newController);
         }
