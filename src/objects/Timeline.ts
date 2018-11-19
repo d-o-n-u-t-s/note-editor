@@ -1,7 +1,7 @@
 import { Record } from "immutable";
 import * as immutablediff from "immutablediff";
 import * as _ from "lodash";
-import { action, IObservableArray, observable } from "mobx";
+import { action, observable } from "mobx";
 import { Mutable } from "src/utils/mutable";
 import { Fraction } from "../math";
 import Chart from "../stores/Chart";
@@ -16,7 +16,7 @@ import { LanePoint, LanePointData, LanePointRecord } from "./LanePoint";
 import { Measure, MeasureData, MeasureRecord, sortMeasure } from "./Measure";
 import { Note, NoteData, NoteRecord } from "./Note";
 import { NoteLine, NoteLineData, NoteLineRecord } from "./NoteLine";
-import SpeedChange from "./SpeedChange";
+import { SpeedChange, SpeedChangeData, SpeedChangeRecord } from "./SpeedChange";
 
 export type TimelineJsonData = {
   notes: NoteData[];
@@ -25,6 +25,7 @@ export type TimelineJsonData = {
   lanePoints: LanePointData[];
   bpmChanges: BpmChangeData[];
   lanes: LaneData[];
+  speedChanges: SpeedChangeData[];
 };
 
 export type TimelineData = {
@@ -34,6 +35,7 @@ export type TimelineData = {
   lanes: Lane[];
   lanePoints: LanePoint[];
   bpmChanges: BpmChange[];
+  speedChanges: SpeedChange[];
 };
 
 const defaultTimelineData: TimelineData = {
@@ -42,7 +44,8 @@ const defaultTimelineData: TimelineData = {
   measures: [],
   lanes: [],
   lanePoints: [],
-  bpmChanges: []
+  bpmChanges: [],
+  speedChanges: []
 };
 
 export type Timeline = Mutable<TimelineRecord>;
@@ -80,6 +83,9 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
     );
     this.mutable.bpmChanges = data.bpmChanges.map(bpmChange =>
       BpmChangeRecord.new(bpmChange)
+    );
+    this.mutable.speedChanges = data.speedChanges.map(speedChange =>
+      SpeedChangeRecord.new(speedChange)
     );
 
     this.updateNoteMap();
@@ -124,13 +130,11 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
   @observable
   horizontalLaneDivision: number = 16;
 
-  @action
-  addBPMChange(value: BpmChange) {
+  addBpmChange(value: BpmChange) {
     this.bpmChanges.push(value);
     this.calculateTime();
   }
 
-  @action
   removeBpmChange(bpmChange: BpmChange) {
     this.mutable.bpmChanges = this.bpmChanges.filter(bc => bc !== bpmChange);
     this.calculateTime();
@@ -141,20 +145,14 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
     this.mutable.measures = measures;
   }
 
-  /**
-   * 速度変更
-   */
-  @observable
-  speedChanges: IObservableArray<SpeedChange> = observable([]);
-
-  @action
   addSpeedChange(speedChange: SpeedChange) {
     this.speedChanges.push(speedChange);
   }
 
-  @action
   removeSpeedChange(speedChange: SpeedChange) {
-    this.speedChanges.remove(speedChange);
+    this.mutable.speedChanges = this.speedChanges.filter(
+      sc => sc !== speedChange
+    );
   }
 
   history: any[] = [];

@@ -16,7 +16,7 @@ import { Note, NoteRecord } from "../objects/Note";
 import { NoteLineRecord } from "../objects/NoteLine";
 import NoteLineRendererResolver from "../objects/NoteLineRendererResolver";
 import NoteRendererResolver from "../objects/NoteRendererResolver";
-import SpeedChange, { SpeedRenderer } from "../objects/SpeedChange";
+import { SpeedChange, SpeedRenderer } from "../objects/SpeedChange";
 import {
   EditMode,
   ObjectCategory,
@@ -256,7 +256,7 @@ export default class Pixi extends InjectedComponent {
 
     // BPM が 1 つも存在しなかったら仮 BPM を先頭に配置する
     if (!chart.timeline.bpmChanges.length) {
-      chart.timeline.addBPMChange(
+      chart.timeline.addBpmChange(
         BpmChangeRecord.new({
           guid: guid(),
           measureIndex: 0,
@@ -954,7 +954,7 @@ export default class Pixi extends InjectedComponent {
       });
 
       if (isClick) {
-        chart.timeline.addBPMChange(newBpmChange);
+        chart.timeline.addBpmChange(newBpmChange);
         chart.save();
       } else {
         // プレビュー
