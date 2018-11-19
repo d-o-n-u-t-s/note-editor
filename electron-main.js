@@ -137,6 +137,21 @@ function initWindowMenu() {
       label: "編集",
       submenu: [
         {
+          label: "元に戻す",
+          accelerator: "CmdOrCtrl+Z",
+          click() {
+            mainWindow.webContents.send("undo");
+          }
+        },
+        {
+          label: "やり直す",
+          accelerator: "Shift+CmdOrCtrl+Z",
+          click() {
+            mainWindow.webContents.send("redo");
+          }
+        },
+        { type: "separator" },
+        {
           label: "切り取り",
           accelerator: "CmdOrCtrl+X",
           click() {
