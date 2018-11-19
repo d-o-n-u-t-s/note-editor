@@ -33,18 +33,10 @@ export default class Inspector extends InjectedComponent {
   controllers: GUIController[] = [];
 
   /**
-   * 前回の対象オブジェクト
-   */
-  previousTarget: any | null | null;
-
-  /**
    * オブジェクトをインスペクタにバインドする
    */
   bind(target: any) {
     if (!target) return;
-
-    if (this.previousTarget === target) return;
-    this.previousTarget = target;
 
     console.log("update inspector", target);
 

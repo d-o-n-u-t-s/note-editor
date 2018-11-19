@@ -130,29 +130,25 @@ export default class Editor {
    */
   @action
   updateInspector() {
-    if (!this.inspectorTarget) {
-      this.inspectorTarget = null;
-      return;
-    }
+    const t = this.inspectorTarget;
+    this.inspectorTarget = null;
 
     // ノート
-    if (this.inspectorTarget instanceof NoteRecord) {
-      this.inspectorTarget = this.currentChart!.timeline.noteMap.get(
-        this.inspectorTarget.guid
-      );
+    if (t instanceof NoteRecord) {
+      this.inspectorTarget = this.currentChart!.timeline.noteMap.get(t.guid);
     }
 
     // BPM 変更
-    if (this.inspectorTarget instanceof BpmChangeRecord) {
+    if (t instanceof BpmChangeRecord) {
       this.inspectorTarget = this.currentChart!.timeline.bpmChanges.find(
-        bpmChange => bpmChange.guid === this.inspectorTarget.guid
+        bpmChange => bpmChange.guid === t.guid
       );
     }
 
     // 速度変更
-    if (this.inspectorTarget instanceof SpeedChangeRecord) {
+    if (t instanceof SpeedChangeRecord) {
       this.inspectorTarget = this.currentChart!.timeline.speedChanges.find(
-        speedChange => speedChange.guid === this.inspectorTarget.guid
+        speedChange => speedChange.guid === t.guid
       );
     }
   }

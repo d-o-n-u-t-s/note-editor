@@ -184,6 +184,8 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
 
     this.chart!.undoable = true;
     this.chart!.redoable = false;
+
+    Editor.instance!.updateInspector();
   }
 
   private get mutable() {
