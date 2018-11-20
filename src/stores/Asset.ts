@@ -141,6 +141,12 @@ export default class AssetStore {
     for (const noteType of musicGameSystems.noteTypes || []) {
       if (!noteType.customProps) noteType.customProps = [];
 
+      // config生成
+      noteType.customPropsInspectorConfig = {};
+      for (const prop of noteType.customProps.filter(p => p.config)) {
+        noteType.customPropsInspectorConfig[prop.key] = prop.config;
+      }
+
       // 判定音源を読み込む
       if (noteType.editorProps.se) {
         const sePath = path.join(rootPath, directory, noteType.editorProps.se);

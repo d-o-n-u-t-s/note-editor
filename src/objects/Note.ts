@@ -108,7 +108,9 @@ export class NoteRecord extends Record<NoteData>(defaultNoteData) {
         }
 
         // 不要カスタムプロパティの削除と新規カスタムプロパティの追加
-        const newProps: any = {};
+        const newProps: any = {
+          inspectorConfig: noteType.customPropsInspectorConfig
+        };
         for (const prop of noteType.customProps) {
           if (prop.key in data.customProps) {
             newProps[prop.key] = data.customProps[prop.key];
@@ -126,7 +128,7 @@ export class NoteRecord extends Record<NoteData>(defaultNoteData) {
           }
         }
 
-        data.customProps = Object.assign(data.customProps, newProps);
+        data.customProps = newProps;
 
         if (noteType.editorProps.color === "$laneColor") {
           data.editorProps.color = Number(

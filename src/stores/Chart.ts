@@ -476,7 +476,7 @@ export default class Chart {
   toJSON(): string {
     if (!this.musicGameSystem) return "{}";
 
-    const chart = Object.assign({}, this);
+    let chart = Object.assign({}, this);
 
     delete chart.filePath;
     delete chart.audio;
@@ -499,6 +499,15 @@ export default class Chart {
     delete chart.time;
 
     chart.timeline.measures = chart.timeline.measures.slice(0, 1000);
+
+    chart = JSON.parse(JSON.stringify(chart));
+    const deleteConfigKey = (obj: any) => {
+      for (const key of Object.keys(obj)) {
+        if (key == "inspectorConfig") delete obj[key];
+        else if (obj[key] instanceof Object) deleteConfigKey(obj[key]);
+      }
+    };
+    deleteConfigKey(chart);
 
     const json = JSON.stringify(chart);
 

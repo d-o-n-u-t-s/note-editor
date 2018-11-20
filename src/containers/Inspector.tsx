@@ -57,7 +57,11 @@ export default class Inspector extends InjectedComponent {
         obj = obj.toJS();
       }
 
+      const config = obj.inspectorConfig || {};
+
       for (const key of Object.keys(obj)) {
+        if (key == "inspectorConfig") continue;
+
         // オブジェクトなら再帰
         if (obj[key] instanceof Object) {
           const folder = gui.addFolder(key);
@@ -80,10 +84,15 @@ export default class Inspector extends InjectedComponent {
           }
 
           newController = gui.addColor(obj, key);
-        } else if (`_${key}_items` in obj) {
-          newController = gui.add(obj, key, obj[`_${key}_items`]);
         } else {
           newController = gui.add(obj, key);
+        }
+
+        // configの適用
+        if (config[key]) {
+          for (const method of Object.keys(config[key])) {
+            (newController as any)[method](config[key][method]);
+          }
         }
 
         const setValue = newController.setValue;
