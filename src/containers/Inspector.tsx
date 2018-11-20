@@ -63,6 +63,7 @@ export default class Inspector extends InjectedComponent {
           const folder = gui.addFolder(key);
           this.folders.push(folder);
           add(folder, obj[key], parent[key]);
+          folder.open();
           continue;
         }
 
