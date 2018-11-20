@@ -91,28 +91,25 @@ export default class Inspector extends InjectedComponent {
         // configの適用
         if (config[key]) {
           for (const method of Object.keys(config[key])) {
-            (newController as any)[method](config[key][method]);
+            newController = (newController as any)[method](
+              config[key][method]
+            ) as GUIController;
           }
         }
 
-        const setValue = newController.setValue;
-        (newController as any).setValue = (value: any) => {
-          runInAction(() => {
-            if (parent.setValue) {
-              parent.setValue(key, value);
-            } else {
-              parent[key] = value;
-            }
-
-            setValue.call(newController, value);
-
-            // TODO: 特定のオブジェクトの場合だけ時間を更新するようにする
-            this.injected.editor.currentChart!.timeline.calculateTime();
-          });
-        };
+        // 値の反映
+        newController.onChange((value: any) => {
+          if (parent.setValue) {
+            parent.setValue(key, value);
+          } else {
+            parent[key] = value;
+          }
+        });
 
         // 値を更新したら保存
         newController.onFinishChange(() => {
+          // TODO: 特定のオブジェクトの場合だけ時間を更新するようにする
+          this.injected.editor.currentChart!.timeline.calculateTime();
           this.injected.editor.currentChart!.save();
         });
 
