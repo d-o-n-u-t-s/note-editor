@@ -34,6 +34,7 @@ export class Fraction {
   }
 
   static equal(a: IFraction, b: IFraction) {
+    if (a.denominator === 0 || b.denominator === 0) return false;
     return a.numerator * b.denominator === b.numerator * a.denominator;
   }
 
