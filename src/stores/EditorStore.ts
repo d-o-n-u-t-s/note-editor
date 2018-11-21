@@ -1,25 +1,23 @@
 import { action, observable } from "mobx";
+import { BpmChangeRecord } from "../objects/BPMChange";
+import { MeasureRecord } from "../objects/Measure";
+import { Note, NoteRecord } from "../objects/Note";
+import { SpeedChangeRecord } from "../objects/SpeedChange";
+import { TimelineData } from "../objects/Timeline";
 import BMSImporter from "../plugins/BMSImporter";
+import { guid } from "../util";
 import { fs, __require } from "../utils/node";
 import AssetStore from "./Asset";
 import Chart from "./Chart";
 import EditorSetting from "./EditorSetting";
 import MusicGameSystem from "./MusicGameSystem";
-import Note from "../objects/Note";
-import Measure from "../objects/Measure";
 import _ = require("lodash");
-import { guid } from "../util";
-
-interface IStore {
-  readonly name: string;
-}
+import { Fraction } from "../math";
 
 const { remote, ipcRenderer } = __require("electron");
 const { dialog } = remote;
 
-export default class Editor implements IStore {
-  readonly name = "editor";
-
+export default class Editor {
   @observable.ref
   inspectorTarget: any = {};
 
@@ -30,13 +28,13 @@ export default class Editor implements IStore {
     this.inspectorTarget = target;
   }
 
-  getInspectNotes() {
-    if (this.inspectorTarget instanceof Note) {
+  getInspectNotes(): Note[] {
+    if (this.inspectorTarget instanceof NoteRecord) {
       return [this.inspectorTarget];
     }
-    if (this.inspectorTarget instanceof Measure) {
+    if (this.inspectorTarget instanceof MeasureRecord) {
       return this.currentChart!.timeline.notes.filter(
-        n => n.data.measureIndex == this.inspectorTarget.data.index
+        n => n.measureIndex == this.inspectorTarget.index
       );
     }
     return [];
@@ -66,7 +64,11 @@ export default class Editor implements IStore {
    * 新規譜面を作成する
    */
   @action
-  newChart(musicGameSystem: MusicGameSystem, audioSource: string) {
+  newChart(
+    musicGameSystem: MusicGameSystem,
+    audioSource: string,
+    data?: TimelineData
+  ) {
     const newChart = new Chart(musicGameSystem, audioSource);
     this.charts.push(newChart);
     return newChart;
@@ -124,6 +126,34 @@ export default class Editor implements IStore {
     if (onSave) onSave(this.currentChart);
   }
 
+  /**
+   * インスペクタの対象を更新する
+   */
+  @action
+  updateInspector() {
+    const t = this.inspectorTarget;
+    this.inspectorTarget = null;
+
+    // ノート
+    if (t instanceof NoteRecord) {
+      this.inspectorTarget = this.currentChart!.timeline.noteMap.get(t.guid);
+    }
+
+    // BPM 変更
+    if (t instanceof BpmChangeRecord) {
+      this.inspectorTarget = this.currentChart!.timeline.bpmChanges.find(
+        bpmChange => bpmChange.guid === t.guid
+      );
+    }
+
+    // 速度変更
+    if (t instanceof SpeedChangeRecord) {
+      this.inspectorTarget = this.currentChart!.timeline.speedChanges.find(
+        speedChange => speedChange.guid === t.guid
+      );
+    }
+  }
+
   private dialogFilters = [{ name: "譜面データ", extensions: ["json"] }];
 
   @action
@@ -178,13 +208,27 @@ export default class Editor implements IStore {
 
   @action
   paste() {
-    if (!(this.inspectorTarget instanceof Measure)) return;
+    if (!(this.inspectorTarget instanceof MeasureRecord)) return;
+
+    const guidMap = new Map<string, string>();
     this.copiedNotes.forEach(note => {
+      guidMap.set(note.guid, guid());
       note = _.cloneDeep(note);
-      note.data.guid = guid();
-      note.data.measureIndex = this.inspectorTarget.data.index;
+      note.guid = guidMap.get(note.guid)!;
+      note.measureIndex = this.inspectorTarget.index;
       this.currentChart!.timeline.addNote(note);
     });
+
+    this.currentChart!.timeline.noteLines.forEach(line => {
+      if (guidMap.has(line.head) && guidMap.has(line.tail)) {
+        line = _.cloneDeep(line);
+        line.head = guidMap.get(line.head)!;
+        line.tail = guidMap.get(line.tail)!;
+        this.currentChart!.timeline.addNoteLine(line);
+      }
+    });
+
+    if (this.copiedNotes.length > 0) this.currentChart!.save();
   }
 
   @action
@@ -198,19 +242,42 @@ export default class Editor implements IStore {
   @action
   moveLane(indexer: (i: number) => number) {
     const lanes = this.currentChart!.timeline.lanes;
-    this.getInspectNotes().forEach(note => {
+    const notes = this.getInspectNotes();
+
+    notes.forEach(note => {
       // 移動先レーンを取得
       const lane =
-        lanes[indexer(lanes.findIndex(lane => lane.guid === note.data.lane))];
+        lanes[indexer(lanes.findIndex(lane => lane.guid === note.lane))];
       if (lane === undefined) return;
 
       // 置けないならやめる
       const typeMap = this.currentChart!.musicGameSystem!.noteTypeMap;
-      const excludeLanes = typeMap.get(note.data.type)!.excludeLanes || [];
+      const excludeLanes = typeMap.get(note.type)!.excludeLanes || [];
       if (excludeLanes.includes(lane.templateName)) return;
 
-      note.data.lane = lane.guid;
+      note.lane = lane.guid;
     });
+    if (notes.length > 0) this.currentChart!.save();
+  }
+
+  @action
+  moveDivision(index: number) {
+    const frac = new Fraction(index, this.setting.measureDivision);
+    const notes = this.getInspectNotes();
+
+    notes.forEach(note => {
+      const p = Fraction.add(note.measurePosition, frac);
+      if (p.numerator < 0 && note.measureIndex != 0) {
+        note.measureIndex--;
+        p.numerator += p.denominator;
+      }
+      if (p.numerator >= p.denominator) {
+        note.measureIndex++;
+        p.numerator -= p.denominator;
+      }
+      note.measurePosition = p;
+    });
+    if (notes.length > 0) this.currentChart!.save();
   }
 
   constructor() {
@@ -220,13 +287,19 @@ export default class Editor implements IStore {
     ipcRenderer.on("saveAs", () => this.saveAs());
     ipcRenderer.on("importBMS", () => BMSImporter.import());
 
-    // 編集1
+    // 編集
+    ipcRenderer.on("undo", () => this.currentChart!.timeline.undo());
+    ipcRenderer.on("redo", () => this.currentChart!.timeline.redo());
     ipcRenderer.on("cut", () => {
       this.copy();
       this.copiedNotes.forEach(n => this.currentChart!.timeline.removeNote(n));
+      if (this.copiedNotes.length > 0) this.currentChart!.save();
     });
     ipcRenderer.on("copy", () => this.copy());
     ipcRenderer.on("paste", () => this.paste());
+    ipcRenderer.on("moveDivision", (_: any, index: number) =>
+      this.moveDivision(index)
+    );
     ipcRenderer.on("moveLane", (_: any, index: number) =>
       this.moveLane(i => i + index)
     );

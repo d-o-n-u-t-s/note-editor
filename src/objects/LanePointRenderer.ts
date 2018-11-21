@@ -1,9 +1,5 @@
-import { Fraction } from "../math";
-import TimelineObject from "./TimelineObject";
-import { LaneTemplate } from "../stores/MusicGameSystem";
-import Pixi from "../containers/Pixi";
-import LanePoint from "./LanePoint";
-import Measure from "./Measure";
+import { LanePoint } from "./LanePoint";
+import { Measure } from "./Measure";
 
 class LanePointRenderer {
   getBounds(lanePoint: LanePoint, measure: Measure): PIXI.Rectangle {
@@ -43,17 +39,6 @@ class LanePointRenderer {
       .lineStyle(4, lanePoint.color, 1)
       .moveTo(bounds.x, bounds.y + bounds.height / 2)
       .lineTo(bounds.x + bounds.width, bounds.y + bounds.height / 2);
-
-    return;
-
-    Pixi.instance!.drawText(
-      `${lanePoint.measureIndex}:${lanePoint.measurePosition}`,
-      bounds.x,
-      bounds.y,
-      {
-        fontSize: 16
-      }
-    );
   }
 }
 

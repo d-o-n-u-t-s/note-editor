@@ -1,5 +1,4 @@
 import Pixi from "../containers/Pixi";
-import Measure from "./Measure";
 import MeasureRenderer, { IMeasureRenderer } from "./MeasureRenderer";
 
 export default class MeasureRendererResolver {

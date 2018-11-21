@@ -158,15 +158,6 @@ class Application extends React.Component<Props, {}> {
             >
               <Settings />
               <Inspector />
-
-              <Button
-                color="primary"
-                variant="fab"
-                aria-label="Add"
-                onClick={() => location.reload()}
-              >
-                reload
-              </Button>
             </Drawer>
 
             <main

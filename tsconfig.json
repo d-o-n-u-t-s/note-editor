@@ -9,6 +9,10 @@
     "module": "commonjs",
 
     "experimentalDecorators": true,
-    "lib": ["es2017", "dom"]
+    "lib": ["es2017", "dom"],
+
+    "baseUrl": "./",
+    "paths": { "immutablediff": ["src/@types/immutablediff"] },
+    "typeRoots": ["src/@types", "node_modules/@types"]
   }
 }

@@ -28,7 +28,8 @@ export interface NoteType {
   /**
    * カスタムプロパティ
    */
-  customProps: { key: string; defaultValue: any }[];
+  customProps: { key: string; defaultValue: any; config?: any }[];
+  customPropsInspectorConfig: any;
 
   /**
    * エディタプロパティ

@@ -19,10 +19,9 @@ function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 800,
-    height: 600
+    height: 600,
+    title: "NoteEditor"
   });
-
-  mainWindow.setTitle("ChartEditor");
 
   if (isDevelopment) {
     mainWindow.loadURL(`http://localhost:9000`);
@@ -100,7 +99,6 @@ function send(name, value) {
 
 function initWindowMenu() {
   const template = [
-    { label: "", submenu: [{ label: "test", click() {} }] },
     {
       label: "ファイル",
       submenu: [
@@ -139,6 +137,21 @@ function initWindowMenu() {
       label: "編集",
       submenu: [
         {
+          label: "元に戻す",
+          accelerator: "CmdOrCtrl+Z",
+          click() {
+            mainWindow.webContents.send("undo");
+          }
+        },
+        {
+          label: "やり直す",
+          accelerator: "Shift+CmdOrCtrl+Z",
+          click() {
+            mainWindow.webContents.send("redo");
+          }
+        },
+        { type: "separator" },
+        {
           label: "切り取り",
           accelerator: "CmdOrCtrl+X",
           click() {
@@ -160,6 +173,20 @@ function initWindowMenu() {
           }
         },
         { type: "separator" },
+        {
+          label: "ノートを上に移動",
+          accelerator: "Up",
+          click() {
+            mainWindow.webContents.send("moveDivision", 1);
+          }
+        },
+        {
+          label: "ノートを下に移動",
+          accelerator: "Down",
+          click() {
+            mainWindow.webContents.send("moveDivision", -1);
+          }
+        },
         {
           label: "ノートを左に移動",
           accelerator: "Left",

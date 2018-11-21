@@ -4,19 +4,19 @@ import * as PIXI from "pixi.js";
 import * as React from "react";
 import { Fraction } from "../math";
 import Vector2 from "../math/Vector2";
-import IBPMChange, { BPMRenderer } from "../objects/BPMChange";
-import Lane from "../objects/Lane";
-import LanePoint from "../objects/LanePoint";
+import { BpmChangeRecord, BPMRenderer } from "../objects/BPMChange";
+import { Lane } from "../objects/Lane";
+import { LanePoint } from "../objects/LanePoint";
 import LanePointRenderer from "../objects/LanePointRenderer";
 import { NotePointInfo } from "../objects/LaneRenderer";
 import LaneRendererResolver from "../objects/LaneRendererResolver";
-import Measure, { sortMeasureData } from "../objects/Measure";
+import { Measure, sortMeasureData } from "../objects/Measure";
 import MeasureRendererResolver from "../objects/MeasureRendererResolver";
-import Note from "../objects/Note";
-import NoteLine from "../objects/NoteLine";
+import { Note, NoteRecord } from "../objects/Note";
+import { NoteLineRecord } from "../objects/NoteLine";
 import NoteLineRendererResolver from "../objects/NoteLineRendererResolver";
 import NoteRendererResolver from "../objects/NoteRendererResolver";
-import SpeedChange, { SpeedRenderer } from "../objects/SpeedChange";
+import { SpeedChange, SpeedRenderer } from "../objects/SpeedChange";
 import {
   EditMode,
   ObjectCategory,
@@ -193,7 +193,7 @@ export default class Pixi extends InjectedComponent {
     return this.injected.editor.setting.measureDivisionMultiplyBeat
       ? Math.round(
           this.injected.editor.setting.measureDivision *
-            Fraction.to01(measure.data.beat)
+            Fraction.to01(measure.beat)
         )
       : this.injected.editor.setting.measureDivision;
   }
@@ -256,12 +256,15 @@ export default class Pixi extends InjectedComponent {
 
     // BPM が 1 つも存在しなかったら仮 BPM を先頭に配置する
     if (!chart.timeline.bpmChanges.length) {
-      chart.timeline.addBPMChange({
-        guid: guid(),
-        measureIndex: 0,
-        measurePosition: new Fraction(0, 1),
-        bpm: 120
-      });
+      chart.timeline.addBpmChange(
+        BpmChangeRecord.new({
+          guid: guid(),
+          measureIndex: 0,
+          measurePosition: new Fraction(0, 1),
+          bpm: 120
+        })
+      );
+      chart.save();
     }
 
     // 縦に何個小節を配置するか
@@ -353,7 +356,7 @@ export default class Pixi extends InjectedComponent {
           );
           // 拍子
           this.drawText(
-            Fraction.to01(measure.data.beat).toString(),
+            Fraction.to01(measure.beat).toString(),
             x - padding / 2,
             y + hh - 30,
             { fontSize: 20, fill: 0xcccccc },
@@ -378,9 +381,9 @@ export default class Pixi extends InjectedComponent {
     );
     const targetMeasureDivision = this.getMeasureDivision(targetMeasure);
 
-    const getLane = (note: Note) => chart.timeline.laneMap.get(note.data.lane)!;
+    const getLane = (note: Note) => chart.timeline.laneMap.get(note.lane)!;
     const getMeasure = (note: Note) =>
-      chart.timeline.measures[note.data.measureIndex];
+      chart.timeline.measures[note.measureIndex];
 
     const getLanePointRenderer = (lanePoint: LanePoint) => LanePointRenderer;
 
@@ -511,7 +514,7 @@ export default class Pixi extends InjectedComponent {
 
     // ノート更新
     for (const note of chart.timeline.notes) {
-      const measure = chart.timeline.measures[note.data.measureIndex];
+      const measure = chart.timeline.measures[note.measureIndex];
 
       // 小節が描画されているなら描画する
       note.isVisible = measure.isVisible;
@@ -532,8 +535,8 @@ export default class Pixi extends InjectedComponent {
       NoteRendererResolver.resolve(note).render(
         note,
         graphics,
-        chart.timeline.laneMap.get(note.data.lane)!,
-        chart.timeline.measures[note.data.measureIndex]
+        chart.timeline.laneMap.get(note.lane)!,
+        chart.timeline.measures[note.measureIndex]
       );
     }
 
@@ -565,6 +568,7 @@ export default class Pixi extends InjectedComponent {
           if (isClick) {
             if (setting.editMode === EditMode.Delete) {
               chart.timeline.removeNote(note);
+              chart.save();
             }
             if (setting.editMode === EditMode.Select) {
               console.log("ノートを選択しました", note);
@@ -628,6 +632,7 @@ export default class Pixi extends InjectedComponent {
 
           if (isClick) {
             chart.timeline.removeBpmChange(bpmChange);
+            chart.save();
           }
         }
       }
@@ -657,6 +662,7 @@ export default class Pixi extends InjectedComponent {
 
           if (isClick) {
             chart.timeline.removeSpeedChange(bpmChange);
+            chart.save();
           }
         }
       }
@@ -674,7 +680,7 @@ export default class Pixi extends InjectedComponent {
       ];
 
       // 新規ノート
-      const newNote = new Note(
+      const newNote = NoteRecord.new(
         {
           guid: guid(),
           horizontalSize: editor.setting!.objectSize,
@@ -682,7 +688,7 @@ export default class Pixi extends InjectedComponent {
             targetNotePoint!.horizontalIndex,
             targetNotePoint!.lane.division
           ),
-          measureIndex: targetMeasure.data.index,
+          measureIndex: targetMeasure.index,
           measurePosition: new Fraction(
             targetMeasureDivision - 1 - targetNotePoint!.verticalIndex!,
             targetMeasureDivision
@@ -703,12 +709,13 @@ export default class Pixi extends InjectedComponent {
 
       if (isClick) {
         chart.timeline.addNote(newNote);
+        chart.save();
       } else {
         NoteRendererResolver.resolve(newNote).render(
           newNote,
           graphics,
           targetNotePoint!.lane,
-          chart.timeline.measures[newNote.data.measureIndex]
+          chart.timeline.measures[newNote.measureIndex]
         );
       }
     }
@@ -807,19 +814,20 @@ export default class Pixi extends InjectedComponent {
           if (
             this.connectTargetNote &&
             // 同じノートタイプか接続可能なノートタイプなら
-            (this.connectTargetNote.data.type === note.data.type ||
+            (this.connectTargetNote.type === note.type ||
               musicGameSystem.noteTypeMap
-                .get(this.connectTargetNote.data.type)!
-                .connectableTypes.includes(note.data.type))
+                .get(this.connectTargetNote.type)!
+                .connectableTypes.includes(note.type))
           ) {
             const [head, tail] = [this.connectTargetNote, note].sort(
               sortMeasureData
             );
 
-            const newNoteLine: NoteLine = {
-              head: head.data.guid,
-              tail: tail.data.guid
-            };
+            const newNoteLine = NoteLineRecord.new({
+              guid: guid(),
+              head: head.guid,
+              tail: tail.guid
+            });
 
             // ノートラインプレビュー
             NoteLineRendererResolver.resolve(newNoteLine).render(
@@ -834,6 +842,8 @@ export default class Pixi extends InjectedComponent {
                 this.connectTargetNote = null;
               } else {
                 chart.timeline.addNoteLine(newNoteLine);
+                chart.save();
+
                 console.log("接続 2");
 
                 this.connectTargetNote = note;
@@ -887,7 +897,7 @@ export default class Pixi extends InjectedComponent {
       const p = (editor.setting!.objectSize - 1) / maxObjectSize / 2;
 
       const newLanePoint = {
-        measureIndex: targetMeasure.data.index,
+        measureIndex: targetMeasure.index,
         measurePosition: new Fraction(
           vlDiv - 1 - _.clamp(Math.floor(ny * vlDiv), 0, vlDiv - 1),
           vlDiv
@@ -910,6 +920,7 @@ export default class Pixi extends InjectedComponent {
 
       if (isClick) {
         this.injected.editor.currentChart!.timeline.addLanePoint(newLanePoint);
+        chart.save();
       } else {
         // プレビュー
 
@@ -932,24 +943,25 @@ export default class Pixi extends InjectedComponent {
 
       const vlDiv = targetMeasureDivision;
 
-      const newLanePoint = {
-        measureIndex: targetMeasure.data.index,
+      const newBpmChange = BpmChangeRecord.new({
+        measureIndex: targetMeasure.index,
         measurePosition: new Fraction(
           vlDiv - 1 - _.clamp(Math.floor(ny * vlDiv), 0, vlDiv - 1),
           vlDiv
         ),
         guid: guid(),
         bpm: setting.bpm
-      } as IBPMChange;
+      });
 
       if (isClick) {
-        this.injected.editor.currentChart!.timeline.addBPMChange(newLanePoint);
+        chart.timeline.addBpmChange(newBpmChange);
+        chart.save();
       } else {
         // プレビュー
         BPMRenderer.render(
-          newLanePoint,
+          newBpmChange,
           graphics,
-          chart.timeline.measures[newLanePoint.measureIndex]
+          chart.timeline.measures[newBpmChange.measureIndex]
         );
       }
     }
@@ -965,7 +977,7 @@ export default class Pixi extends InjectedComponent {
 
       const vlDiv = targetMeasureDivision;
       const newLanePoint = {
-        measureIndex: targetMeasure.data.index,
+        measureIndex: targetMeasure.index,
         measurePosition: new Fraction(
           vlDiv - 1 - _.clamp(Math.floor(ny * vlDiv), 0, vlDiv - 1),
           vlDiv
@@ -978,6 +990,7 @@ export default class Pixi extends InjectedComponent {
         this.injected.editor.currentChart!.timeline.addSpeedChange(
           newLanePoint
         );
+        chart.save();
       } else {
         // プレビュー
         SpeedRenderer.render(
@@ -993,27 +1006,27 @@ export default class Pixi extends InjectedComponent {
     // 再生時間がノートの判定時間を超えたら SE を鳴らす
     for (const note of chart.timeline.notes) {
       // 判定時間
-      const judgeTime = note.data.editorProps.time;
+      const judgeTime = note.editorProps.time;
 
       // 時間が巻き戻っていたら SE 再生済みフラグをリセットする
       if (currentTime < this.previousTime && currentTime < judgeTime) {
-        note.data.editorProps.sePlayed = false;
+        note.editorProps.sePlayed = false;
       }
 
-      if (!chart.isPlaying || note.data.editorProps.sePlayed) continue;
+      if (!chart.isPlaying || note.editorProps.sePlayed) continue;
 
       if (currentTime >= judgeTime) {
         // SE を鳴らす
         if (
-          !this.seMap.has(note.data.type) &&
-          musicGameSystem.seMap.has(note.data.type)
+          !this.seMap.has(note.type) &&
+          musicGameSystem.seMap.has(note.type)
         ) {
           this.seMap.set(
-            note.data.type,
-            musicGameSystem.seMap.get(note.data.type)!.next()
+            note.type,
+            musicGameSystem.seMap.get(note.type)!.next()
           );
         }
-        note.data.editorProps.sePlayed = true;
+        note.editorProps.sePlayed = true;
       }
     }
 

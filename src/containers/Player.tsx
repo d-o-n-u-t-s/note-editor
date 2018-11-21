@@ -1,16 +1,19 @@
-import * as React from "react";
-import { observer, inject } from "mobx-react";
+import {
+  createStyles,
+  IconButton,
+  withStyles,
+  WithStyles
+} from "@material-ui/core";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
-import { withStyles, WithStyles, createStyles } from "@material-ui/core";
-import Slider from "@material-ui/lab/Slider";
-import PlayArrow from "@material-ui/icons/PlayArrow";
-import PauseIcon from "@material-ui/icons/Pause";
-import SpeakerIcon from "@material-ui/icons/VolumeUp";
-import SettingsIcon from "@material-ui/icons/Settings";
 import NotesIcon from "@material-ui/icons/Notes";
-import { IconButton } from "@material-ui/core";
+import PauseIcon from "@material-ui/icons/Pause";
+import PlayArrow from "@material-ui/icons/PlayArrow";
+import SettingsIcon from "@material-ui/icons/Settings";
+import SpeakerIcon from "@material-ui/icons/VolumeUp";
+import Slider from "@material-ui/lab/Slider";
+import { inject, observer } from "mobx-react";
+import * as React from "react";
 import Editor from "../stores/EditorStore";
-
 import { safe } from "../util";
 
 const styles = (theme: Theme) =>

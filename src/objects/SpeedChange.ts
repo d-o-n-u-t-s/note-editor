@@ -1,18 +1,12 @@
-import TimelineObject from "./TimelineObject";
-
-import { GUID } from "../util";
-import { Fraction } from "../math";
+import { Record } from "immutable";
 import Pixi from "../containers/Pixi";
-import Measure from "./Measure";
+import { Fraction } from "../math";
+import { GUID } from "../util";
+import { Mutable } from "../utils/mutable";
+import { Measure } from "./Measure";
 
-enum Types {
-  Integer,
-  Float,
-  Boolean,
-  Fraction
-}
-
-interface IChronoObject {
+export type SpeedChangeData = {
+  speed: number;
   guid: GUID;
 
   /**
@@ -23,10 +17,28 @@ interface IChronoObject {
    * 小節内の位置
    */
   measurePosition: Fraction;
-}
+};
 
-export default interface SpeedChange extends IChronoObject {
-  speed: number;
+const defaultSpeedChangeData: SpeedChangeData = {
+  guid: "",
+  measureIndex: 0,
+  measurePosition: Fraction.none,
+  speed: 1
+};
+
+export type SpeedChange = Mutable<SpeedChangeRecord>;
+
+export class SpeedChangeRecord extends Record<SpeedChangeData>(
+  defaultSpeedChangeData
+) {
+  static new(data: SpeedChangeData): SpeedChange {
+    const speedChange = new SpeedChangeRecord(data);
+    return Object.assign(speedChange, speedChange.asMutable());
+  }
+
+  private constructor(data: SpeedChangeData) {
+    super(data);
+  }
 }
 
 class _SpeedRenderer {
@@ -60,8 +72,10 @@ class _SpeedRenderer {
 
     Pixi.instance!.drawText(
       `speed: ${speed.speed}`,
-      bounds.x + bounds.width / 6,
-      bounds.y + bounds.height / 2
+      bounds.x + bounds.width / 2,
+      bounds.y + bounds.height / 2,
+      {},
+      measure.width
     );
   }
 }

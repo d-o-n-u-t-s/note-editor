@@ -7,7 +7,7 @@ import Chart from "../stores/Chart";
 import store from "../stores/stores";
 import { Fraction } from "../math";
 import { guid } from "../util";
-import { IMeasureData } from "../objects/Measure";
+import { MeasureData } from "../objects/Measure";
 import { number } from "prop-types";
 
 export default class BMSImporter {
@@ -49,7 +49,7 @@ export default class BMSImporter {
 
     const notes: any[] = [];
 
-    const measures: IMeasureData[] = [];
+    const measures: MeasureData[] = [];
 
     const note = (index: number, id: number, values: string) => {
       const mc = values.match(/.{2}/g)!;
@@ -396,7 +396,7 @@ export default class BMSImporter {
 
     const maxMeasureIndex = Math.max(...measures.map(m => m.index));
 
-    const newMeasures: IMeasureData[] = Array(maxMeasureIndex + 1)
+    const newMeasures: MeasureData[] = Array(maxMeasureIndex + 1)
       .fill(0)
       .map((_, index) => {
         return {
@@ -461,10 +461,10 @@ export default class BMSImporter {
                   note.horizontalPosition.numerator === -1
                     ? "#666666"
                     : note.horizontalPosition.numerator === 0
-                      ? "#ff0000"
-                      : note.horizontalPosition.numerator % 2
-                        ? "#ffffff"
-                        : "#0000ff"
+                    ? "#ff0000"
+                    : note.horizontalPosition.numerator % 2
+                    ? "#ffffff"
+                    : "#0000ff"
               };
               return note;
             }),

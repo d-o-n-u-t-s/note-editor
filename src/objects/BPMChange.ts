@@ -1,9 +1,12 @@
 import { GUID, guid } from "../util";
 import { Fraction, IFraction } from "../math";
 import Pixi from "../containers/Pixi";
-import Measure, { sortMeasure } from "./Measure";
+import { Measure, sortMeasure } from "./Measure";
+import { Record } from "immutable";
+import { Mutable } from "src/utils/mutable";
 
-interface IChronoObject {
+export type BpmChangeData = {
+  bpm: number;
   guid: GUID;
 
   /**
@@ -14,14 +17,33 @@ interface IChronoObject {
    * 小節内の位置
    */
   measurePosition: Fraction;
-}
+};
 
-export default interface IBPMChange extends IChronoObject {
-  bpm: number;
+const defaultBpmChangeData: BpmChangeData = {
+  guid: "GUID",
+
+  measureIndex: 0,
+  measurePosition: Fraction.none,
+  bpm: 0
+};
+
+export type BpmChange = Mutable<BpmChangeRecord>;
+
+export class BpmChangeRecord extends Record<BpmChangeData>(
+  defaultBpmChangeData
+) {
+  static new(data: BpmChangeData): BpmChange {
+    const bpmChange = new BpmChangeRecord(data);
+    return Object.assign(bpmChange, bpmChange.asMutable());
+  }
+
+  private constructor(data: BpmChangeData) {
+    super(data);
+  }
 }
 
 class _BPMRenderer {
-  getBounds(bpmChange: IBPMChange, measure: Measure): PIXI.Rectangle {
+  getBounds(bpmChange: BpmChange, measure: Measure): PIXI.Rectangle {
     const lane = measure;
 
     const y =
@@ -38,7 +60,7 @@ class _BPMRenderer {
     return new PIXI.Rectangle(_x, _y, measure.width, colliderH);
   }
 
-  render(bpm: IBPMChange, graphics: PIXI.Graphics, measure: Measure) {
+  render(bpm: BpmChange, graphics: PIXI.Graphics, measure: Measure) {
     const bounds = this.getBounds(bpm, measure);
 
     graphics
@@ -50,7 +72,9 @@ class _BPMRenderer {
     Pixi.instance!.drawText(
       `bpm: ${bpm.bpm}`,
       bounds.x + bounds.width / 2,
-      bounds.y + bounds.height / 2
+      bounds.y + bounds.height / 2,
+      {},
+      measure.width
     );
   }
 }
@@ -77,26 +101,24 @@ class BPMChangeData {
 /**
  * BPM 変更命令 + 拍子
  */
-interface IBPMChangeAndBeat extends IBPMChange {
+interface IBPMChangeAndBeat extends BpmChangeData {
   beat: IFraction;
 }
 
 export class TimeCalculator {
   data: BPMChangeData[] = [];
-  constructor(data: IBPMChange[], measures: Measure[]) {
+  constructor(data: BpmChange[], measures: Measure[]) {
     // 小節番号をキーにした BPM と拍子の変更命令マップ
     const bpmAndBeatMap = new Map<number, IBPMChangeAndBeat>();
 
     // 小節の開始位置に配置されている BPM 変更命令に拍子情報を追加
     let bpmChanges = data
       .map(bpmChange => {
-        const bpmAndBeat = Object.assign(
-          {
-            beat: measures[bpmChange.measureIndex].data.beat
-          },
-          bpmChange
-        ) as IBPMChangeAndBeat;
+        const bpmAndBeat = Object.assign(bpmChange, {
+          beat: measures[bpmChange.measureIndex].beat
+        }) as IBPMChangeAndBeat;
         bpmAndBeatMap.set(bpmAndBeat.measureIndex, bpmAndBeat);
+
         return bpmAndBeat;
       })
       .sort(sortMeasure);
@@ -113,7 +135,7 @@ export class TimeCalculator {
             measureIndex: i,
             measurePosition: new Fraction(0, 1),
             bpm: prevBpm,
-            beat: measures[i].data.beat
+            beat: measures[i].beat
           };
 
       // 前の小節と比較して BPM か拍子が変わっているなら命令を追加する

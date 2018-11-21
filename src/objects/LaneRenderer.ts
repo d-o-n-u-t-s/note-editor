@@ -1,15 +1,12 @@
-import LanePoint from "./LanePoint";
-import Measure from "./Measure";
-import { Fraction, Vector2, lerp, inverseLerp, IFraction } from "../math";
-import Lane, { LinePointInfo, LineInfo } from "./Lane";
-
-import { sortMeasure } from "../objects/Measure";
-
 import Pixi from "../containers/Pixi";
-
+import { Fraction, IFraction, inverseLerp, lerp, Vector2 } from "../math";
+import { sortMeasure } from "../objects/Measure";
 import { LaneTemplate } from "../stores/MusicGameSystem";
 import { drawQuad } from "../utils/drawQuad";
 import { GetLineInfoFromPool, GetLinePointInfoFromPool } from "../utils/pool";
+import { Lane, LineInfo, LinePointInfo } from "./Lane";
+import { LanePoint } from "./LanePoint";
+import { Measure } from "./Measure";
 
 interface LinePoint {
   measureIndex: number;

@@ -11,12 +11,12 @@ import AddIcon from "@material-ui/icons/Add";
 
 import AudioSelect from "./AudioSelect";
 import MusicGameSystemSelect from "./MusicGameSystemSelect";
-import { observer, inject } from "mobx-react";
+import { observer } from "mobx-react";
 import Editor from "../stores/EditorStore";
-
+import { inject, InjectedComponent } from "../stores/inject";
+@inject
 @observer
-@inject("editor")
-class NewChartDialog extends React.Component<{ editor?: Editor }> {
+class NewChartDialog extends InjectedComponent {
   state = {
     open: false,
 
@@ -33,7 +33,7 @@ class NewChartDialog extends React.Component<{ editor?: Editor }> {
   };
 
   handleCreate = () => {
-    const editor = this.props.editor!;
+    const editor = this.injected.editor;
 
     const newChart = editor.newChart(
       editor.asset.musicGameSystems[Number(this.state.musicGameSystemIndex)],

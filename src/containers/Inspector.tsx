@@ -1,9 +1,9 @@
 import { GUI, GUIController } from "dat-gui";
+import { runInAction } from "mobx";
 import { observer } from "mobx-react";
 import * as React from "react";
 import config from "../config";
 import { inject, InjectedComponent } from "../stores/inject";
-import { runInAction } from "mobx";
 
 /**
  * フォルダを削除する GUI#removeFolder を定義
@@ -33,17 +33,10 @@ export default class Inspector extends InjectedComponent {
   controllers: GUIController[] = [];
 
   /**
-   * 前回の対象オブジェクト
-   */
-  previousTarget: any | null | null;
-
-  /**
    * オブジェクトをインスペクタにバインドする
    */
   bind(target: any) {
-    if ("data" in target) target = target.data;
-    if (this.previousTarget === target) return;
-    this.previousTarget = target;
+    if (!target) return;
 
     console.log("update inspector", target);
 
@@ -60,12 +53,21 @@ export default class Inspector extends InjectedComponent {
 
     // プロパティを追加する
     const add = (gui: GUI, obj: any, parent: any) => {
+      if (obj.toJS) {
+        obj = obj.toJS();
+      }
+
+      const config = obj.inspectorConfig || {};
+
       for (const key of Object.keys(obj)) {
+        if (key == "inspectorConfig") continue;
+
         // オブジェクトなら再帰
         if (obj[key] instanceof Object) {
           const folder = gui.addFolder(key);
           this.folders.push(folder);
           add(folder, obj[key], parent[key]);
+          folder.open();
           continue;
         }
 
@@ -82,22 +84,34 @@ export default class Inspector extends InjectedComponent {
           }
 
           newController = gui.addColor(obj, key);
-        } else if (`_${key}_items` in obj) {
-          newController = gui.add(obj, key, obj[`_${key}_items`]);
         } else {
           newController = gui.add(obj, key);
         }
 
-        const setValue = newController.setValue;
-        (newController as any).setValue = (value: any) => {
-          runInAction(() => {
-            parent[key] = value;
-            setValue.call(newController, value);
+        // configの適用
+        if (config[key]) {
+          for (const method of Object.keys(config[key])) {
+            newController = (newController as any)[method](
+              config[key][method]
+            ) as GUIController;
+          }
+        }
 
-            // TODO: 特定のオブジェクトの場合だけ時間を更新するようにする
-            this.injected.editor.currentChart!.timeline.calculateTime();
-          });
-        };
+        // 値の反映
+        newController.onChange((value: any) => {
+          if (parent.setValue) {
+            parent.setValue(key, value);
+          } else {
+            parent[key] = value;
+          }
+        });
+
+        // 値を更新したら保存
+        newController.onFinishChange(() => {
+          // TODO: 特定のオブジェクトの場合だけ時間を更新するようにする
+          this.injected.editor.currentChart!.timeline.calculateTime();
+          this.injected.editor.currentChart!.save();
+        });
 
         if (gui === this.gui) {
           this.controllers.push(newController);
@@ -145,9 +159,6 @@ export default class Inspector extends InjectedComponent {
             component.gameCanvas = thisDiv!;
           }}
         />
-        <span style={{ display: "none" }}>
-          {JSON.stringify(this.injected.editor.inspectorTarget)}
-        </span>
       </div>
     );
   }

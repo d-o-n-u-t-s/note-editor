@@ -1,7 +1,6 @@
-import Lane from "./Lane";
-import NoteLine from "./NoteLine";
-import NoteLineRenderer, { INoteLineRenderer } from "./NoteLineRenderer";
 import Pixi from "../containers/Pixi";
+import { NoteLine } from "./NoteLine";
+import NoteLineRenderer, { INoteLineRenderer } from "./NoteLineRenderer";
 
 export default class NoteLineRendererResolver {
   static resolve(noteLine: NoteLine): INoteLineRenderer {
@@ -10,7 +9,7 @@ export default class NoteLineRendererResolver {
     )!;
 
     const customRenderer = Pixi.instance!.injected.editor!.currentChart!.musicGameSystem!.customNoteLineRendererMap.get(
-      headNote.data.type
+      headNote.type
     );
 
     if (!customRenderer) return NoteLineRenderer;

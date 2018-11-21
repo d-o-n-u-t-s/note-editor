@@ -26,9 +26,7 @@ export enum ObjectCategory {
 
 export enum OtherObjectType {
   BPM = 1,
-  Stop,
-  Speed = 3,
-  BarLine
+  Speed
 }
 
 export interface ObjectVisibility {

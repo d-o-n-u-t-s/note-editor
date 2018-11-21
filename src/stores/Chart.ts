@@ -1,27 +1,81 @@
 import { Howl } from "howler";
+import { List, Record } from "immutable";
 import * as _ from "lodash";
-import { action, observable, computed, transaction } from "mobx";
+import { action, computed, observable } from "mobx";
 import { Fraction } from "../math";
+import { Lane } from "../objects/Lane";
+import { LanePoint } from "../objects/LanePoint";
+import { MeasureRecord } from "../objects/Measure";
+import { Note } from "../objects/Note";
+import {
+  Timeline,
+  TimelineData,
+  TimelineJsonData,
+  TimelineRecord
+} from "../objects/Timeline";
+import { guid } from "../util";
+import HotReload from "../utils/HotReload";
+import Editor from "./EditorStore";
 import MusicGameSystem, {
-  IMusicGameSystemMeasure,
   IMusicGameSystemMeasureCustomProps
 } from "./MusicGameSystem";
 
-import Timeline from "../objects/Timeline";
-import Editor from "./EditorStore";
-import Lane from "../objects/Lane";
-import LanePoint from "../objects/LanePoint";
-import { guid } from "../util";
-import Note, { INoteData } from "../objects/Note";
-import Measure, { IMeasureData } from "../objects/Measure";
-import HotReload from "../utils/HotReload";
+type ChartData = {
+  name: string;
+
+  editorVersion: number;
+
+  musicGameSystem: {
+    name: string;
+    version: number;
+  };
+
+  audio: {
+    source: string;
+    startTime: number;
+  };
+
+  timeline: {
+    notes: List<Note>;
+  };
+};
+
+class ChartRecord extends Record<ChartData>({
+  name: "新規譜面",
+  editorVersion: 1,
+  musicGameSystem: {
+    name: "string",
+    version: 1
+  },
+
+  audio: {
+    source: "string",
+    startTime: 0
+  },
+
+  timeline: {
+    notes: List<Note>()
+  }
+}) {}
 
 export default class Chart {
-  @observable
+  data = new ChartRecord();
+
   timeline: Timeline;
 
   @observable
   filePath: string | null = null;
+
+  @observable
+  undoable = false;
+
+  @observable
+  redoable = false;
+
+  @action
+  save() {
+    this.timeline.save();
+  }
 
   static fromJSON(json: string) {
     const editor = Editor.instance!;
@@ -69,7 +123,7 @@ export default class Chart {
       {}
     );
 
-    return new Measure({
+    return MeasureRecord.new({
       index,
       beat: new Fraction(4, 4),
       editorProps: { time: 0 },
@@ -79,25 +133,49 @@ export default class Chart {
 
   @action
   load(json: string) {
-    const chart = JSON.parse(json);
-    console.log("譜面を読み込みます", chart);
+    const chartData = JSON.parse(json);
+    console.log("譜面を読み込みます", chartData);
 
-    this.setName(chart.name);
-    this.setStartTime(chart.startTime);
+    const timelineData: TimelineJsonData = chartData.timeline;
+
+    // 1000 小節まで生成する
+    for (let i = timelineData.measures.length; i <= 999; i++) {
+      timelineData.measures.push({
+        index: i,
+        beat: new Fraction(4, 4),
+        editorProps: { time: 0 },
+        customProps: {}
+      });
+    }
+
+    // 小節のカスタムプロパティを生成する
+    for (const [index, measure] of timelineData.measures.entries()) {
+      measure.customProps = Object.assign(
+        this.createMeasure(index).customProps,
+        measure.customProps
+      );
+    }
+
+    this.timeline = TimelineRecord.new(this, timelineData as TimelineData);
+
+    this.setName(chartData.name);
+    this.setStartTime(chartData.startTime);
+
+    /*
     transaction(() => {
       const measures: Measure[] = [];
 
       // 小節を読み込む
       for (const measureData of (chart.timeline.measures ||
-        []) as IMeasureData[]) {
-        const measure = new Measure(measureData);
+        []) as MeasureData[]) {
+        const measure = MeasureRecord.new(measureData);
         measures.push(measure);
       }
 
       // 1000 小節まで生成する
       for (let i = measures.length; i <= 999; i++) {
         measures.push(
-          new Measure({
+          MeasureRecord.new({
             index: i,
             beat: new Fraction(4, 4),
             editorProps: { time: 0 },
@@ -108,9 +186,9 @@ export default class Chart {
 
       // HACK: テスト
       for (const [index, measure] of measures.entries()) {
-        measure.data.customProps = Object.assign(
-          this.createMeasure(index).data.customProps,
-          measure.data.customProps
+        measure.customProps = Object.assign(
+          this.createMeasure(index).customProps,
+          measure.customProps
         );
       }
 
@@ -129,17 +207,13 @@ export default class Chart {
         this.timeline.addLanePoint(lanePoint);
       }
 
-      const notes: any[] = [];
+      this.timeline.$initializeLanes(timeline.lanes);
+      this.timeline.$initializeNotes(chart.timeline.notes, this);
+      this.timeline.$initializeNoteLines(chart.timeline.noteLines, this);
+      
 
-      for (const noteLine of chart.timeline.noteLines) {
-        this.timeline.addNoteLine(noteLine);
-      }
-      this.timeline.setLanes(chart.timeline.lanes);
+      this.timeline.save();
 
-      for (const noteData of chart.timeline.notes as INoteData[]) {
-        notes.push(new Note(noteData, this));
-      }
-      this.timeline.addNotes(notes);
 
       for (const bpmChange of chart.timeline.bpmChanges) {
         bpmChange.measurePosition = new Fraction(
@@ -157,10 +231,13 @@ export default class Chart {
         this.timeline.addSpeedChange(speedChange);
       }
     });
+    */
   }
 
   constructor(musicGameSystem: MusicGameSystem, audioSource: string) {
-    this.timeline = new Timeline();
+    this.timeline = TimelineRecord.new(this);
+
+    console.log(this.timeline);
 
     this.setMusicGameSystem(musicGameSystem);
     this.setAudioFromSource(audioSource);
@@ -282,7 +359,6 @@ export default class Chart {
     this.setAudio(audioBuffer, source);
   }
 
-  @action
   updateTime() {
     const time = this.audio!.seek() as number;
     if (this.time !== time) this.setTime(time);
@@ -342,14 +418,13 @@ export default class Chart {
     this.timeline.setMeasures(
       Array(1000)
         .fill(0)
-        .map(
-          (_, index) =>
-            new Measure({
-              index,
-              beat: new Fraction(4, 4),
-              editorProps: { time: 0 },
-              customProps: {}
-            })
+        .map((_, index) =>
+          MeasureRecord.new({
+            index,
+            beat: new Fraction(4, 4),
+            editorProps: { time: 0 },
+            customProps: {}
+          })
         )
     );
   }
@@ -401,7 +476,7 @@ export default class Chart {
   toJSON(): string {
     if (!this.musicGameSystem) return "{}";
 
-    const chart = Object.assign({}, this);
+    let chart = Object.assign({}, this);
 
     delete chart.filePath;
     delete chart.audio;
@@ -415,28 +490,24 @@ export default class Chart {
 
     chart.audioSource = (chart.audioSource || "").split("/").pop();
 
-    const tl = (chart.timeline = Object.assign({}, chart.timeline));
+    //  const tl = (chart.timeline = Object.assign({}, chart.timeline));
 
-    console.log(tl);
+    //console.log(tl);
 
-    tl.bpmChanges.replace(
-      chart.timeline.bpmChanges.map(t => Object.assign({}, t))
-    );
-    tl.lanePoints = chart.timeline.lanePoints.map(t => Object.assign({}, t));
-    (tl as any).lanes = chart.timeline.lanes.map(t => Object.assign({}, t));
-    (tl as any).notes = chart.timeline.notes.map(note => {
-      return note.data;
-    });
-
-    (tl as any).measures = chart.timeline.measures.map(measure => {
-      return measure.data;
-    });
+    chart.timeline = TimelineRecord.newnew(this, chart.timeline.toJS());
 
     delete chart.time;
-    delete chart.timeline.timeCalculator;
-    delete chart.timeline.noteMap;
-    delete chart.timeline.laneMap;
-    delete chart.timeline.lanePointMap;
+
+    chart.timeline.measures = chart.timeline.measures.slice(0, 1000);
+
+    chart = JSON.parse(JSON.stringify(chart));
+    const deleteConfigKey = (obj: any) => {
+      for (const key of Object.keys(obj)) {
+        if (key == "inspectorConfig") delete obj[key];
+        else if (obj[key] instanceof Object) deleteConfigKey(obj[key]);
+      }
+    };
+    deleteConfigKey(chart);
 
     const json = JSON.stringify(chart);
 
