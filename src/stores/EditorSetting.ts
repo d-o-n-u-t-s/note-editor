@@ -242,4 +242,24 @@ export default class EditorSetting {
   get measureLayout() {
     return this.measureLayouts[this.currentMeasureLayoutIndex];
   }
+
+  @observable
+  preserve3D = false;
+
+  @observable
+  rotateX = 10;
+
+  @observable
+  scale3D = 2;
+
+  @observable
+  perspective = 150;
+
+  @action
+  set3D(enabled: boolean, rotate: number, scale: number, perspective: number) {
+    this.preserve3D = enabled;
+    this.rotateX = rotate;
+    this.scale3D = scale;
+    this.perspective = perspective;
+  }
 }

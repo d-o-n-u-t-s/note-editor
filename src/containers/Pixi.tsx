@@ -73,7 +73,7 @@ export default class Pixi extends InjectedComponent {
       // リサイズ
       if (app.renderer.width !== w || app.renderer.height !== h) {
         app.renderer.resize(w, h);
-        //this.renderCanvas();
+        this.update3D();
       }
       this.renderCanvas();
 
@@ -81,6 +81,8 @@ export default class Pixi extends InjectedComponent {
     });
 
     this.app.start();
+
+    this.update3D();
   }
 
   componentWillUnmount() {
@@ -1030,10 +1032,44 @@ export default class Pixi extends InjectedComponent {
     }
   }
 
+  update3D() {
+    const setting = this.injected.editor.setting;
+
+    if (!this.app) return;
+
+    if (setting.preserve3D) {
+      this.app.view.style.transform = `
+        rotateX(${setting.rotateX}deg)
+        scale(${setting.scale3D})
+      `;
+      this.app.view.style.transformOrigin = "50% 100% 0px";
+      this.app.view.style.boxShadow = `
+        +${this.app.view.width}px 0px #000,
+        -${this.app.view.width}px 0px #000
+      `;
+    } else {
+      this.app.view.style.transform = "";
+      this.app.view.style.transformOrigin = "";
+      this.app.view.style.boxShadow = "";
+    }
+  }
+
   render() {
     let component = this;
+    const setting = this.injected.editor.setting;
+
+    this.update3D();
+
     return (
       <div
+        style={
+          setting.preserve3D
+            ? {
+                transformStyle: "preserve-3d",
+                perspective: setting.perspective + "px"
+              }
+            : {}
+        }
         ref={thisDiv => {
           component.container = thisDiv!;
         }}
