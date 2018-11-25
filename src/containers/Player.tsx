@@ -11,9 +11,9 @@ import PlayArrow from "@material-ui/icons/PlayArrow";
 import SettingsIcon from "@material-ui/icons/Settings";
 import SpeakerIcon from "@material-ui/icons/VolumeUp";
 import Slider from "@material-ui/lab/Slider";
-import { inject, observer } from "mobx-react";
+import { observer } from "mobx-react";
 import * as React from "react";
-import Editor from "../stores/EditorStore";
+import { inject, InjectedComponent } from "../stores/inject";
 import { safe } from "../util";
 
 const styles = (theme: Theme) =>
@@ -39,13 +39,11 @@ const styles = (theme: Theme) =>
     }
   });
 
-interface Props extends WithStyles<typeof styles> {
-  editor?: Editor;
-}
+interface Props extends WithStyles<typeof styles> {}
 
-@inject("editor")
+@inject
 @observer
-class Player extends React.Component<Props, {}> {
+class Player extends InjectedComponent<Props> {
   state = {
     vV: 0,
     currentAudio: ""
@@ -53,10 +51,6 @@ class Player extends React.Component<Props, {}> {
 
   handleChange = (event: any) => {
     this.setState({ [event.target.name]: event.target.value });
-  };
-
-  private handleChartChange = (_: any, value: number) => {
-    this.props.editor!.setCurrentChart(value);
   };
 
   private formatTime(time: number) {
@@ -67,19 +61,14 @@ class Player extends React.Component<Props, {}> {
   }
 
   render() {
-    const editor = this.props.editor;
+    const editor = this.injected.editor;
 
     const { classes } = this.props;
 
-    const isPlaying = safe(
-      () => this.props.editor!.currentChart!.isPlaying,
-      false
-    );
+    const isPlaying = safe(() => editor.currentChart!.isPlaying, false);
 
     const time = safe(
-      () =>
-        this.props.editor!.currentChart!.time /
-        this.props.editor!.currentChart!.audio!.duration(),
+      () => editor.currentChart!.time / editor.currentChart!.audio!.duration(),
       0
     );
 
@@ -103,10 +92,8 @@ class Player extends React.Component<Props, {}> {
             }}
             id="test2"
             onChange={(_, value) => {
-              console.log("TimeChange!", _);
-
-              this.props.editor!.currentChart!.setTime(
-                value * this.props.editor!.currentChart!.audio!.duration(),
+              editor.currentChart!.setTime(
+                value * editor.currentChart!.audio!.duration(),
                 true
               );
             }}
@@ -120,7 +107,7 @@ class Player extends React.Component<Props, {}> {
               className={classes.playerButton}
               aria-label=""
               onClick={() => {
-                this.props.editor!.currentChart!.play();
+                editor.currentChart!.play();
               }}
             >
               <PlayArrow />
@@ -131,7 +118,7 @@ class Player extends React.Component<Props, {}> {
               className={classes.playerButton}
               aria-label=""
               onClick={() => {
-                this.props.editor!.currentChart!.pause();
+                editor.currentChart!.pause();
               }}
             >
               <PauseIcon />
@@ -168,14 +155,11 @@ class Player extends React.Component<Props, {}> {
 
           <span style={{ color: "#fff" }}>
             {this.formatTime(
-              safe(
-                () =>
-                  this.props.editor!.currentChart!.audioBuffer!.duration * time
-              )
+              safe(() => editor.currentChart!.audioBuffer!.duration * time)
             )}
             {" / "}
             {this.formatTime(
-              safe(() => this.props.editor!.currentChart!.audioBuffer!.duration)
+              safe(() => editor.currentChart!.audioBuffer!.duration)
             )}
           </span>
 

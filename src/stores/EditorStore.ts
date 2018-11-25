@@ -322,15 +322,6 @@ export default class Editor {
       this.setting.setEditNoteTypeIndex(Math.min(index, max));
     });
 
-    // テスト処理
-    /*
-    if (localStorage.getItem("_test_bms_chart")) {
-      setTimeout(() => {
-        BMSImporter.importImplement(localStorage.getItem("_test_bms_chart")!);
-      }, 1000);
-    }
-    */
-
     ipcRenderer.on("close", () => {
       for (let i = 0; i < this.charts.length; i++) this.saveConfirm(i);
       localStorage.setItem(

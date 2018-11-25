@@ -31,7 +31,6 @@ class EditorSetting extends InjectedComponent<IProps> {
     }
 
     const editor = this.injected.editor;
-    const classes = this.props.classes;
 
     return (
       <div style={{ width: "100%" }}>
@@ -95,10 +94,6 @@ class EditorSetting extends InjectedComponent<IProps> {
             label="拍子を考慮した小節分割"
           />
         </FormControl>
-
-        {/*
-
-        */}
       </div>
     );
   }
