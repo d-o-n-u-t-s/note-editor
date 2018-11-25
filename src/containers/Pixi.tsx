@@ -48,10 +48,9 @@ export default class Pixi extends InjectedComponent {
     this.container!.addEventListener(
       "mousewheel",
       (e: any) => {
-        this.injected.editor.currentChart!.setTime(
-          this.injected.editor.currentChart!.time + e.wheelDelta * 0.01,
-          true
-        );
+        const chart = this.injected.editor.currentChart!;
+        const direction = this.injected.editor.setting.reverseScroll ? -1 : 1;
+        chart.setTime(chart.time + e.wheelDelta * 0.01 * direction, true);
       },
       false
     );

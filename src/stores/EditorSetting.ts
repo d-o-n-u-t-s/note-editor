@@ -138,6 +138,14 @@ export default class EditorSetting {
   @action
   setPadding = (value: number) => (this.padding = value);
 
+  @observable
+  reverseScroll = false;
+
+  @action
+  setReverseScroll(value: boolean) {
+    this.reverseScroll = value;
+  }
+
   /**
    * 小節分割数に拍子を乗算するか
    */

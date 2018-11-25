@@ -83,6 +83,17 @@ class EditorSetting extends InjectedComponent<IProps> {
           <FormControlLabel
             control={
               <Switch
+                checked={editor.setting.reverseScroll}
+                onChange={(_, value) => editor.setting.setReverseScroll(value)}
+                color="primary"
+              />
+            }
+            label="スクロール反転"
+          />
+
+          <FormControlLabel
+            control={
+              <Switch
                 checked={editor.setting.measureDivisionMultiplyBeat}
                 onChange={(_, value) =>
                   editor.setting.setMeasureDivisionMultiplyBeat(value)
