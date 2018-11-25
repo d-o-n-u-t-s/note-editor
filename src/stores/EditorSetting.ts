@@ -1,6 +1,11 @@
 import * as _ from "lodash";
-import { action, observable, observe } from "mobx";
+import { action, computed, observable, observe } from "mobx";
 import { verifyNumber } from "../math";
+import {
+  DefaultMeasureLayout,
+  GameMeasureLayout,
+  IMeasureLayout
+} from "../objects/MeasureLayout";
 
 /**
  * 編集モード
@@ -37,7 +42,10 @@ export default class EditorSetting {
   constructor() {
     this.load();
     observe(this, () => {
-      localStorage.setItem("editorSetting", JSON.stringify(this));
+      const setting = _.clone(this);
+      // 保存してはいけないプロパティを削除する
+      delete setting.measureLayouts;
+      localStorage.setItem("editorSetting", JSON.stringify(setting));
     });
   }
 
@@ -119,12 +127,21 @@ export default class EditorSetting {
   }
 
   @observable
-  laneWidth = 300;
+  measureWidth = 300;
 
   @action
-  setLaneWidth(newLaneWidth: number) {
-    this.laneWidth = newLaneWidth;
+  setMeasureWidth(value: number) {
+    this.measureWidth = value;
   }
+
+  @observable
+  measureHeight = 300;
+
+  @action
+  setMeasureHeight(value: number) {
+    this.measureHeight = value;
+  }
+
   @observable
   verticalLaneCount = 3;
 
@@ -206,5 +223,23 @@ export default class EditorSetting {
   @action
   setSpeed(speed: number) {
     this.speed = speed;
+  }
+
+  measureLayouts: IMeasureLayout[] = [
+    new DefaultMeasureLayout(),
+    new GameMeasureLayout()
+  ];
+
+  @observable
+  currentMeasureLayoutIndex = 0;
+
+  @action
+  setCurrentMeasureLayoutIndex(index: number) {
+    this.currentMeasureLayoutIndex = index;
+  }
+
+  @computed
+  get measureLayout() {
+    return this.measureLayouts[this.currentMeasureLayoutIndex];
   }
 }

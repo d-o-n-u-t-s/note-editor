@@ -44,6 +44,12 @@ export class MeasureRecord extends Record<MeasureData>(defaultMeasureData) {
     super(data);
   }
 
+  beginTime = 0;
+  endTime = 0;
+
+  containsCurrentTime = false;
+  currentTimePosition = 0;
+
   isVisible = false;
 
   x = 0;

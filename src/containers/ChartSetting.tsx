@@ -1,5 +1,4 @@
-import { Button, TextField, WithStyles, withStyles } from "@material-ui/core";
-import { runInAction } from "mobx";
+import { TextField, WithStyles, withStyles } from "@material-ui/core";
 import { observer } from "mobx-react";
 import * as React from "react";
 import AudioSelect from "../components/AudioSelect";
@@ -24,10 +23,6 @@ class ChartSetting extends InjectedComponent<IProps> {
     this.setState({ [event.target.name]: event.target.value });
   };
 
-  private handleChartChange = (_: any, value: number) => {
-    this.injected.editor.setCurrentChart(value);
-  };
-
   handleAudioChange = async (newValue: number | null) => {
     // 音源リセット
     if (newValue === null) {
@@ -37,11 +32,7 @@ class ChartSetting extends InjectedComponent<IProps> {
 
     const path = this.injected.editor.asset.audioAssetPaths[newValue];
 
-    // this.injected.editor.currentChart!.setAudio();
-
     const nn = await this.injected.editor.asset.loadAudioAsset(path);
-
-    // console.warn(nn);
 
     this.injected.editor.currentChart!.setAudio(nn, path);
   };
