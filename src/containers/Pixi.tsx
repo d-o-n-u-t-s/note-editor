@@ -49,10 +49,9 @@ export default class Pixi extends InjectedComponent {
     this.container!.addEventListener(
       "mousewheel",
       (e: any) => {
-        this.injected.editor.currentChart!.setTime(
-          this.injected.editor.currentChart!.time + e.wheelDelta * 0.01,
-          true
-        );
+        const chart = this.injected.editor.currentChart!;
+        const direction = this.injected.editor.setting.reverseScroll ? -1 : 1;
+        chart.setTime(chart.time + e.wheelDelta * 0.01 * direction, true);
       },
       false
     );
@@ -77,7 +76,7 @@ export default class Pixi extends InjectedComponent {
       // リサイズ
       if (app.renderer.width !== w || app.renderer.height !== h) {
         app.renderer.resize(w, h);
-        //this.renderCanvas();
+        this.update3D();
       }
       this.renderCanvas();
 
@@ -85,6 +84,8 @@ export default class Pixi extends InjectedComponent {
     });
 
     this.app.start();
+
+    this.update3D();
   }
 
   componentWillUnmount() {
@@ -223,7 +224,7 @@ export default class Pixi extends InjectedComponent {
 
     const { editor } = this.injected;
     const { setting } = editor;
-    const { theme } = setting;
+    const { theme, padding, measureWidth } = setting;
 
     const chart = editor.currentChart!;
     const musicGameSystem = chart.musicGameSystem!;
@@ -270,111 +271,103 @@ export default class Pixi extends InjectedComponent {
       chart.save();
     }
 
-    // 縦に何個小節を配置するか
-    var hC = this.injected.editor.setting!.verticalLaneCount;
-
-    const padding = this.injected.editor.setting!.padding;
-
-    this.injected.editor.currentChart!.updateTime();
-    const currentTime =
-      this.injected.editor.currentChart!.time - chart.startTime;
-
-    (window as any).g = graphics;
-
-    const laneWidth = this.injected.editor.setting!.laneWidth;
-
-    let index = 0;
+    chart.updateTime();
+    const currentTime = chart.time - chart.startTime;
 
     // 判定ラインの x 座標
     let cx = 0;
+
     // 0 ~ 1 に正規化された判定ラインの y 座標
     let cy = 0;
 
-    // レーンを描画
-    draw_lane: for (var $x = 0; ; ++$x) {
-      for (var i = hC - 1; i >= 0; --i) {
-        var hh = (h - padding * 2) / hC;
+    for (const measure of chart.timeline.measures) {
+      // 小節の開始時刻、終了時刻
+      measure.beginTime = timeCalculator.getTime(measure.index);
+      measure.endTime = timeCalculator.getTime(measure.index + 1);
+      measure.containsCurrentTime = false;
 
-        const x = padding + $x * (laneWidth + padding);
-        const y = padding + hh * i;
-
-        const measure = chart.timeline.measures[index];
-
-        // 画面内に表示されているか
-        measure.isVisible = x + laneWidth > -graphics.x && x < -graphics.x + w;
-
-        measure.x = x;
-        measure.y = y;
-        measure.width = laneWidth;
-        measure.height = hh;
-
-        // 画面内なら小節を描画する
-        if (measure.isVisible) {
-          MeasureRendererResolver.resolve().render(
-            graphics,
-            measure,
-            chart.timeline.measures
-          );
-        }
-
-        // 小節の開始時刻、終了時刻
-        var b = timeCalculator.getTime(index);
-        var e = timeCalculator.getTime(index + 1);
-
-        // 小節の中に現在時刻があるなら
-        if (b <= currentTime && currentTime < e) {
-          // 位置を二分探索
-          let min = 0,
-            max = 1,
-            pos = 0.5;
-          while ((max - min) * hh > 1) {
-            if (currentTime < timeCalculator.getTime(index + pos)) {
-              max = pos;
-            } else {
-              min = pos;
-            }
-            pos = (min + max) / 2;
+      // 小節の中に現在時刻があるなら
+      if (measure.beginTime <= currentTime && currentTime < measure.endTime) {
+        // 位置を二分探索
+        let min = 0,
+          max = 1,
+          pos = 0.5;
+        while ((max - min) * measure.height > 1) {
+          if (currentTime < timeCalculator.getTime(measure.index + pos)) {
+            max = pos;
+          } else {
+            min = pos;
           }
-
-          const $y = y + hh - hh * pos;
-
-          cx = x + laneWidth / 2;
-          // 0 ~ 1
-          cy = (hC - 1 - i + pos) / hC;
-
-          graphics
-            .lineStyle(4, 0xff0000)
-            .moveTo(x, $y)
-            .lineTo(x + laneWidth, $y);
+          pos = (min + max) / 2;
         }
 
-        if (measure.isVisible) {
-          // 小節番号
-          this.drawText(
-            index.toString().padStart(3, "0"),
-            x - padding / 2,
-            y + hh - 10,
-            { fontSize: 20 },
-            padding
-          );
-          // 拍子
-          this.drawText(
-            Fraction.to01(measure.beat).toString(),
-            x - padding / 2,
-            y + hh - 30,
-            { fontSize: 20, fill: 0xcccccc },
-            padding
-          );
-        }
+        measure.containsCurrentTime = true;
+        measure.currentTimePosition = pos;
+      }
+    }
 
-        if (++index >= chart.timeline.measures.length) break draw_lane;
+    setting.measureLayout.layout(
+      editor.setting,
+      this.app!.renderer,
+      graphics,
+      chart.timeline.measures
+    );
+
+    for (const measure of chart.timeline.measures) {
+      const x = measure.x;
+      const y = measure.y;
+      const hh = measure.height;
+
+      // 画面内なら小節を描画する
+      if (measure.isVisible) {
+        MeasureRendererResolver.resolve().render(
+          graphics,
+          measure,
+          chart.timeline.measures
+        );
+      }
+
+      // 小節の中に現在時刻があるなら
+      if (measure.containsCurrentTime) {
+        const $y = y + hh - hh * measure.currentTimePosition;
+
+        cx = x + measureWidth / 2;
+        cy = setting.measureLayout.getScrollOffsetY(
+          setting,
+          measure,
+          measure.currentTimePosition
+        );
+
+        graphics
+          .lineStyle(4, 0xff0000)
+          .moveTo(x, $y)
+          .lineTo(x + measureWidth, $y);
+      }
+
+      if (measure.isVisible) {
+        // 小節番号
+        this.drawText(
+          measure.index.toString().padStart(3, "0"),
+          x - padding / 2,
+          y + hh - 10,
+          { fontSize: 20 },
+          padding
+        );
+        // 拍子
+        this.drawText(
+          Fraction.to01(measure.beat).toString(),
+          x - padding / 2,
+          y + hh - 30,
+          { fontSize: 20, fill: 0xcccccc },
+          padding
+        );
       }
     }
 
     // 対象タイムラインを画面中央に配置する
     graphics.x = w / 2 - cx;
 
-    graphics.x -= (laneWidth + padding) * (cy - 0.5);
+    graphics.x -= (measureWidth + padding) * (cy - 0.5);
 
     if (graphics.x > 0) graphics.x = 0;
 
@@ -414,7 +407,7 @@ export default class Pixi extends InjectedComponent {
         graphics
           .lineStyle(2, 0xffffff, (4 * i) % div === 0 ? 1 : 0.6)
           .moveTo(s.x, y)
-          .lineTo(s.x + laneWidth, y);
+          .lineTo(s.x + measureWidth, y);
       }
 
       // 小節選択
@@ -435,7 +428,7 @@ export default class Pixi extends InjectedComponent {
         ) {
           const x =
             s.x +
-            (laneWidth /
+            (measureWidth /
               this.injected.editor.currentChart!.timeline
                 .horizontalLaneDivision) *
               i;
@@ -1046,10 +1039,44 @@ export default class Pixi extends InjectedComponent {
     }
   }
 
+  update3D() {
+    const setting = this.injected.editor.setting;
+
+    if (!this.app) return;
+
+    if (setting.preserve3D) {
+      this.app.view.style.transform = `
+        rotateX(${setting.rotateX}deg)
+        scale(${setting.scale3D})
+      `;
+      this.app.view.style.transformOrigin = "50% 100% 0px";
+      this.app.view.style.boxShadow = `
+        +${this.app.view.width}px 0px #000,
+        -${this.app.view.width}px 0px #000
+      `;
+    } else {
+      this.app.view.style.transform = "";
+      this.app.view.style.transformOrigin = "";
+      this.app.view.style.boxShadow = "";
+    }
+  }
+
   render() {
     let component = this;
+    const setting = this.injected.editor.setting;
+
+    this.update3D();
+
     return (
       <div
+        style={
+          setting.preserve3D
+            ? {
+                transformStyle: "preserve-3d",
+                perspective: setting.perspective + "px"
+              }
+            : {}
+        }
         ref={thisDiv => {
           component.container = thisDiv!;
         }}

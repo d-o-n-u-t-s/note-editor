@@ -1,5 +1,6 @@
 import { Record } from "immutable";
 import * as immutablediff from "immutablediff";
+import * as immutablepatch from "immutablepatch";
 import * as _ from "lodash";
 import { action, observable } from "mobx";
 import { Mutable } from "src/utils/mutable";
@@ -173,7 +174,7 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
 
     // 1 つ前の状態に復元する
     for (let i = 0; i < this.historyIndex; i++) {
-      data = require("immutablepatch")(data, this.history[i]);
+      data = immutablepatch(data, this.history[i]);
     }
 
     this.history = this.history.slice(0, this.historyIndex);
@@ -201,7 +202,7 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
     let data = _.cloneDeep(defaultTimelineData);
 
     for (let i = 0; i < this.historyIndex; i++) {
-      data = require("immutablepatch")(data, this.history[i]);
+      data = immutablepatch(data, this.history[i]);
     }
 
     this.toMutable((data as any).toJS() as TimelineJsonData);
@@ -221,7 +222,7 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
     let data = _.cloneDeep(defaultTimelineData);
 
     for (let i = 0; i < this.historyIndex; i++) {
-      data = require("immutablepatch")(data, this.history[i]);
+      data = immutablepatch(data, this.history[i]);
     }
 
     this.toMutable((data as any).toJS() as TimelineJsonData);
