@@ -19,25 +19,41 @@ const { dialog } = remote;
 
 export default class Editor {
   @observable.ref
-  inspectorTarget: any = {};
+  inspectorTargets: any[] = [];
 
   copiedNotes: Note[] = [];
 
   @action
   setInspectorTarget(target: any) {
-    this.inspectorTarget = target;
+    this.inspectorTargets = [target];
+  }
+
+  @action
+  addInspectorTarget(target: any) {
+    const i = this.inspectorTargets.indexOf(target);
+    this.inspectorTargets = this.inspectorTargets.slice();
+    if (i >= 0) {
+      this.inspectorTargets.splice(i, 1);
+    } else {
+      this.inspectorTargets.push(target);
+    }
   }
 
   getInspectNotes(): Note[] {
-    if (this.inspectorTarget instanceof NoteRecord) {
-      return [this.inspectorTarget];
+    const notes = [];
+    for (const target of this.inspectorTargets) {
+      if (target instanceof NoteRecord) {
+        notes.push(target);
+      }
+      if (target instanceof MeasureRecord) {
+        notes.push(
+          ...this.currentChart!.timeline.notes.filter(
+            n => n.measureIndex == target.index
+          )
+        );
+      }
     }
-    if (this.inspectorTarget instanceof MeasureRecord) {
-      return this.currentChart!.timeline.notes.filter(
-        n => n.measureIndex == this.inspectorTarget.index
-      );
-    }
-    return [];
+    return notes;
   }
 
   @observable
@@ -131,26 +147,34 @@ export default class Editor {
    */
   @action
   updateInspector() {
-    const t = this.inspectorTarget;
-    this.inspectorTarget = null;
+    const targets = this.inspectorTargets;
+    this.inspectorTargets = [];
 
-    // ノート
-    if (t instanceof NoteRecord) {
-      this.inspectorTarget = this.currentChart!.timeline.noteMap.get(t.guid);
-    }
+    for (const t of targets) {
+      // ノート
+      if (t instanceof NoteRecord) {
+        this.inspectorTargets.push(
+          this.currentChart!.timeline.noteMap.get(t.guid)
+        );
+      }
 
-    // BPM 変更
-    if (t instanceof BpmChangeRecord) {
-      this.inspectorTarget = this.currentChart!.timeline.bpmChanges.find(
-        bpmChange => bpmChange.guid === t.guid
-      );
-    }
+      // BPM 変更
+      if (t instanceof BpmChangeRecord) {
+        this.inspectorTargets.push(
+          this.currentChart!.timeline.bpmChanges.find(
+            bpmChange => bpmChange.guid === t.guid
+          )
+        );
+      }
 
-    // 速度変更
-    if (t instanceof SpeedChangeRecord) {
-      this.inspectorTarget = this.currentChart!.timeline.speedChanges.find(
-        speedChange => speedChange.guid === t.guid
-      );
+      // 速度変更
+      if (t instanceof SpeedChangeRecord) {
+        this.inspectorTargets.push(
+          this.currentChart!.timeline.speedChanges.find(
+            speedChange => speedChange.guid === t.guid
+          )
+        );
+      }
     }
   }
 
@@ -208,14 +232,19 @@ export default class Editor {
 
   @action
   paste() {
-    if (!(this.inspectorTarget instanceof MeasureRecord)) return;
+    if (this.inspectorTargets.length != 1) return;
+    if (!(this.inspectorTargets[0] instanceof MeasureRecord)) return;
+
+    const diff =
+      this.inspectorTargets[0].index -
+      Math.min(...this.copiedNotes.map(note => note.measureIndex));
 
     const guidMap = new Map<string, string>();
     this.copiedNotes.forEach(note => {
       guidMap.set(note.guid, guid());
       note = _.cloneDeep(note);
       note.guid = guidMap.get(note.guid)!;
-      note.measureIndex = this.inspectorTarget.index;
+      note.measureIndex += diff;
       this.currentChart!.timeline.addNote(note);
     });
 

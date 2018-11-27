@@ -149,7 +149,7 @@ export default class Inspector extends InjectedComponent {
   }
 
   render() {
-    this.bind(this.injected.editor.inspectorTarget);
+    this.bind(this.injected.editor.inspectorTargets);
 
     let component = this;
     return (

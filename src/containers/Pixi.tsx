@@ -26,6 +26,7 @@ import { inject, InjectedComponent } from "../stores/inject";
 import { guid } from "../util";
 import CustomRendererUtility from "../utils/CustomRendererUtility";
 import * as pool from "../utils/pool";
+import * as key from "../utils/keyboard";
 
 @inject
 @observer
@@ -55,6 +56,8 @@ export default class Pixi extends InjectedComponent {
       },
       false
     );
+
+    key.beginWatch();
 
     const app = this.app;
 
@@ -1035,7 +1038,11 @@ export default class Pixi extends InjectedComponent {
     this.previousTime = currentTime;
 
     if (this.inspectTarget) {
-      editor.setInspectorTarget(this.inspectTarget);
+      if (key.isDown("Control") || key.isDown("Meta")) {
+        editor.addInspectorTarget(this.inspectTarget);
+      } else {
+        editor.setInspectorTarget(this.inspectTarget);
+      }
     }
   }
 
