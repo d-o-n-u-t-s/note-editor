@@ -306,6 +306,7 @@ export default class Editor {
       }
       note.measurePosition = p;
     });
+    this.currentChart!.timeline.calculateTime();
     if (notes.length > 0) this.currentChart!.save();
   }
 
