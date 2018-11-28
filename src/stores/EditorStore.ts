@@ -153,13 +153,12 @@ export default class Editor {
     for (const t of targets) {
       // ノート
       if (t instanceof NoteRecord) {
-        this.inspectorTargets.push(
-          this.currentChart!.timeline.noteMap.get(t.guid)
-        );
+        const note = this.currentChart!.timeline.noteMap.get(t.guid);
+        if (note) this.inspectorTargets.push(note);
       }
 
       // BPM 変更
-      if (t instanceof BpmChangeRecord) {
+      else if (t instanceof BpmChangeRecord) {
         this.inspectorTargets.push(
           this.currentChart!.timeline.bpmChanges.find(
             bpmChange => bpmChange.guid === t.guid
@@ -168,12 +167,17 @@ export default class Editor {
       }
 
       // 速度変更
-      if (t instanceof SpeedChangeRecord) {
+      else if (t instanceof SpeedChangeRecord) {
         this.inspectorTargets.push(
           this.currentChart!.timeline.speedChanges.find(
             speedChange => speedChange.guid === t.guid
           )
         );
+      }
+
+      // その他
+      else {
+        this.inspectorTargets.push(t);
       }
     }
   }
