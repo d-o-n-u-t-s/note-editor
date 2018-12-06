@@ -710,6 +710,23 @@ export default class Pixi extends InjectedComponent {
       );
 
       if (isClick) {
+        // 同じレーンの重なっているノートを取得する
+        const overlapNotes = chart.timeline.notes.filter(
+          note =>
+            note.lane === newNote.lane &&
+            note.measureIndex === newNote.measureIndex &&
+            Fraction.equal(note.measurePosition, newNote.measurePosition) &&
+            newNote.horizontalPosition.numerator <=
+              note.horizontalPosition.numerator + note.horizontalSize - 1 &&
+            note.horizontalPosition.numerator <=
+              newNote.horizontalPosition.numerator + newNote.horizontalSize - 1
+        );
+
+        // 重なっているノートを削除する
+        for (const note of overlapNotes) {
+          chart.timeline.removeNote(note);
+        }
+
         chart.timeline.addNote(newNote);
         chart.save();
       } else {
