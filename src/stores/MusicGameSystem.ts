@@ -80,6 +80,9 @@ export class HowlPool {
 interface MusicGameSystem {
   name: string;
   version: number;
+
+  difficulties: string[];
+
   laneTemplates: LaneTemplate[];
 
   laneTemplateMap: Map<string, LaneTemplate>;
@@ -114,6 +117,7 @@ export function normalizeMusicGameSystem(
 ): MusicGameSystem {
   const system: MusicGameSystem = Object.assign(
     {
+      difficulties: ["unknown"],
       initialLanes: [],
       laneTemplates: [],
       customNoteLineRenderers: [],

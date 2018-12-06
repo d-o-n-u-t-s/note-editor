@@ -257,6 +257,7 @@ export default class Chart {
 
     this.setName(chartData.name);
     this.setStartTime(chartData.startTime);
+    this.setDifficulty(chartData.difficulty || 0);
   }
 
   constructor(musicGameSystem: MusicGameSystem, audioSource: string) {
@@ -271,6 +272,14 @@ export default class Chart {
 
   @action
   setName = (name: string) => (this.name = name);
+
+  @observable
+  difficulty: number = 0;
+
+  @action
+  setDifficulty(difficulty: number) {
+    this.difficulty = difficulty;
+  }
 
   @observable
   musicGameSystem?: MusicGameSystem;
