@@ -1,10 +1,11 @@
 import { Howl } from "howler";
 import { List, Record } from "immutable";
 import * as _ from "lodash";
-import { action, computed, observable } from "mobx";
+import { action, computed, observable, transaction } from "mobx";
 import { Fraction } from "../math";
 import { Lane } from "../objects/Lane";
 import { LanePoint } from "../objects/LanePoint";
+import { Layer, LayerData, LayerRecord } from "../objects/Layer";
 import { MeasureRecord } from "../objects/Measure";
 import { Note } from "../objects/Note";
 import {
@@ -16,9 +17,7 @@ import {
 import { guid } from "../util";
 import HotReload from "../utils/HotReload";
 import Editor from "./EditorStore";
-import MusicGameSystem, {
-  IMusicGameSystemMeasureCustomProps
-} from "./MusicGameSystem";
+import MusicGameSystem from "./MusicGameSystem";
 
 type ChartData = {
   name: string;
@@ -59,9 +58,90 @@ class ChartRecord extends Record<ChartData>({
 }) {}
 
 export default class Chart {
-  data = new ChartRecord();
+  // TODO: Record にする
+  // data = new ChartRecord();
 
   timeline: Timeline;
+
+  @observable.shallow
+  layers: Layer[] = [];
+
+  @observable
+  currentLayerIndex = 0;
+
+  @computed
+  get currentLayer() {
+    return this.layers[this.currentLayerIndex];
+  }
+
+  /**
+   * 新規レイヤーを作成する
+   */
+  @action
+  addLayer() {
+    this.layers.splice(
+      this.currentLayerIndex,
+      0,
+      LayerRecord.new({
+        guid: guid(),
+        name: `レイヤー${this.layers.length + 1}`,
+        visible: true
+      })
+    );
+
+    this.layers = [...this.layers];
+  }
+
+  @action
+  removeLayer() {
+    // 削除対象のノートを列挙する
+    const removeNotes = this.timeline.notes.filter(
+      note => note.layer === this.currentLayer.guid
+    );
+
+    if (removeNotes.length) {
+      // TODO: 専用のダイアログを作成する
+      if (
+        window.confirm(
+          `${
+            removeNotes.length
+          } 個のノートが削除されます\nレイヤーを削除しますか？`
+        )
+      ) {
+        // TODO: 一括削除する
+        for (const note of removeNotes) {
+          this.timeline.removeNote(note);
+        }
+      } else return;
+    }
+
+    this.layers = this.layers.filter(
+      (_, index) => index !== this.currentLayerIndex
+    );
+
+    this.currentLayerIndex = Math.min(
+      this.currentLayerIndex,
+      this.layers.length - 1
+    );
+  }
+
+  @action
+  selectLayer(index: number) {
+    this.currentLayerIndex = index;
+  }
+
+  @action
+  toggleLayerVisible(index: number) {
+    this.selectLayer(index);
+    this.currentLayer.visible = !this.currentLayer.visible;
+    this.layers = [...this.layers];
+  }
+
+  @action
+  renameLayer(name: string) {
+    this.currentLayer.name = name;
+    this.layers = [...this.layers];
+  }
 
   @observable
   filePath: string | null = null;
@@ -115,20 +195,21 @@ export default class Chart {
    */
   private createMeasure(index: number) {
     const customProps = this.musicGameSystem!.measure.customProps.reduce(
-      (object: any, customProps: IMusicGameSystemMeasureCustomProps) => {
+      (object: any, customProps) => {
         object[customProps.key] = customProps.defaultValue;
-        // object[Symbol(`_${customProps.key}_items`)] = customProps.items;
         return object;
       },
       {}
     );
 
-    return MeasureRecord.new({
-      index,
-      beat: new Fraction(4, 4),
-      editorProps: { time: 0 },
-      customProps
-    });
+    return MeasureRecord.new(
+      {
+        index,
+        beat: new Fraction(4, 4),
+        customProps
+      },
+      this.musicGameSystem!.measure
+    );
   }
 
   @action
@@ -143,7 +224,6 @@ export default class Chart {
       timelineData.measures.push({
         index: i,
         beat: new Fraction(4, 4),
-        editorProps: { time: 0 },
         customProps: {}
       });
     }
@@ -158,91 +238,32 @@ export default class Chart {
 
     this.timeline = TimelineRecord.new(this, timelineData as TimelineData);
 
+    const layers = (chartData.layers || []) as LayerData[];
+
+    // 譜面にレイヤー情報がなければ初期レイヤーを生成する
+    if (layers.length === 0) {
+      layers.push({
+        guid: guid(),
+        name: "レイヤー1",
+        visible: true
+      });
+      // 全ノートを初期レイヤーに割り当てる
+      for (const note of this.timeline.notes) {
+        note.layer = layers[0].guid;
+      }
+    }
+
+    this.layers = layers.map(layer => LayerRecord.new(layer));
+
     this.setName(chartData.name);
     this.setStartTime(chartData.startTime);
-
-    /*
-    transaction(() => {
-      const measures: Measure[] = [];
-
-      // 小節を読み込む
-      for (const measureData of (chart.timeline.measures ||
-        []) as MeasureData[]) {
-        const measure = MeasureRecord.new(measureData);
-        measures.push(measure);
-      }
-
-      // 1000 小節まで生成する
-      for (let i = measures.length; i <= 999; i++) {
-        measures.push(
-          MeasureRecord.new({
-            index: i,
-            beat: new Fraction(4, 4),
-            editorProps: { time: 0 },
-            customProps: {}
-          })
-        );
-      }
-
-      // HACK: テスト
-      for (const [index, measure] of measures.entries()) {
-        measure.customProps = Object.assign(
-          this.createMeasure(index).customProps,
-          measure.customProps
-        );
-      }
-
-      this.timeline.setMeasures(measures);
-
-      for (const lanePoint of chart.timeline.lanePoints) {
-        lanePoint.measurePosition = new Fraction(
-          lanePoint.measurePosition.numerator,
-          lanePoint.measurePosition.denominator
-        );
-        lanePoint.horizontalPosition = new Fraction(
-          lanePoint.horizontalPosition.numerator,
-          lanePoint.horizontalPosition.denominator
-        );
-
-        this.timeline.addLanePoint(lanePoint);
-      }
-
-      this.timeline.$initializeLanes(timeline.lanes);
-      this.timeline.$initializeNotes(chart.timeline.notes, this);
-      this.timeline.$initializeNoteLines(chart.timeline.noteLines, this);
-      
-
-      this.timeline.save();
-
-
-      for (const bpmChange of chart.timeline.bpmChanges) {
-        bpmChange.measurePosition = new Fraction(
-          bpmChange.measurePosition.numerator,
-          bpmChange.measurePosition.denominator
-        );
-        this.timeline.addBPMChange(bpmChange);
-      }
-
-      for (const speedChange of chart.timeline.speedChanges) {
-        speedChange.measurePosition = new Fraction(
-          speedChange.measurePosition.numerator,
-          speedChange.measurePosition.denominator
-        );
-        this.timeline.addSpeedChange(speedChange);
-      }
-    });
-    */
   }
 
   constructor(musicGameSystem: MusicGameSystem, audioSource: string) {
     this.timeline = TimelineRecord.new(this);
 
-    console.log(this.timeline);
-
     this.setMusicGameSystem(musicGameSystem);
     this.setAudioFromSource(audioSource);
-
-    console.log("譜面を生成しました", musicGameSystem, audioSource);
   }
 
   @observable
@@ -419,12 +440,14 @@ export default class Chart {
       Array(1000)
         .fill(0)
         .map((_, index) =>
-          MeasureRecord.new({
-            index,
-            beat: new Fraction(4, 4),
-            editorProps: { time: 0 },
-            customProps: {}
-          })
+          MeasureRecord.new(
+            {
+              index,
+              beat: new Fraction(4, 4),
+              customProps: {}
+            },
+            this.musicGameSystem!.measure
+          )
         )
     );
   }
@@ -476,6 +499,12 @@ export default class Chart {
   toJSON(): string {
     if (!this.musicGameSystem) return "{}";
 
+    // 最終小節のインデックスを取得
+    const audioDuration = this.audio!.duration() - this.startTime;
+    const lastMeasureIndex = this.timeline.measures.findIndex(
+      measure => measure.endTime >= audioDuration
+    );
+
     let chart = Object.assign({}, this);
 
     delete chart.filePath;
@@ -484,21 +513,23 @@ export default class Chart {
     delete chart.isPlaying;
     delete chart.volume;
     delete chart.musicGameSystem;
+    delete chart.currentLayerIndex;
+    delete chart.redoable;
+    delete chart.undoable;
 
     chart.musicGameSystemName = this.musicGameSystem!.name;
     chart.musicGameSystemVersion = this.musicGameSystem!.version;
 
     chart.audioSource = (chart.audioSource || "").split("/").pop();
 
-    //  const tl = (chart.timeline = Object.assign({}, chart.timeline));
-
-    //console.log(tl);
-
     chart.timeline = TimelineRecord.newnew(this, chart.timeline.toJS());
 
     delete chart.time;
 
-    chart.timeline.measures = chart.timeline.measures.slice(0, 1000);
+    chart.timeline.measures = chart.timeline.measures.slice(
+      0,
+      lastMeasureIndex
+    );
 
     chart = JSON.parse(JSON.stringify(chart));
     const deleteConfigKey = (obj: any) => {

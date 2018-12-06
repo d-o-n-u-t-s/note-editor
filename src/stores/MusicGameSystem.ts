@@ -46,17 +46,20 @@ export interface CustomNoteLineRenderer {
   rendererReference: any;
 }
 
-export interface IMusicGameSystemMeasureCustomProps {
+export type MusicGameSystemMeasureCustomProps = {
   key: string;
   defaultValue: any;
-  items: string[] | null;
-}
+  config: string[] | null;
+};
 
-export interface IMusicGameSystemMeasure {
+export type MusicGameSystemMeasure = {
   renderer: string;
   rendererReference: any;
-  customProps: IMusicGameSystemMeasureCustomProps[];
-}
+  /**
+   * カスタムプロパティ
+   */
+  customProps: MusicGameSystemMeasureCustomProps[];
+};
 
 export class HowlPool {
   index = 0;
@@ -97,7 +100,7 @@ interface MusicGameSystem {
 
   customNoteLineRendererMap: Map<string, CustomNoteLineRenderer>;
 
-  measure: IMusicGameSystemMeasure;
+  measure: MusicGameSystemMeasure;
 
   eventListener: string | null;
   eventListeners: IMusicGameSystemEventListener;

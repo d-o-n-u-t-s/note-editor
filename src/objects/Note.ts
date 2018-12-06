@@ -8,7 +8,6 @@ import { GUID } from "../util";
 
 interface INoteEditorProps {
   time: number;
-
   color: number;
   sePlayed: boolean;
 }
@@ -36,6 +35,11 @@ export type NoteData = {
    */
   lane: GUID;
 
+  /**
+   * 所属レイヤーの GUID
+   */
+  layer: GUID;
+
   customProps: any;
 };
 
@@ -58,6 +62,8 @@ const defaultNoteData: NoteData = {
    * 所属レーンの GUID
    */
   lane: "GUID",
+
+  layer: "GUID",
 
   customProps: {}
 };

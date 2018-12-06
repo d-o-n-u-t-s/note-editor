@@ -2,11 +2,11 @@ import { Record } from "immutable";
 import * as _ from "lodash";
 import Pixi from "../containers/Pixi";
 import { Fraction, IFraction } from "../math";
+import {
+  MusicGameSystemMeasure,
+  MusicGameSystemMeasureCustomProps
+} from "../stores/MusicGameSystem";
 import { Mutable } from "../utils/mutable";
-
-export interface IMeasureEditorProps {
-  time: number;
-}
 
 export interface IMeasureCustomProps {
   [key: string]: {
@@ -18,14 +18,12 @@ export interface IMeasureCustomProps {
 export type MeasureData = {
   index: number;
   beat: IFraction;
-  editorProps: IMeasureEditorProps;
   customProps: any;
 };
 
 const defaultMeasureData: MeasureData = {
   index: -1,
   beat: Fraction.none,
-  editorProps: { time: 0 },
   customProps: {}
 };
 
@@ -35,9 +33,19 @@ export type Measure = Mutable<MeasureRecord>;
  * 小節
  */
 export class MeasureRecord extends Record<MeasureData>(defaultMeasureData) {
-  static new(data: MeasureData): Measure {
+  static new(data: MeasureData, config: MusicGameSystemMeasure): Measure {
     const measure = new MeasureRecord(data);
-    return Object.assign(measure, measure.asMutable());
+    const mutableMeasure = Object.assign(measure, measure.asMutable());
+
+    mutableMeasure.customProps.inspectorConfig = config.customProps.reduce(
+      (obj: any, customProp: MusicGameSystemMeasureCustomProps) => {
+        obj[customProp.key] = customProp.config;
+        return obj;
+      },
+      {}
+    );
+
+    return mutableMeasure;
   }
 
   private constructor(data: MeasureData) {

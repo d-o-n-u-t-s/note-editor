@@ -508,12 +508,17 @@ export default class Pixi extends InjectedComponent {
       }
     }
 
+    // 可視レイヤーの GUID
+    const visibleLayers = new Set(
+      chart.layers.filter(layer => layer.visible).map(layer => layer.guid)
+    );
+
     // ノート更新
     for (const note of chart.timeline.notes) {
       const measure = chart.timeline.measures[note.measureIndex];
 
-      // 小節が描画されているなら描画する
-      note.isVisible = measure.isVisible;
+      // 小節とレイヤーが表示されているなら描画する
+      note.isVisible = measure.isVisible && visibleLayers.has(note.layer);
     }
 
     // ノートライン描画
@@ -691,6 +696,7 @@ export default class Pixi extends InjectedComponent {
           ),
           type: newNoteType.name,
           lane: targetNotePoint!.lane.guid,
+          layer: chart.currentLayer.guid,
           editorProps: {
             time: 0,
             sePlayed: false,
