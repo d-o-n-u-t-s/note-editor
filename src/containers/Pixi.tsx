@@ -717,6 +717,7 @@ export default class Pixi extends InjectedComponent {
         const overlapNotes = chart.timeline.notes.filter(
           note =>
             note.lane === newNote.lane &&
+            note.layer === newNote.layer &&
             note.measureIndex === newNote.measureIndex &&
             Fraction.equal(note.measurePosition, newNote.measurePosition) &&
             newNote.horizontalPosition.numerator <=
