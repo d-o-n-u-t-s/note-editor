@@ -567,7 +567,10 @@ export default class Pixi extends InjectedComponent {
               chart.save();
             }
             if (setting.editMode === EditMode.Select) {
-              console.log("ノートを選択しました", note);
+              console.log(
+                "ノート時刻:" +
+                  Math.round((chart.startTime + note.editorProps.time) * 1000)
+              );
               this.inspect(note);
             }
           }
