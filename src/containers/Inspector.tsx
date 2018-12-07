@@ -1,9 +1,9 @@
 import { GUI, GUIController } from "dat-gui";
-import { runInAction } from "mobx";
 import { observer } from "mobx-react";
 import * as React from "react";
 import config from "../config";
 import { inject, InjectedComponent } from "../stores/inject";
+import guiUtil from "../utils/GuiUtility";
 
 /**
  * フォルダを削除する GUI#removeFolder を定義
@@ -26,6 +26,11 @@ Object.defineProperty(GUI.prototype, "removeFolder", {
 @inject
 @observer
 export default class Inspector extends InjectedComponent {
+  constructor(props: any) {
+    super(props);
+    guiUtil.gui = this.gui;
+  }
+
   gameCanvas?: HTMLDivElement;
 
   gui = new GUI({ autoPlace: false });
@@ -50,6 +55,16 @@ export default class Inspector extends InjectedComponent {
 
     this.controllers = [];
     this.folders = [];
+
+    // onRenderInspector
+    if (
+      this.injected.editor.currentChart! &&
+      this.injected.editor.currentChart!.musicGameSystem
+    ) {
+      const onRenderInspector = this.injected.editor.currentChart!
+        .musicGameSystem!.eventListeners.onRenderInspector;
+      if (onRenderInspector) onRenderInspector(this.gui, guiUtil);
+    }
 
     // プロパティを追加する
     const add = (gui: GUI, obj: any, parent: any) => {

@@ -1,7 +1,7 @@
 import { Howl } from "howler";
 import { List, Record } from "immutable";
 import * as _ from "lodash";
-import { action, computed, observable, transaction } from "mobx";
+import { action, computed, observable } from "mobx";
 import { Fraction } from "../math";
 import { Lane } from "../objects/Lane";
 import { LanePoint } from "../objects/LanePoint";
