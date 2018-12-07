@@ -20,7 +20,6 @@ import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import ClearIcon from "@material-ui/icons/clear";
 import CreateIcon from "@material-ui/icons/create";
 import MenuIcon from "@material-ui/icons/menu";
-import PaletteIcon from "@material-ui/icons/Palette";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import ShowChartIcon from "@material-ui/icons/ShowChart";
 import VisibilityIcon from "@material-ui/icons/Visibility";
@@ -457,6 +456,7 @@ class Toolbar extends InjectedComponent<Props> {
         </Menu>
         <div style={{ width: 1, background: "#ddd" }} />
         {/* カスタムパレット */}
+        {/*
         <IconButton
           onClick={event => {
             this.setState({
@@ -466,6 +466,8 @@ class Toolbar extends InjectedComponent<Props> {
         >
           <PaletteIcon style={{ color: editor.setting.customPropColor }} />
         </IconButton>
+        */}
+
         <Menu
           style={{ marginTop: "2rem" }}
           anchorEl={this.state.customColorAnchorEl}

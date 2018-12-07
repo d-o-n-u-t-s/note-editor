@@ -15,6 +15,7 @@ import Editor from "../stores/EditorStore";
 import stores from "../stores/stores";
 import Empty from "./Empty";
 import Inspector from "./Inspector";
+import Layer from "./Layer";
 import Pixi from "./Pixi";
 import Player from "./Player";
 import Settings from "./Settings";
@@ -171,6 +172,8 @@ class Application extends React.Component<Props, {}> {
               <T />
               <T2 />
             </main>
+
+            <Layer />
           </div>
         </div>
       </Provider>

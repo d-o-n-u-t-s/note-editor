@@ -46,17 +46,20 @@ export interface CustomNoteLineRenderer {
   rendererReference: any;
 }
 
-export interface IMusicGameSystemMeasureCustomProps {
+export type MusicGameSystemMeasureCustomProps = {
   key: string;
   defaultValue: any;
-  items: string[] | null;
-}
+  config: string[] | null;
+};
 
-export interface IMusicGameSystemMeasure {
+export type MusicGameSystemMeasure = {
   renderer: string;
   rendererReference: any;
-  customProps: IMusicGameSystemMeasureCustomProps[];
-}
+  /**
+   * カスタムプロパティ
+   */
+  customProps: MusicGameSystemMeasureCustomProps[];
+};
 
 export class HowlPool {
   index = 0;
@@ -77,6 +80,9 @@ export class HowlPool {
 interface MusicGameSystem {
   name: string;
   version: number;
+
+  difficulties: string[];
+
   laneTemplates: LaneTemplate[];
 
   laneTemplateMap: Map<string, LaneTemplate>;
@@ -97,7 +103,7 @@ interface MusicGameSystem {
 
   customNoteLineRendererMap: Map<string, CustomNoteLineRenderer>;
 
-  measure: IMusicGameSystemMeasure;
+  measure: MusicGameSystemMeasure;
 
   eventListener: string | null;
   eventListeners: IMusicGameSystemEventListener;
@@ -111,6 +117,7 @@ export function normalizeMusicGameSystem(
 ): MusicGameSystem {
   const system: MusicGameSystem = Object.assign(
     {
+      difficulties: ["unknown"],
       initialLanes: [],
       laneTemplates: [],
       customNoteLineRenderers: [],

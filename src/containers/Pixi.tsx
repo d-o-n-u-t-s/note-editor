@@ -508,12 +508,17 @@ export default class Pixi extends InjectedComponent {
       }
     }
 
+    // 可視レイヤーの GUID
+    const visibleLayers = new Set(
+      chart.layers.filter(layer => layer.visible).map(layer => layer.guid)
+    );
+
     // ノート更新
     for (const note of chart.timeline.notes) {
       const measure = chart.timeline.measures[note.measureIndex];
 
-      // 小節が描画されているなら描画する
-      note.isVisible = measure.isVisible;
+      // 小節とレイヤーが表示されているなら描画する
+      note.isVisible = measure.isVisible && visibleLayers.has(note.layer);
     }
 
     // ノートライン描画
@@ -694,6 +699,7 @@ export default class Pixi extends InjectedComponent {
           ),
           type: newNoteType.name,
           lane: targetNotePoint!.lane.guid,
+          layer: chart.currentLayer.guid,
           editorProps: {
             time: 0,
             sePlayed: false,
@@ -707,6 +713,23 @@ export default class Pixi extends InjectedComponent {
       );
 
       if (isClick) {
+        // 同じレーンの重なっているノートを取得する
+        const overlapNotes = chart.timeline.notes.filter(
+          note =>
+            note.lane === newNote.lane &&
+            note.measureIndex === newNote.measureIndex &&
+            Fraction.equal(note.measurePosition, newNote.measurePosition) &&
+            newNote.horizontalPosition.numerator <=
+              note.horizontalPosition.numerator + note.horizontalSize - 1 &&
+            note.horizontalPosition.numerator <=
+              newNote.horizontalPosition.numerator + newNote.horizontalSize - 1
+        );
+
+        // 重なっているノートを削除する
+        for (const note of overlapNotes) {
+          chart.timeline.removeNote(note);
+        }
+
         chart.timeline.addNote(newNote);
         chart.save();
       } else {

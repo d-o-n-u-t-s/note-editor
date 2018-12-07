@@ -1,4 +1,12 @@
-import { TextField, WithStyles, withStyles } from "@material-ui/core";
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  WithStyles,
+  withStyles
+} from "@material-ui/core";
 import { observer } from "mobx-react";
 import * as React from "react";
 import AudioSelect from "../components/AudioSelect";
@@ -77,10 +85,8 @@ class ChartSetting extends InjectedComponent<IProps> {
 
     return (
       <div style={{ width: "100%" }}>
-        {this.renderTextField(
-          "タイトル",
-          editor.currentChart.name,
-          (value: any) => editor.currentChart!.setName(value)
+        {this.renderTextField("タイトル", chart.name, (value: any) =>
+          chart!.setName(value)
         )}
         <AudioSelect
           value={editor.asset.audioAssetPaths.findIndex(
@@ -94,10 +100,32 @@ class ChartSetting extends InjectedComponent<IProps> {
           (value: any) => editor.currentChart!.setStartTime(parseFloat(value)),
           "number"
         )}
-        {this.renderTextField("難易度", "hard", (value: any) => {})}
+
+        <FormControl style={{ width: "100%", margin: "6px 0" }}>
+          <InputLabel htmlFor="difficulty" className={classes.label}>
+            難易度
+          </InputLabel>
+          <Select
+            value={chart.difficulty}
+            onChange={({ target: { value } }) => {
+              chart.setDifficulty(parseInt(value));
+            }}
+            inputProps={{
+              className: classes.input,
+              id: "difficulty"
+            }}
+          >
+            {chart.musicGameSystem!.difficulties.map((difficulty, index) => (
+              <MenuItem value={index} key={difficulty}>
+                {difficulty}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
         <MusicGameSystemSelect
           value={editor.asset.musicGameSystems.findIndex(
-            path => path === editor.currentChart!.musicGameSystem
+            path => path === chart.musicGameSystem
           )}
           onChange={this.handleMusicGameSystemsChange}
         />
