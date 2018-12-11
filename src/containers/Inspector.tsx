@@ -4,6 +4,10 @@ import * as React from "react";
 import config from "../config";
 import { inject, InjectedComponent } from "../stores/inject";
 import guiUtil from "../utils/GuiUtility";
+import extensionUtility from "../utils/ExtensionUtility";
+import Editor from "../stores/EditorStore";
+
+(window as any).extensionUtility = extensionUtility;
 
 /**
  * フォルダを削除する GUI#removeFolder を定義
@@ -63,7 +67,8 @@ export default class Inspector extends InjectedComponent {
     ) {
       const onRenderInspector = this.injected.editor.currentChart!
         .musicGameSystem!.eventListeners.onRenderInspector;
-      if (onRenderInspector) onRenderInspector(this.gui, guiUtil);
+      if (onRenderInspector)
+        onRenderInspector(Editor.instance!.currentChart!, guiUtil);
     }
 
     // プロパティを追加する

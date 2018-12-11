@@ -2,7 +2,7 @@ import * as _ from "lodash";
 import { observer } from "mobx-react";
 import * as PIXI from "pixi.js";
 import * as React from "react";
-import { Fraction } from "../math";
+import { Fraction, inverseLerp, lerp } from "../math";
 import Vector2 from "../math/Vector2";
 import { BpmChangeRecord, BPMRenderer } from "../objects/BPMChange";
 import { Lane } from "../objects/Lane";
@@ -23,10 +23,11 @@ import {
   OtherObjectType
 } from "../stores/EditorSetting";
 import { inject, InjectedComponent } from "../stores/inject";
-import { guid } from "../util";
+import { guid, GUID } from "../util";
 import CustomRendererUtility from "../utils/CustomRendererUtility";
-import * as pool from "../utils/pool";
 import * as key from "../utils/keyboard";
+import * as pool from "../utils/pool";
+import Chart from "../stores/Chart";
 
 @inject
 @observer
@@ -465,6 +466,10 @@ export default class Pixi extends InjectedComponent {
 
     let targetNotePoint: NotePointInfo | null = null;
 
+    const newNoteType = chart.musicGameSystem!.noteTypes[
+      setting.editNoteTypeIndex
+    ];
+
     // レーン描画
     for (const lane of chart.timeline.lanes) {
       const laneRenderer = LaneRendererResolver.resolve(lane);
@@ -474,7 +479,8 @@ export default class Pixi extends InjectedComponent {
         graphics,
         chart.timeline.lanePointMap,
         chart.timeline.measures,
-        targetMeasure
+        targetMeasure || null,
+        newNoteType
       );
 
       // ノート配置モードなら選択中のレーンを計算する
@@ -791,7 +797,9 @@ export default class Pixi extends InjectedComponent {
               newLane,
               graphics,
               chart.timeline.lanePointMap,
-              chart.timeline.measures
+              chart.timeline.measures,
+              null,
+              newNoteType
             );
 
             if (isClick) {

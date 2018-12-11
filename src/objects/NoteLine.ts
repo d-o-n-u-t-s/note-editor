@@ -1,6 +1,6 @@
 import { Record } from "immutable";
 import { Mutable } from "src/utils/mutable";
-import { GUID } from "../util";
+import { GUID, guid } from "../util";
 
 export type NoteLineData = {
   guid: GUID;
@@ -18,11 +18,16 @@ export type NoteLine = Mutable<NoteLineRecord>;
 
 export class NoteLineRecord extends Record<NoteLineData>(defaultNoteLineData) {
   static new(data: NoteLineData): NoteLine {
-    return new NoteLineRecord(data.head, data.tail).asMutable();
+    return new NoteLineRecord(data).asMutable();
   }
 
-  private constructor(head: GUID, tail: GUID) {
-    super({ head, tail, guid: "" });
+  private constructor(data: NoteLineData) {
+    super(
+      (() => {
+        if (data.guid === "") data.guid = guid();
+        return data;
+      })()
+    );
   }
 
   isVisible = false;

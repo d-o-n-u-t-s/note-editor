@@ -1,7 +1,7 @@
 import Pixi from "../containers/Pixi";
 import { Fraction, IFraction, inverseLerp, lerp, Vector2 } from "../math";
 import { sortMeasure } from "../objects/Measure";
-import { LaneTemplate } from "../stores/MusicGameSystem";
+import { LaneTemplate, NoteType } from "../stores/MusicGameSystem";
 import { drawQuad } from "../utils/drawQuad";
 import { GetLineInfoFromPool, GetLinePointInfoFromPool } from "../utils/pool";
 import { Lane, LineInfo, LinePointInfo } from "./Lane";
@@ -91,7 +91,8 @@ export interface ILaneRenderer {
     graphics: PIXI.Graphics,
     lanePointMap: Map<string, LanePoint>,
     measures: Measure[],
-    drawHorizontalLineTargetMeasure?: Measure
+    drawHorizontalLineTargetMeasure: Measure | null,
+    noteType: NoteType
   ): void;
 
   defaultRender(
@@ -230,15 +231,13 @@ class LaneRenderer implements ILaneRenderer {
     graphics: PIXI.Graphics,
     lanePointMap: Map<string, LanePoint>,
     measures: Measure[],
-    drawHorizontalLineTargetMeasure?: Measure,
-    md = 4
+    drawHorizontalLineTargetMeasure: Measure | null,
+    noteType: NoteType
   ): void {
     const lines = getLines(
       lane.points.map(point => lanePointMap.get(point)!),
       measures
     );
-
-    // console.log(lines);
 
     // キャッシュしておく
     linesCache.set(lane, lines);
@@ -248,6 +247,8 @@ class LaneRenderer implements ILaneRenderer {
     )!;
 
     this.defaultRender(graphics, lines, laneTemplate);
+
+    if (noteType.excludeLanes.includes(lane.templateName)) return;
 
     // 選択中の小節に乗っているレーン
     const targetMeasureLines = !drawHorizontalLineTargetMeasure

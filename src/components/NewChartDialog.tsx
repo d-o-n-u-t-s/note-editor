@@ -38,6 +38,7 @@ class NewChartDialog extends InjectedComponent {
     );
     newChart.loadInitialMeasures();
     newChart.loadInitialLanes();
+    newChart.addLayer();
     editor.setCurrentChart(editor.charts.length - 1);
 
     this.handleClose();

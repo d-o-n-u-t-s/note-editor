@@ -251,12 +251,12 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
 
   private chart: Chart | null = null;
 
-  addNote(note: Note) {
+  addNote(note: Note, updateNoteMap = true) {
     this.notes.push(note);
-    this.updateNoteMap();
+    if (updateNoteMap) this.updateNoteMap();
   }
 
-  removeNote(note: Note) {
+  removeNote(note: Note, updateNoteMap = true) {
     // ノートを参照しているノートラインを削除する
     for (const noteLine of this.noteLines.filter(
       noteLine => noteLine.head === note.guid || noteLine.tail === note.guid
@@ -268,7 +268,7 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
       _note => _note != note
     );
 
-    this.updateNoteMap();
+    if (updateNoteMap) this.updateNoteMap();
   }
 
   addNoteLine(noteLine: NoteLine) {

@@ -56,3 +56,29 @@ export function drawQuad(
   ]);
   graphics.endFill();
 }
+
+export function drawTriangle(
+  graphics: PIXI.Graphics,
+  p1: Vector2,
+  p2: Vector2,
+  p3: Vector2,
+  color: number,
+  alpha: number = 1
+) {
+  const [pp1, pp2, pp3] = [p1, p2, p3];
+
+  graphics.lineStyle(0);
+  graphics.beginFill(color, alpha);
+
+  const margin = 0;
+
+  graphics.drawPolygon([
+    pp1.x + margin,
+    pp1.y + margin,
+    pp2.x - margin,
+    pp2.y + margin,
+    pp3.x - margin,
+    pp3.y - margin
+  ]);
+  graphics.endFill();
+}
