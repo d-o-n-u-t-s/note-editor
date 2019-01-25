@@ -15,6 +15,7 @@ import { observer } from "mobx-react";
 import * as React from "react";
 import { inject, InjectedComponent } from "../stores/inject";
 import { safe } from "../util";
+import ChartInformation from "../components/ChartInformation";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -46,7 +47,8 @@ interface Props extends WithStyles<typeof styles> {}
 class Player extends InjectedComponent<Props> {
   state = {
     vV: 0,
-    currentAudio: ""
+    currentAudio: "",
+    openInformation: false
   };
 
   handleChange = (event: any) => {
@@ -184,9 +186,10 @@ class Player extends InjectedComponent<Props> {
           />
 
           <IconButton
+            id="notes"
             style={{ color: "#fff", float: "right" }}
             className={classes.playerButton}
-            aria-label=""
+            onClick={() => this.setState({ openInformation: true })}
           >
             <NotesIcon />
           </IconButton>
@@ -197,6 +200,13 @@ class Player extends InjectedComponent<Props> {
           >
             <SettingsIcon />
           </IconButton>
+
+          <ChartInformation
+            chart={editor.currentChart!}
+            open={this.state.openInformation}
+            onClose={() => this.setState({ openInformation: false })}
+            anchorEl={document.querySelector("#notes")! as HTMLElement}
+          />
         </div>
       </div>
     );
