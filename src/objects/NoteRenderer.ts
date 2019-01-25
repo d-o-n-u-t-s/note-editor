@@ -4,8 +4,6 @@ import { Measure } from "./Measure";
 import { Note } from "./Note";
 
 export interface INoteRenderer {
-  getBounds(note: Note, lane: Lane, measure: Measure): PIXI.Rectangle;
-
   render(
     target: Note,
     graphics: PIXI.Graphics,
@@ -25,14 +23,19 @@ export function defaultRender(
     .lineTo(area.point.x + area.width, area.point.y);
 }
 
-class NoteRenderer implements INoteRenderer {
-  getBounds(note: Note, lane: Lane, measure: Measure): PIXI.Rectangle {
+export class NoteRenderer implements INoteRenderer {
+  /*
+  static getBounds(note: Note, lane: Lane, measure: Measure): PIXI.Rectangle {
     const q = LaneRendererResolver.resolve(lane).getNotePointInfo(
       lane,
       measure,
       note.horizontalPosition,
       note.measurePosition
     )!;
+
+    if (!q) {
+      console.log(q);
+    }
 
     return new PIXI.Rectangle(
       q.point.x,
@@ -41,6 +44,7 @@ class NoteRenderer implements INoteRenderer {
       10
     );
   }
+  */
 
   customRender = defaultRender;
 
@@ -57,6 +61,12 @@ class NoteRenderer implements INoteRenderer {
     }
 
     q.width *= note.horizontalSize;
+
+    // note.updateBounds
+    note.x = q.point.x;
+    note.y = q.point.y - 5;
+    note.width = q.width;
+    note.height = 10;
 
     this.customRender(graphics, note, q);
   }

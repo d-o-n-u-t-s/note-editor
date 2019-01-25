@@ -1,7 +1,7 @@
 import { Record } from "immutable";
 import * as _ from "lodash";
+import * as PIXI from "pixi.js";
 import { Mutable } from "src/utils/mutable";
-import Pixi from "../containers/Pixi";
 import { Fraction, IFraction } from "../math";
 import Chart from "../stores/Chart";
 import { GUID } from "../util";
@@ -30,6 +30,8 @@ export type NoteData = {
 
   type: string;
 
+  speed: number;
+
   /**
    * 所属レーンの GUID
    */
@@ -55,9 +57,8 @@ const defaultNoteData: NoteData = {
 
   horizontalSize: 1,
   horizontalPosition: Fraction.none,
-
   type: "string",
-
+  speed: 1,
   /**
    * 所属レーンの GUID
    */
@@ -83,6 +84,8 @@ export class NoteRecord extends Record<NoteData>(defaultNoteData) {
   width = 0;
   height = 0;
 
+  isSelected = false;
+
   getMeasurePosition() {
     return this.measureIndex + Fraction.to01(this.measurePosition);
   }
@@ -95,13 +98,19 @@ export class NoteRecord extends Record<NoteData>(defaultNoteData) {
   }
 
   getBounds() {
-    return new PIXI.Rectangle(
-      this.x + Pixi.debugGraphics!.x,
+    return new PIXI.Rectangle(this.x, this.y, this.width, this.height);
+  }
 
-      this.y,
-      this.width,
-      this.height
-    );
+  drawBounds(graphics: PIXI.Graphics) {
+    const bounds = this.getBounds();
+    graphics
+      .lineStyle(2, 0xff9900)
+      .drawRect(
+        bounds.x - 2,
+        bounds.y - 2,
+        bounds.width + 4,
+        bounds.height + 4
+      );
   }
 
   private constructor(data: NoteData, chart: Chart) {

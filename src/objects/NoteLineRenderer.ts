@@ -8,7 +8,6 @@ import { getLines } from "./LaneRenderer";
 import { sortMeasure, sortMeasureData } from "./Measure";
 import { Note } from "./Note";
 import { NoteLine } from "./NoteLine";
-import NoteRenderer from "./NoteRenderer";
 
 export interface INoteLineRenderer {
   customRender(
@@ -82,17 +81,8 @@ class NoteLineRenderer implements INoteLineRenderer {
       measurePosition: Fraction.clone(lanePoint.measurePosition)
     });
 
-    const headBounds = NoteRenderer.getBounds(
-      head,
-      lane,
-      measures[head.measureIndex]
-    );
-
-    const tailBounds = NoteRenderer.getBounds(
-      tail,
-      laneMap.get(tail.lane)!,
-      measures[tail.measureIndex]
-    );
+    const headBounds = head.getBounds();
+    const tailBounds = tail.getBounds();
 
     // 先頭ノートと末尾ノートの間にあるレーン中間ポイントを取得する
     let lps = lane.points
@@ -106,20 +96,6 @@ class NoteLineRenderer implements INoteLineRenderer {
 
       .map(lp => {
         lp = cloneLanePoint(lp);
-
-        /*
-        Pixi.debugGraphics!.lineStyle(0)
-          .beginFill(0x00ff00, 0.5)
-          .drawRect(
-            headBounds.x,
-            headBounds.y,
-            headBounds.width,
-            headBounds.height
-          )
-          .endFill();
-
-          */
-        //  return lp;
 
         const pos = lp.measureIndex + Fraction.to01(lp.measurePosition);
 

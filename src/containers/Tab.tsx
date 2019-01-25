@@ -62,7 +62,7 @@ export default class ChartTab extends InjectedComponent {
         <Tabs
           value={editor ? editor.currentChartIndex : -1}
           onChange={this.handleChartChange}
-          scrollable
+          variant="scrollable"
           indicatorColor="primary"
           textColor="primary"
           scrollButtons="auto"

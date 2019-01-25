@@ -10,7 +10,6 @@ import {
 import { guid } from "../util";
 import CustomRendererUtility from "../utils/CustomRendererUtility";
 import { __require } from "../utils/node";
-import Chart from "./Chart";
 import MusicGameSystem from "./MusicGameSystem";
 
 const fs = (window as any).require("fs");
@@ -102,9 +101,13 @@ export default class AssetStore {
 
     const key = guid();
 
+    (window as any).exports = { __esModule: true };
+
     const source = buffer
       .toString()
-      .replace("export default", `window["${key}"] = `);
+      .replace(`exports.__esModule = true;`, "")
+      .replace("export default", `window["${key}"] = `)
+      .replace(`exports["default"]`, `window["${key}"]`);
 
     eval(source);
 
