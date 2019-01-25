@@ -1,5 +1,5 @@
-import { LinePointInfo, LineInfo } from "../objects/Lane";
 import Vector2 from "../math/Vector2";
+import { LineInfo, LinePointInfo } from "../objects/Lane";
 import { Measure } from "../objects/Measure";
 
 class Pool<T> {

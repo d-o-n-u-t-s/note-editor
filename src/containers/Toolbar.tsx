@@ -12,30 +12,32 @@ import {
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import Switch from "@material-ui/core/Switch";
+import {
+  Clear as ClearIcon,
+  Create as CreateIcon,
+  Menu as MenuIcon,
+  Refresh as RefreshIcon,
+  ShowChart as ShowChartIcon,
+  Visibility as VisibilityIcon
+} from "@material-ui/icons";
 import AddIcon from "@material-ui/icons/Add";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
-import ClearIcon from "@material-ui/icons/clear";
-import CreateIcon from "@material-ui/icons/create";
-import MenuIcon from "@material-ui/icons/menu";
-import RefreshIcon from "@material-ui/icons/Refresh";
-import ShowChartIcon from "@material-ui/icons/ShowChart";
-import VisibilityIcon from "@material-ui/icons/Visibility";
 import ToggleButton from "@material-ui/lab/ToggleButton";
 import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
 import { observer } from "mobx-react";
 import * as React from "react";
 import { SketchPicker } from "react-color";
 import NewChartDialog from "../components/NewChartDialog";
+import VerticalDivider from "../components/VerticalDivider";
 import EditorSetting, {
   ObjectCategory,
   OtherObjectType
 } from "../stores/EditorSetting";
 import { inject, InjectedComponent } from "../stores/inject";
 import { safe } from "../util";
-import VerticalDivider from "../components/VerticalDivider";
 
 function getEnumKeys(_enum: any): string[] {
   return Object.values(_enum).filter(

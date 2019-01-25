@@ -22,15 +22,6 @@ interface IProps extends WithStyles<typeof styles> {}
 @inject
 @observer
 class ChartSetting extends InjectedComponent<IProps> {
-  state = {
-    vV: 0,
-    currentAudio: ""
-  };
-
-  handleChange = (event: any) => {
-    this.setState({ [event.target.name]: event.target.value });
-  };
-
   handleAudioChange = async (newValue: number | null) => {
     // 音源リセット
     if (newValue === null) {

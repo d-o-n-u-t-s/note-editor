@@ -3,27 +3,30 @@ import { InjectedNotistackProps, withSnackbar } from "notistack";
 import * as React from "react";
 import { inject, InjectedComponent } from "../stores/inject";
 
+/**
+ * 通知用コンポーネント
+ */
 @inject
 @observer
 class Notification extends InjectedComponent<InjectedNotistackProps> {
-  state = {
-    prevGuid: ""
-  };
+  /**
+   * 通知する
+   */
+  notify = (notification: any) => {
+    if (!notification) return;
+    if (!notification.guid) return;
 
-  shouldComponentUpdate(a: any, b: any) {
-    console.log("NotiUpdate", a, b);
-
-    return true;
-  }
-
-  render() {
-    this.props.enqueueSnackbar(this.injected.editor.notification.text, {
+    this.props.enqueueSnackbar(notification.text, {
       variant: "success",
       anchorOrigin: {
         vertical: "bottom",
         horizontal: "right"
       }
     });
+  };
+
+  render() {
+    this.notify(this.injected.editor.notification);
 
     return (
       <div style={{ display: "none" }}>

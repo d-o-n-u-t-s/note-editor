@@ -21,7 +21,7 @@ import Inspector from "./Inspector";
 import Layer from "./Layer";
 import Pixi from "./Pixi";
 import Player from "./Player";
-import Settings from "./Settings";
+import Settings from "../components/Settings";
 import ChartTab from "./Tab";
 import Toolbar from "./Toolbar";
 

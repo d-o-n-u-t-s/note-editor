@@ -1,9 +1,6 @@
 import Pixi from "../containers/Pixi";
 import { Note } from "./Note";
-import defaultNoteRenderer, {
-  INoteRenderer,
-  NoteRenderer
-} from "./NoteRenderer";
+import defaultNoteRenderer, { INoteRenderer } from "./NoteRenderer";
 
 export default class NoteRendererResolver {
   private static renderers = new WeakMap<any, any>();

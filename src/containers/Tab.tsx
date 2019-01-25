@@ -59,25 +59,30 @@ export default class ChartTab extends InjectedComponent {
             </IconButton>
           ))}
         </div>
-        <Tabs
-          value={editor ? editor.currentChartIndex : -1}
-          onChange={this.handleChartChange}
-          variant="scrollable"
-          indicatorColor="primary"
-          textColor="primary"
-          scrollButtons="auto"
-        >
-          {editor.charts.map((chart, index) => (
-            <Tab
-              key={index}
-              label={chart.name}
-              buttonRef={el => {
-                if (!el) return;
-                this.tabElements.push(el);
-              }}
-            />
-          ))}
-        </Tabs>
+
+        {editor ? (
+          <Tabs
+            value={editor.currentChartIndex}
+            onChange={this.handleChartChange}
+            variant="scrollable"
+            indicatorColor="primary"
+            textColor="primary"
+            scrollButtons="auto"
+          >
+            {editor.charts.map((chart, index) => (
+              <Tab
+                key={index}
+                label={chart.name}
+                buttonRef={el => {
+                  if (!el) return;
+                  this.tabElements.push(el);
+                }}
+              />
+            ))}
+          </Tabs>
+        ) : (
+          <div />
+        )}
       </div>
     );
   }

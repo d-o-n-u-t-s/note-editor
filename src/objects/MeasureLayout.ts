@@ -3,10 +3,6 @@ import { Fraction } from "../math";
 import EditorSetting from "../stores/EditorSetting";
 import { Measure } from "./Measure";
 
-type MeasureLayoutResult = {
-  normalizedScrollOffsetY: number;
-};
-
 export interface IMeasureLayout {
   name: string;
 

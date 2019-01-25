@@ -75,7 +75,7 @@ export default class Editor {
   currentChart: Chart | null = null;
 
   @observable
-  currentChartIndex: number = -1;
+  currentChartIndex: number = 0;
 
   @observable
   setting = new EditorSetting();

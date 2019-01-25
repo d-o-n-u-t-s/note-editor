@@ -24,28 +24,6 @@ export function defaultRender(
 }
 
 export class NoteRenderer implements INoteRenderer {
-  /*
-  static getBounds(note: Note, lane: Lane, measure: Measure): PIXI.Rectangle {
-    const q = LaneRendererResolver.resolve(lane).getNotePointInfo(
-      lane,
-      measure,
-      note.horizontalPosition,
-      note.measurePosition
-    )!;
-
-    if (!q) {
-      console.log(q);
-    }
-
-    return new PIXI.Rectangle(
-      q.point.x,
-      q.point.y - 5,
-      q.width * note.horizontalSize,
-      10
-    );
-  }
-  */
-
   customRender = defaultRender;
 
   render(note: Note, graphics: PIXI.Graphics, lane: Lane, measure: Measure) {

@@ -5,8 +5,6 @@ class LanePointRenderer {
   getBounds(lanePoint: LanePoint, measure: Measure): PIXI.Rectangle {
     const lane = measure;
 
-    //    math.fraction(0, 0)
-
     const w =
       (measure.width / lanePoint.horizontalPosition!.denominator) *
       lanePoint.horizontalSize;

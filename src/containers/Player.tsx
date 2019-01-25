@@ -13,9 +13,9 @@ import SpeakerIcon from "@material-ui/icons/VolumeUp";
 import Slider from "@material-ui/lab/Slider";
 import { observer } from "mobx-react";
 import * as React from "react";
+import ChartInformation from "../components/ChartInformation";
 import { inject, InjectedComponent } from "../stores/inject";
 import { safe } from "../util";
-import ChartInformation from "../components/ChartInformation";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -49,10 +49,6 @@ class Player extends InjectedComponent<Props> {
     vV: 0,
     currentAudio: "",
     openInformation: false
-  };
-
-  handleChange = (event: any) => {
-    this.setState({ [event.target.name]: event.target.value });
   };
 
   private formatTime(time: number) {

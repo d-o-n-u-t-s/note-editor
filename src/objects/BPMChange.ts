@@ -1,9 +1,9 @@
-import { GUID, guid } from "../util";
-import { Fraction, IFraction } from "../math";
-import Pixi from "../containers/Pixi";
-import { Measure, sortMeasure } from "./Measure";
 import { Record } from "immutable";
+import Pixi from "../containers/Pixi";
+import { Fraction, IFraction } from "../math";
+import { GUID, guid } from "../util";
 import { Mutable } from "../utils/mutable";
+import { Measure, sortMeasure } from "./Measure";
 
 export type BpmChangeData = {
   bpm: number;
