@@ -406,9 +406,7 @@ export default class Chart {
   setTime = (time: number, seek: boolean = false) => {
     this.time = _.clamp(time, 0, this.audio!.duration());
 
-    //    console.log("change time", time);
-
-    if (seek) this.audio!.seek(time); //, this.playId);
+    if (seek) this.audio!.seek(time);
   };
 
   @action

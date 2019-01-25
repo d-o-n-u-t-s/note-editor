@@ -47,8 +47,6 @@ export default class Inspector extends InjectedComponent {
   bind(target: any) {
     if (!target) return;
 
-    console.log("update inspector", target);
-
     // 既存のコントローラーを削除する
     for (const controller of this.controllers) {
       this.gui.remove(controller);

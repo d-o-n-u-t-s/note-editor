@@ -393,9 +393,5 @@ export default class Editor {
     });
 
     Editor.instance = this;
-
-    const atRandom = (array: any[]) => {
-      return array[(Math.random() * array.length) | 0];
-    };
   }
 }
