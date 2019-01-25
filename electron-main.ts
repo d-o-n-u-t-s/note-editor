@@ -1,6 +1,5 @@
-const { app, BrowserWindow, Menu, ipcMain } = require("electron");
-
-const path = require("path");
+import { app, BrowserWindow, Menu } from "electron";
+import * as path from "path";
 
 const isDevelopment = process.env.NODE_ENV === "development";
 
@@ -13,31 +12,32 @@ if (dirname.includes(".app")) {
 const audioAssetPath = path.resolve(dirname, "assets/audio");
 const musicGameSystemsPath = path.resolve(dirname, "assets/musicGameSystems");
 
-let mainWindow;
+let mainWindow: BrowserWindow | null;
 
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
-    title: "NoteEditor"
+    // title: "NoteEditor",
+    webPreferences: { nodeIntegration: true }
   });
 
   if (isDevelopment) {
-    mainWindow.loadURL(`http://localhost:9000`);
+    mainWindow!.loadURL(`http://localhost:9000`);
   } else {
     if (process.platform === "darwin") {
       // win
-      mainWindow.loadFile(`dist/index.html`);
+      mainWindow!.loadFile(`dist/index.html`);
     } else {
       // mac
-      mainWindow.loadURL(`file:///resources/app.asar/dist/index.html`);
+      mainWindow!.loadURL(`file:///resources/app.asar/dist/index.html`);
     }
   }
 
   // ページが読み込まれたら assets フォルダのパスを渡す
-  mainWindow.webContents.on("did-finish-load", () => {
-    mainWindow.webContents.send("assets", {
+  mainWindow!.webContents.on("did-finish-load", () => {
+    mainWindow!.webContents.send("assets", {
       aap: audioAssetPath,
       mgsp: musicGameSystemsPath
     });
@@ -45,6 +45,7 @@ function createWindow() {
 
   initWindowMenu();
 
+  /*
   if (isDevelopment) {
     const loadDevtool = require("electron-load-devtool");
     loadDevtool({
@@ -52,50 +53,31 @@ function createWindow() {
       name: "MobX Developer Tools"
     });
   }
+  */
 
-  mainWindow.webContents.openDevTools();
+  mainWindow!.webContents.openDevTools();
 
-  mainWindow.on("close", e => {
-    mainWindow.webContents.send("close");
+  mainWindow!.on("close", e => {
+    mainWindow!.webContents.send("close");
   });
-  mainWindow.on("closed", () => (mainWindow = null));
+  mainWindow!.on("closed", () => (mainWindow = null));
 }
 
 app.setName("NoteEditor");
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
 app.on("ready", createWindow);
 
-// Quit when all windows are closed.
-app.on("window-all-closed", function() {
-  // On OS X it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
+app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
   }
 });
 
-app.on("activate", function() {
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  if (mainWindow === null) {
+app.on("activate", () => {
+  if (!mainWindow) {
     createWindow();
   }
 });
-
-function send(name, value) {
-  let resolve = null;
-
-  ipcMain.once(name, (_, response) => {
-    resolve(response);
-  });
-
-  const ret = mainWindow.webContents.send(name, value);
-
-  return new Promise(_resolve => (resolve = _resolve));
-}
 
 function initWindowMenu() {
   const template = [
@@ -106,7 +88,7 @@ function initWindowMenu() {
           label: "開く",
           accelerator: "CmdOrCtrl+O",
           click() {
-            mainWindow.webContents.send("open");
+            mainWindow!.webContents.send("open");
           }
         },
         { type: "separator" },
@@ -114,21 +96,21 @@ function initWindowMenu() {
           label: "保存",
           accelerator: "CmdOrCtrl+S",
           click() {
-            mainWindow.webContents.send("save");
+            mainWindow!.webContents.send("save");
           }
         },
         {
           label: "名前を付けて保存",
           accelerator: "CmdOrCtrl+Shift+S",
           click() {
-            mainWindow.webContents.send("saveAs");
+            mainWindow!.webContents.send("saveAs");
           }
         },
         { type: "separator" },
         {
           label: "BMS 譜面をインポート",
           click() {
-            mainWindow.webContents.send("importBMS");
+            mainWindow!.webContents.send("importBMS");
           }
         }
       ]
@@ -138,74 +120,59 @@ function initWindowMenu() {
       submenu: [
         {
           label: "元に戻す",
-          accelerator: "CmdOrCtrl+Z",
-          click() {
-            mainWindow.webContents.send("undo");
-          }
+          role: "undo"
         },
         {
           label: "やり直す",
-          accelerator: "Shift+CmdOrCtrl+Z",
-          click() {
-            mainWindow.webContents.send("redo");
-          }
+          role: "redo"
         },
         { type: "separator" },
         {
           label: "切り取り",
-          accelerator: "CmdOrCtrl+X",
-          click() {
-            mainWindow.webContents.send("cut");
-          }
+          role: "cut"
         },
         {
           label: "コピー",
-          accelerator: "CmdOrCtrl+C",
-          click() {
-            mainWindow.webContents.send("copy");
-          }
+          role: "copy"
         },
         {
           label: "貼り付け",
-          accelerator: "CmdOrCtrl+V",
-          click() {
-            mainWindow.webContents.send("paste");
-          }
+          role: "paste"
         },
         { type: "separator" },
         {
           label: "ノートを上に移動",
           accelerator: "Up",
           click() {
-            mainWindow.webContents.send("moveDivision", 1);
+            mainWindow!.webContents.send("moveDivision", 1);
           }
         },
         {
           label: "ノートを下に移動",
           accelerator: "Down",
           click() {
-            mainWindow.webContents.send("moveDivision", -1);
+            mainWindow!.webContents.send("moveDivision", -1);
           }
         },
         {
           label: "ノートを左に移動",
           accelerator: "Left",
           click() {
-            mainWindow.webContents.send("moveLane", -1);
+            mainWindow!.webContents.send("moveLane", -1);
           }
         },
         {
           label: "ノートを右に移動",
           accelerator: "Right",
           click() {
-            mainWindow.webContents.send("moveLane", 1);
+            mainWindow!.webContents.send("moveLane", 1);
           }
         },
         {
           label: "ノートの位置を反転",
           accelerator: "CmdOrCtrl+F",
           click() {
-            mainWindow.webContents.send("flipLane");
+            mainWindow!.webContents.send("flipLane");
           }
         }
       ]
@@ -214,20 +181,24 @@ function initWindowMenu() {
       label: "選択",
       submenu: [
         {
+          label: "すべてを選択",
+          role: "selectall"
+        },
+        {
           label: "小節分割数",
           submenu: [
             {
               label: "アップ",
               accelerator: "CmdOrCtrl+Up",
               click() {
-                mainWindow.webContents.send("changeMeasureDivision", 1);
+                mainWindow!.webContents.send("changeMeasureDivision", 1);
               }
             },
             {
               label: "ダウン",
               accelerator: "CmdOrCtrl+Down",
               click() {
-                mainWindow.webContents.send("changeMeasureDivision", -1);
+                mainWindow!.webContents.send("changeMeasureDivision", -1);
               }
             }
           ]
@@ -239,14 +210,14 @@ function initWindowMenu() {
               label: "アップ",
               accelerator: "CmdOrCtrl+Right",
               click() {
-                mainWindow.webContents.send("changeObjectSize", 1);
+                mainWindow!.webContents.send("changeObjectSize", 1);
               }
             },
             {
               label: "ダウン",
               accelerator: "CmdOrCtrl+Left",
               click() {
-                mainWindow.webContents.send("changeObjectSize", -1);
+                mainWindow!.webContents.send("changeObjectSize", -1);
               }
             }
           ]
@@ -258,28 +229,28 @@ function initWindowMenu() {
               label: "選択モード",
               accelerator: "Q",
               click() {
-                mainWindow.webContents.send("changeEditMode", 1);
+                mainWindow!.webContents.send("changeEditMode", 1);
               }
             },
             {
               label: "追加モード",
               accelerator: "W",
               click() {
-                mainWindow.webContents.send("changeEditMode", 2);
+                mainWindow!.webContents.send("changeEditMode", 2);
               }
             },
             {
               label: "削除モード",
               accelerator: "E",
               click() {
-                mainWindow.webContents.send("changeEditMode", 3);
+                mainWindow!.webContents.send("changeEditMode", 3);
               }
             },
             {
               label: "接続モード",
               accelerator: "R",
               click() {
-                mainWindow.webContents.send("changeEditMode", 4);
+                mainWindow!.webContents.send("changeEditMode", 4);
               }
             }
           ]
@@ -287,11 +258,11 @@ function initWindowMenu() {
         {
           label: "ノートタイプ",
           submenu: [
-            ...[...Array(9)].map((_, index) => ({
+            ...[...Array(9)].fill(0).map((_, index) => ({
               label: `${index + 1}番目を選択`,
               accelerator: `${index + 1}`,
               click() {
-                mainWindow.webContents.send("changeNoteTypeIndex", index);
+                mainWindow!.webContents.send("changeNoteTypeIndex", index);
               }
             }))
           ]
@@ -300,7 +271,7 @@ function initWindowMenu() {
     }
   ];
 
-  const menu = Menu.buildFromTemplate(template);
+  const menu = Menu.buildFromTemplate(template as any);
 
   Menu.setApplicationMenu(menu);
 }

@@ -4,3 +4,4 @@ assets/audio/
 assets/musicGameSystems/
 node_modules/
 dist/
+electron-main.js
