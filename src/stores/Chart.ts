@@ -85,7 +85,8 @@ export default class Chart {
       LayerRecord.new({
         guid: guid(),
         name: `レイヤー${this.layers.length + 1}`,
-        visible: true
+        visible: true,
+        lock: false
       })
     );
 
@@ -138,9 +139,35 @@ export default class Chart {
   }
 
   @action
+  toggleLayerLock(index: number) {
+    this.selectLayer(index);
+    this.currentLayer.lock = !this.currentLayer.lock;
+    this.layers = [...this.layers];
+  }
+
+  @action
   renameLayer(name: string) {
     this.currentLayer.name = name;
     this.layers = [...this.layers];
+  }
+
+  /**
+   * レイヤーを結合する
+   */
+  @action
+  mergeLayer() {
+    // マージするノートを列挙する
+    const mergeNotes = this.timeline.notes.filter(
+      note => note.layer === this.currentLayer.guid
+    );
+
+    const nextLayer = this.layers[this.currentLayerIndex + 1];
+
+    for (const note of mergeNotes) {
+      note.layer = nextLayer.guid;
+    }
+
+    this.removeLayer();
   }
 
   @observable
@@ -245,7 +272,8 @@ export default class Chart {
       layers.push({
         guid: guid(),
         name: "レイヤー1",
-        visible: true
+        visible: true,
+        lock: false
       });
       // 全ノートを初期レイヤーに割り当てる
       for (const note of this.timeline.notes) {
@@ -549,8 +577,6 @@ export default class Chart {
     };
     deleteConfigKey(chart);
 
-    const json = JSON.stringify(chart);
-
-    return json;
+    return JSON.stringify(chart, null, 2);
   }
 }

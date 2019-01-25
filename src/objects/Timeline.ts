@@ -1,6 +1,4 @@
 import { Record } from "immutable";
-import * as immutablediff from "immutablediff";
-import * as immutablepatch from "immutablepatch";
 import * as _ from "lodash";
 import { action, observable } from "mobx";
 import { Mutable } from "src/utils/mutable";
@@ -19,6 +17,17 @@ import { Measure, MeasureData, MeasureRecord, sortMeasure } from "./Measure";
 import { Note, NoteData, NoteRecord } from "./Note";
 import { NoteLine, NoteLineData, NoteLineRecord } from "./NoteLine";
 import { SpeedChange, SpeedChangeData, SpeedChangeRecord } from "./SpeedChange";
+
+var jsondiffpatch = require("jsondiffpatch").create({
+  array: {
+    //デフォルトはtrue、配列内で移動されたアイテムを検出する（それ以外の場合はremove + addとして登録される）
+    detectMove: false
+  },
+  textDiff: {
+    //デフォルト60、テキストの差分を使用するための最小文字列長（左側と右側）algorythm：google-diff-match-patch
+    minLength: 0
+  }
+});
 
 export type TimelineJsonData = {
   notes: NoteData[];
@@ -161,25 +170,30 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
 
   historyIndex = 0;
 
-  @action
+  prevData: any;
+
+  // @action
   save() {
     let data = _.cloneDeep(defaultTimelineData);
 
     // 初回
     if (this.history.length === 0) {
-      this.history.push(_.cloneDeep(immutablediff(data, this.toJS())));
+      this.prevData = this.toJS();
+      this.history.push(_.cloneDeep(jsondiffpatch.diff(data, this.toJS())));
       this.historyIndex++;
       return;
     }
 
-    // 1 つ前の状態に復元する
-    for (let i = 0; i < this.historyIndex; i++) {
-      data = immutablepatch(data, this.history[i]);
-    }
+    data = this.prevData || data;
 
     this.history = this.history.slice(0, this.historyIndex);
 
-    this.history.push(immutablediff((data as any).toJS(), this.toJS()));
+    let n1 = data; // ImMap(data).toJS();
+    let n2 = this.toJS(); // ImMap(this).toJS();
+
+    const diff = jsondiffpatch.diff(n1, n2);
+
+    this.history.push(diff);
 
     this.historyIndex++;
 
@@ -187,6 +201,8 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
     this.chart!.redoable = false;
 
     Editor.instance!.updateInspector();
+
+    this.prevData = this.toJS();
   }
 
   private get mutable() {
@@ -202,10 +218,10 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
     let data = _.cloneDeep(defaultTimelineData);
 
     for (let i = 0; i < this.historyIndex; i++) {
-      data = immutablepatch(data, this.history[i]);
+      data = jsondiffpatch.patch(data, this.history[i]);
     }
 
-    this.toMutable((data as any).toJS() as TimelineJsonData);
+    this.toMutable(data);
 
     this.chart!.redoable = true;
     this.chart!.undoable = this.historyIndex > 1;
@@ -222,10 +238,10 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
     let data = _.cloneDeep(defaultTimelineData);
 
     for (let i = 0; i < this.historyIndex; i++) {
-      data = immutablepatch(data, this.history[i]);
+      data = jsondiffpatch.patch(data, this.history[i]);
     }
 
-    this.toMutable((data as any).toJS() as TimelineJsonData);
+    this.toMutable(data);
 
     this.chart!.undoable = true;
     this.chart!.redoable = this.historyIndex < this.history.length;
