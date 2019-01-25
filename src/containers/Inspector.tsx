@@ -1,4 +1,4 @@
-import { GUI, GUIController } from "dat-gui";
+import { GUI, GUIController } from "dat.gui";
 import { observer } from "mobx-react";
 import * as React from "react";
 import config from "../config";

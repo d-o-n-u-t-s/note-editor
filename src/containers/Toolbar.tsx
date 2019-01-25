@@ -35,6 +35,7 @@ import EditorSetting, {
 } from "../stores/EditorSetting";
 import { inject, InjectedComponent } from "../stores/inject";
 import { safe } from "../util";
+import VerticalDivider from "../components/VerticalDivider";
 
 function getEnumKeys(_enum: any): string[] {
   return Object.values(_enum).filter(
@@ -55,10 +56,9 @@ enum EditMode {
 const styles = (theme: Theme) =>
   createStyles({
     badge: {
-      top: 13,
-      right: -8,
-
-      border: `2px solid ${
+      marginTop: ".8rem",
+      marginRight: ".5rem",
+      boxShadow: `0 0 0 2px ${
         theme.palette.type === "light"
           ? theme.palette.grey[200]
           : theme.palette.grey[900]
@@ -81,11 +81,11 @@ const styles = (theme: Theme) =>
     }
   });
 
-interface Props extends WithStyles<typeof styles> {}
+interface IProps extends WithStyles<typeof styles> {}
 
 @inject
 @observer
-class Toolbar extends InjectedComponent<Props> {
+class Toolbar extends InjectedComponent<IProps> {
   state = {
     // タイムライン上に配置するオブジェクトのサイズ
     timelineDivisionSize: 1,
@@ -201,7 +201,8 @@ class Toolbar extends InjectedComponent<Props> {
           <RefreshIcon />
         </IconButton>
 
-        <div style={{ width: 1, background: "#ddd" }} />
+        <VerticalDivider />
+
         <Badge
           badgeContent={setting.measureDivision}
           color="primary"
@@ -211,6 +212,7 @@ class Toolbar extends InjectedComponent<Props> {
             <MenuIcon />
           </IconButton>
         </Badge>
+
         <Badge
           badgeContent={setting.objectSize}
           color="primary"
@@ -454,19 +456,8 @@ class Toolbar extends InjectedComponent<Props> {
             ))}
           </FormGroup>
         </Menu>
-        <div style={{ width: 1, background: "#ddd" }} />
-        {/* カスタムパレット */}
-        {/*
-        <IconButton
-          onClick={event => {
-            this.setState({
-              customColorAnchorEl: event.currentTarget
-            });
-          }}
-        >
-          <PaletteIcon style={{ color: editor.setting.customPropColor }} />
-        </IconButton>
-        */}
+
+        <VerticalDivider />
 
         <Menu
           style={{ marginTop: "2rem" }}

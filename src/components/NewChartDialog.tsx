@@ -1,3 +1,4 @@
+import { Fab } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
@@ -53,15 +54,14 @@ class NewChartDialog extends InjectedComponent {
           left: "calc(100% - 48px)"
         }}
       >
-        <Button
+        <Fab
           color="primary"
-          variant="fab"
           aria-label="Add"
-          mini
+          size="small"
           onClick={this.handleClickOpen}
         >
           <AddIcon />
-        </Button>
+        </Fab>
 
         <Dialog
           open={this.state.open}
