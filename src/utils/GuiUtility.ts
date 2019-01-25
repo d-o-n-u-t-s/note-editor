@@ -1,4 +1,4 @@
-import { GUI } from "dat-gui";
+import { GUI } from "dat.gui";
 
 export class GuiUtility {
   gui: GUI | null = null;
