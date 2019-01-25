@@ -81,6 +81,9 @@ class NoteLineRenderer implements INoteLineRenderer {
       measurePosition: Fraction.clone(lanePoint.measurePosition)
     });
 
+    head.updateBounds();
+    tail.updateBounds();
+
     const headBounds = head.getBounds();
     const tailBounds = tail.getBounds();
 
@@ -98,11 +101,7 @@ class NoteLineRenderer implements INoteLineRenderer {
         lp = cloneLanePoint(lp);
 
         const pos = lp.measureIndex + Fraction.to01(lp.measurePosition);
-
-        // const bounds = lp.renderer!.
-
         const s = pos - headPos;
-        // prevPos = pos;
 
         // 現在の位置
         const pp = s / length;
@@ -134,15 +133,8 @@ class NoteLineRenderer implements INoteLineRenderer {
         const tailLaneNormalizedHorizontalPos =
           (tailBounds.x - tailNoteLaneLeft) / tailNoteLaneWidth;
 
-        /*
-        Pixi.debugGraphics!.lineStyle(8, 0xffff00, 0.6)
-          .moveTo(measure.x, 0)
-          .lineTo(measure.x, 2000);
-*/
-
         const measureW = measures[lp.measureIndex].width;
 
-        // lerp(headBounds.width, tailBounds.width, pp)
         const curSize =
           headBounds.width + (tailBounds.width - headBounds.width) * pp;
 
@@ -162,7 +154,6 @@ class NoteLineRenderer implements INoteLineRenderer {
         lp.horizontalPosition = new Fraction(left, measureW);
         return lp;
       });
-    // console.log(head, tail);
 
     const noteToLanePoint = (note: Note, noteBounds: PIXI.Rectangle) => {
       return {

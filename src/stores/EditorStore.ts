@@ -19,6 +19,11 @@ const { remote, ipcRenderer } = __require("electron");
 const { dialog } = remote;
 
 export default class Editor {
+  /**
+   * エディタの起動時間
+   */
+  currentFrame = 0;
+
   @observable.ref
   inspectorTargets: any[] = [];
 

@@ -1,10 +1,14 @@
 import { Record } from "immutable";
 import * as _ from "lodash";
 import * as PIXI from "pixi.js";
-import { Mutable } from "src/utils/mutable";
 import { Fraction, IFraction } from "../math";
 import Chart from "../stores/Chart";
+import Editor from "../stores/EditorStore";
 import { GUID } from "../util";
+import { Mutable } from "../utils/mutable";
+import { Lane, LinePointInfo } from "./Lane";
+import LaneRendererResolver from "./LaneRendererResolver";
+import { Measure } from "./Measure";
 
 interface INoteEditorProps {
   time: number;
@@ -75,6 +79,61 @@ export class NoteRecord extends Record<NoteData>(defaultNoteData) {
   static new(data: NoteData, chart: Chart): Note {
     const note = new NoteRecord(data, chart);
     return Object.assign(note, note.asMutable());
+  }
+
+  chart: Chart;
+
+  getLane(): Lane {
+    return this.chart.timeline.laneMap.get(this.lane)!;
+  }
+  getMeasure(): Measure {
+    return this.chart.timeline.measures[this.measureIndex];
+  }
+
+  /**
+   * updateBounds() を最後に実行した時間
+   */
+  private lastUpdateBoundsFrame = -1;
+
+  /**
+   * ノート領域のキャッシュ
+   */
+  private boundsCache: LinePointInfo | null = null;
+
+  /**
+   * 描画領域を更新する
+   */
+  updateBounds(): LinePointInfo | null {
+    // キャッシュのチェック
+    const { currentFrame } = Editor.instance!;
+    if (currentFrame == this.lastUpdateBoundsFrame) {
+      return this.boundsCache;
+    }
+
+    const lane = this.getLane();
+
+    const linePointInfo = LaneRendererResolver.resolve(lane).getNotePointInfo(
+      lane,
+      this.getMeasure(),
+      this.horizontalPosition,
+      this.measurePosition
+    );
+
+    if (!linePointInfo) {
+      console.error("ノートの描画範囲が計算できません");
+      return null;
+    }
+
+    linePointInfo.width *= this.horizontalSize;
+    this.x = linePointInfo.point.x;
+    this.y = linePointInfo.point.y - 5;
+    this.width = linePointInfo.width;
+    this.height = 10;
+
+    this.lastUpdateBoundsFrame = Editor.instance!.currentFrame;
+    this.boundsCache = linePointInfo;
+
+    return linePointInfo;
   }
 
   isVisible = false;
@@ -158,5 +217,7 @@ export class NoteRecord extends Record<NoteData>(defaultNoteData) {
         return data;
       })()
     );
+
+    this.chart = chart;
   }
 }

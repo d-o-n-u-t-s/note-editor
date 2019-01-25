@@ -81,6 +81,7 @@ export default class Pixi extends InjectedComponent {
       this.renderCanvas();
 
       this.currentFrame++;
+      this.injected.editor.currentFrame++;
     });
 
     this.app.start();
@@ -534,12 +535,7 @@ export default class Pixi extends InjectedComponent {
     for (const note of chart.timeline.notes) {
       if (!note.isVisible) continue;
 
-      NoteRendererResolver.resolve(note).render(
-        note,
-        graphics,
-        chart.timeline.laneMap.get(note.lane)!,
-        chart.timeline.measures[note.measureIndex]
-      );
+      NoteRendererResolver.resolve(note).render(note, graphics);
 
       // 選択中表示
       if (note.isSelected) {
@@ -776,12 +772,7 @@ export default class Pixi extends InjectedComponent {
         chart.timeline.addNote(newNote);
         chart.save();
       } else {
-        NoteRendererResolver.resolve(newNote).render(
-          newNote,
-          graphics,
-          targetNotePoint!.lane,
-          chart.timeline.measures[newNote.measureIndex]
-        );
+        NoteRendererResolver.resolve(newNote).render(newNote, graphics);
       }
     }
 
