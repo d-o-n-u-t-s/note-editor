@@ -6,12 +6,14 @@ export type LayerData = {
   guid: GUID;
   name: string;
   visible: boolean;
+  lock: boolean;
 };
 
 const defaultLayerData: LayerData = {
   guid: "",
   name: "",
-  visible: true
+  visible: true,
+  lock: false
 };
 
 export type Layer = Mutable<LayerRecord>;

@@ -3,18 +3,14 @@ import {
   Drawer,
   IconButton,
   List,
-  ListItem,
   ListSubheader,
-  TextField,
   withStyles,
   WithStyles
 } from "@material-ui/core";
-import AddIcon from "@material-ui/icons/Add";
-import DeleteIcon from "@material-ui/icons/Delete";
-import VisibilityIcon from "@material-ui/icons/Visibility";
-import VisibilityOffIcon from "@material-ui/icons/VisibilityOff";
+import { Add, ArrowDownward, ArrowUpward, Delete } from "@material-ui/icons";
 import { observer } from "mobx-react";
 import * as React from "react";
+import LayerItem from "../components/LayerItem";
 import { inject, InjectedComponent } from "../stores/inject";
 import styles from "../styles/styles";
 
@@ -29,6 +25,13 @@ class Layer extends InjectedComponent<IProps> {
 
   handleToggleVisible = (index: number) => {
     this.injected.editor.currentChart!.toggleLayerVisible(index);
+  };
+
+  /**
+   * レイヤーを結合する
+   */
+  handleMergeLayer = () => {
+    this.injected.editor.currentChart!.mergeLayer();
   };
 
   render() {
@@ -52,42 +55,47 @@ class Layer extends InjectedComponent<IProps> {
         >
           {chart.layers.map((layer, index) => (
             <div key={layer.guid}>
-              <ListItem
-                button
-                style={{ padding: 0 }}
+              <LayerItem
+                layer={layer}
                 selected={index === chart.currentLayerIndex}
-                onClick={() => this.handleSelect(index)}
-              >
-                <IconButton onClick={() => this.handleToggleVisible(index)}>
-                  {layer.visible ? (
-                    <VisibilityIcon fontSize="small" />
-                  ) : (
-                    <VisibilityOffIcon fontSize="small" />
-                  )}
-                </IconButton>
-                <TextField
-                  value={layer.name}
-                  margin="normal"
-                  onChange={({ target: { value } }) => {
-                    chart.renameLayer(value);
-                  }}
-                />
-              </ListItem>
+                onSelect={() => this.handleSelect(index)}
+                onToggleVisible={() => this.handleToggleVisible(index)}
+                onRename={(value: string) => chart.renameLayer(value)}
+                onToggleLock={() => chart.toggleLayerLock(index)}
+              />
               <Divider />
             </div>
           ))}
         </List>
 
-        <Divider />
         <div>
           <IconButton onClick={() => chart.addLayer()}>
-            <AddIcon />
+            <Add fontSize="small" />
           </IconButton>
           <IconButton
             disabled={chart.layers.length <= 1}
             onClick={() => chart.removeLayer()}
           >
-            <DeleteIcon />
+            <Delete fontSize="small" />
+          </IconButton>
+
+          {/* レイヤーアップボタン */}
+          <IconButton>
+            <ArrowUpward fontSize="small" />
+          </IconButton>
+
+          {/* レイヤーダウンボタン */}
+          <IconButton>
+            <ArrowDownward fontSize="small" />
+          </IconButton>
+
+          {/* マージボタン */}
+          <IconButton
+            disabled={chart.currentLayerIndex == chart.layers.length - 1}
+            color="primary"
+            onClick={this.handleMergeLayer}
+          >
+            <ArrowDownward fontSize="small" />
           </IconButton>
         </div>
       </Drawer>
