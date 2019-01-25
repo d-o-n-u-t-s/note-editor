@@ -15,7 +15,6 @@ import { observer } from "mobx-react";
 import * as React from "react";
 import ChartInformation from "../components/ChartInformation";
 import { inject, InjectedComponent } from "../stores/inject";
-import { safe } from "../util";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -42,12 +41,23 @@ const styles = (theme: Theme) =>
 
 interface Props extends WithStyles<typeof styles> {}
 
+const TimeSlider = (props: Props & { time: number; onChange: any }) => (
+  <Slider
+    value={props.time}
+    min={0}
+    max={1}
+    classes={{
+      track: props.classes.timeSliderTrack,
+      thumb: props.classes.timeSliderThumb
+    }}
+    onChange={props.onChange}
+  />
+);
+
 @inject
 @observer
 class Player extends InjectedComponent<Props> {
   state = {
-    vV: 0,
-    currentAudio: "",
     openInformation: false
   };
 
@@ -61,14 +71,20 @@ class Player extends InjectedComponent<Props> {
   render() {
     const editor = this.injected.editor;
 
+    if (
+      !editor ||
+      !editor.currentChart ||
+      !editor.currentChart!.audio ||
+      !editor.currentChart!.audioBuffer
+    )
+      return <div />;
+
+    const chart = editor.currentChart!;
+
     const { classes } = this.props;
 
-    const isPlaying = safe(() => editor.currentChart!.isPlaying, false);
-
-    const time = safe(
-      () => editor.currentChart!.time / editor.currentChart!.audio!.duration(),
-      0
-    );
+    const time =
+      editor.currentChart!.time / editor.currentChart!.audio!.duration();
 
     return (
       <div>
@@ -80,16 +96,10 @@ class Player extends InjectedComponent<Props> {
             marginBottom: "14px"
           }}
         >
-          <Slider
-            value={time}
-            min={0}
-            max={1}
-            classes={{
-              track: classes.timeSliderTrack,
-              thumb: classes.timeSliderThumb
-            }}
-            id="test2"
-            onChange={(_, value) => {
+          <TimeSlider
+            time={time}
+            classes={classes}
+            onChange={(_: any, value: any) => {
               editor.currentChart!.setTime(
                 value * editor.currentChart!.audio!.duration(),
                 true
@@ -99,7 +109,7 @@ class Player extends InjectedComponent<Props> {
         </div>
 
         <div style={{ background: "#000", marginTop: "-14px" }}>
-          {!isPlaying ? (
+          {!chart.isPlaying ? (
             <IconButton
               style={{ color: "#fff" }}
               className={classes.playerButton}
@@ -133,7 +143,7 @@ class Player extends InjectedComponent<Props> {
 
           {/* volume */}
           <Slider
-            value={safe(() => editor!.currentChart!.volume, 0)}
+            value={chart.volume}
             min={0}
             max={1}
             style={{
@@ -152,17 +162,13 @@ class Player extends InjectedComponent<Props> {
           />
 
           <span style={{ color: "#fff" }}>
-            {this.formatTime(
-              safe(() => editor.currentChart!.audioBuffer!.duration * time)
-            )}
+            {this.formatTime(chart.audioBuffer!.duration * time)}
             {" / "}
-            {this.formatTime(
-              safe(() => editor.currentChart!.audioBuffer!.duration)
-            )}
+            {this.formatTime(chart.audioBuffer!.duration)}
           </span>
 
           <Slider
-            value={safe(() => editor!.currentChart!.speed, 0)}
+            value={chart.speed}
             min={0.1}
             max={1}
             step={0.1}
@@ -177,7 +183,7 @@ class Player extends InjectedComponent<Props> {
               thumb: classes.volumeSliderThumb
             }}
             onChange={(_, value) => {
-              editor!.currentChart!.setSpeed(value);
+              chart.setSpeed(value);
             }}
           />
 
@@ -192,7 +198,6 @@ class Player extends InjectedComponent<Props> {
           <IconButton
             style={{ color: "#fff", float: "right" }}
             className={classes.playerButton}
-            aria-label=""
           >
             <SettingsIcon />
           </IconButton>
