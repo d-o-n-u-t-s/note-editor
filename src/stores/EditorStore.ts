@@ -1,4 +1,6 @@
 import { action, observable } from "mobx";
+import * as Mousetrap from "mousetrap";
+import { Fraction } from "../math";
 import { BpmChangeRecord } from "../objects/BPMChange";
 import { MeasureRecord } from "../objects/Measure";
 import { Note, NoteRecord } from "../objects/Note";
@@ -12,7 +14,6 @@ import Chart from "./Chart";
 import EditorSetting from "./EditorSetting";
 import MusicGameSystem from "./MusicGameSystem";
 import _ = require("lodash");
-import { Fraction } from "../math";
 
 const { remote, ipcRenderer } = __require("electron");
 const { dialog } = remote;
@@ -248,6 +249,8 @@ export default class Editor {
   @action
   copy() {
     this.copiedNotes = this.getInspectNotes();
+
+    this.notify(`${this.copiedNotes.length} 個のオブジェクトをコピーしました`);
   }
 
   @action
@@ -260,13 +263,14 @@ export default class Editor {
       Math.min(...this.copiedNotes.map(note => note.measureIndex));
 
     const guidMap = new Map<string, string>();
-    this.copiedNotes.forEach(note => {
+    for (let note of this.copiedNotes) {
       guidMap.set(note.guid, guid());
       note = _.cloneDeep(note);
       note.guid = guidMap.get(note.guid)!;
       note.measureIndex += diff;
-      this.currentChart!.timeline.addNote(note);
-    });
+      this.currentChart!.timeline.addNote(note, false);
+    }
+    this.currentChart!.timeline.updateNoteMap();
 
     this.currentChart!.timeline.noteLines.forEach(line => {
       if (guidMap.has(line.head) && guidMap.has(line.tail)) {
@@ -340,15 +344,16 @@ export default class Editor {
     ipcRenderer.on("importBMS", () => BMSImporter.import());
 
     // 編集
-    ipcRenderer.on("undo", () => this.currentChart!.timeline.undo());
-    ipcRenderer.on("redo", () => this.currentChart!.timeline.redo());
-    ipcRenderer.on("cut", () => {
+    Mousetrap.bind("mod+z", () => this.currentChart!.timeline.undo());
+    Mousetrap.bind("mod+shift+z", () => this.currentChart!.timeline.redo());
+    Mousetrap.bind("mod+x", () => {
       this.copy();
       this.copiedNotes.forEach(n => this.currentChart!.timeline.removeNote(n));
       if (this.copiedNotes.length > 0) this.currentChart!.save();
     });
-    ipcRenderer.on("copy", () => this.copy());
-    ipcRenderer.on("paste", () => this.paste());
+    Mousetrap.bind("mod+c", () => this.copy());
+    Mousetrap.bind("mod+v", () => this.paste());
+
     ipcRenderer.on("moveDivision", (_: any, index: number) =>
       this.moveDivision(index)
     );
