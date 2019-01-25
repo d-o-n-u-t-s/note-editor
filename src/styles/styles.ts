@@ -15,5 +15,11 @@ export default (theme: Theme) =>
       zIndex: 0,
       position: "relative",
       width: 180
+    },
+    table: {
+      // minWidth: 700,
+
+      outline: 0,
+      padding: theme.spacing.unit * 2
     }
   });

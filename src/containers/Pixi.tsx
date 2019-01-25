@@ -2,7 +2,7 @@ import * as _ from "lodash";
 import { observer } from "mobx-react";
 import * as PIXI from "pixi.js";
 import * as React from "react";
-import { Fraction, inverseLerp, lerp } from "../math";
+import { Fraction } from "../math";
 import Vector2 from "../math/Vector2";
 import { BpmChangeRecord, BPMRenderer } from "../objects/BPMChange";
 import { Lane } from "../objects/Lane";
@@ -23,11 +23,10 @@ import {
   OtherObjectType
 } from "../stores/EditorSetting";
 import { inject, InjectedComponent } from "../stores/inject";
-import { guid, GUID } from "../util";
+import { guid } from "../util";
 import CustomRendererUtility from "../utils/CustomRendererUtility";
 import * as key from "../utils/keyboard";
 import * as pool from "../utils/pool";
-import Chart from "../stores/Chart";
 
 @inject
 @observer
@@ -314,6 +313,7 @@ export default class Pixi extends InjectedComponent {
       chart.timeline.measures
     );
 
+    // 小節の操作
     for (const measure of chart.timeline.measures) {
       const x = measure.x;
       const y = measure.y;
@@ -377,12 +377,6 @@ export default class Pixi extends InjectedComponent {
       measure.containsPoint(mousePosition)
     );
     const targetMeasureDivision = this.getMeasureDivision(targetMeasure);
-
-    const getLane = (note: Note) => chart.timeline.laneMap.get(note.lane)!;
-    const getMeasure = (note: Note) =>
-      chart.timeline.measures[note.measureIndex];
-
-    const getLanePointRenderer = (lanePoint: LanePoint) => LanePointRenderer;
 
     if (targetMeasure) {
       // ターゲット小節の枠を描画
@@ -460,7 +454,7 @@ export default class Pixi extends InjectedComponent {
       for (const lanePoint of chart.timeline.lanePoints) {
         const measure = chart.timeline.measures[lanePoint.measureIndex];
 
-        getLanePointRenderer(lanePoint).render(lanePoint, graphics, measure);
+        LanePointRenderer.render(lanePoint, graphics, measure);
       }
     }
 
@@ -539,53 +533,94 @@ export default class Pixi extends InjectedComponent {
     // ノート描画
     for (const note of chart.timeline.notes) {
       if (!note.isVisible) continue;
+
       NoteRendererResolver.resolve(note).render(
         note,
         graphics,
         chart.timeline.laneMap.get(note.lane)!,
         chart.timeline.measures[note.measureIndex]
       );
-    }
 
-    // ノート選択 or 削除
-    if (
-      (setting.editMode === EditMode.Select ||
-        setting.editMode === EditMode.Delete) &&
-      setting.editObjectCategory === ObjectCategory.Note
-    ) {
-      for (const note of chart.timeline.notes) {
-        if (!note.isVisible) continue;
+      // 選択中表示
+      if (note.isSelected) {
+        note.drawBounds(graphics);
+      }
 
-        const bounds = NoteRendererResolver.resolve(note)!.getBounds(
-          note,
-          getLane(note),
-          getMeasure(note)
-        );
+      // ノート関連の操作
+      if (setting.editObjectCategory !== ObjectCategory.Note) continue;
 
-        if (bounds.contains(mousePosition.x, mousePosition.y)) {
-          graphics
-            .lineStyle(2, 0xff9900)
-            .drawRect(
-              bounds.x - 2,
-              bounds.y - 2,
-              bounds.width + 4,
-              bounds.height + 4
-            );
+      const bounds = note.getBounds();
+      if (!bounds.contains(mousePosition.x, mousePosition.y)) continue;
+
+      // ノート選択 or 削除
+      if (
+        setting.editMode === EditMode.Select ||
+        setting.editMode === EditMode.Delete
+      ) {
+        note.drawBounds(graphics);
+
+        if (isClick) {
+          if (setting.editMode === EditMode.Delete) {
+            chart.timeline.removeNote(note);
+            chart.save();
+          }
+          if (setting.editMode === EditMode.Select) {
+            this.inspect(note);
+          }
+        }
+      }
+
+      // ノート接続
+      if (setting.editMode === EditMode.Connect) {
+        graphics
+          .lineStyle(2, 0xff9900)
+          //.beginFill(0x0099ff, 0.3)
+          .drawRect(bounds.x, bounds.y, bounds.width, bounds.height);
+        //.endFill();
+
+        if (
+          this.connectTargetNote &&
+          // 同じノートタイプか接続可能なノートタイプなら
+          (this.connectTargetNote.type === note.type ||
+            musicGameSystem.noteTypeMap
+              .get(this.connectTargetNote.type)!
+              .connectableTypes.includes(note.type))
+        ) {
+          const [head, tail] = [this.connectTargetNote, note].sort(
+            sortMeasureData
+          );
+
+          const newNoteLine = NoteLineRecord.new({
+            guid: guid(),
+            head: head.guid,
+            tail: tail.guid
+          });
+
+          // ノートラインプレビュー
+          NoteLineRendererResolver.resolve(newNoteLine).render(
+            newNoteLine,
+            graphics,
+            chart.timeline.notes
+          );
 
           if (isClick) {
-            if (setting.editMode === EditMode.Delete) {
-              chart.timeline.removeNote(note);
+            // 同じノートを接続しようとしたら接続状態をリセットする
+            if (this.connectTargetNote === note) {
+              this.connectTargetNote = null;
+            } else {
+              chart.timeline.addNoteLine(newNoteLine);
               chart.save();
-            }
-            if (setting.editMode === EditMode.Select) {
-              console.log(
-                "ノート時刻:" +
-                  Math.round((chart.startTime + note.editorProps.time) * 1000)
-              );
-              this.inspect(note);
+
+              console.log("接続 2");
+
+              this.connectTargetNote = note;
             }
           }
-          break;
+        } else {
+          if (isClick) {
+            this.connectTargetNote = note;
+            console.log("接続 1");
+          }
         }
       }
     }
@@ -704,6 +739,7 @@ export default class Pixi extends InjectedComponent {
             targetMeasureDivision
           ),
           type: newNoteType.name,
+          speed: 1,
           lane: targetNotePoint!.lane.guid,
           layer: chart.currentLayer.guid,
           editorProps: {
@@ -766,12 +802,10 @@ export default class Pixi extends InjectedComponent {
       for (const lanePoint of this.injected.editor.currentChart!.timeline
         .lanePoints) {
         if (
-          getLanePointRenderer(lanePoint)
-            .getBounds(
-              lanePoint,
-              chart.timeline.measures[lanePoint.measureIndex]
-            )
-            .contains(mousePosition.x, mousePosition.y)
+          LanePointRenderer.getBounds(
+            lanePoint,
+            chart.timeline.measures[lanePoint.measureIndex]
+          ).contains(mousePosition.x, mousePosition.y)
         ) {
           // console.log("接続！", lanePoint);
 
@@ -823,82 +857,9 @@ export default class Pixi extends InjectedComponent {
       this.connectTargetNote = null;
     }
 
-    // ノート接続
-    if (
-      setting.editMode === EditMode.Connect &&
-      setting.editObjectCategory === ObjectCategory.Note
-    ) {
-      for (const note of chart.timeline.notes) {
-        const bounds = NoteRendererResolver.resolve(note)!.getBounds(
-          note,
-          getLane(note),
-          getMeasure(note)
-        );
-
-        if (bounds.contains(mousePosition.x, mousePosition.y)) {
-          graphics
-            .lineStyle(2, 0xff9900)
-            //.beginFill(0x0099ff, 0.3)
-            .drawRect(bounds.x, bounds.y, bounds.width, bounds.height);
-          //.endFill();
-
-          if (
-            this.connectTargetNote &&
-            // 同じノートタイプか接続可能なノートタイプなら
-            (this.connectTargetNote.type === note.type ||
-              musicGameSystem.noteTypeMap
-                .get(this.connectTargetNote.type)!
-                .connectableTypes.includes(note.type))
-          ) {
-            const [head, tail] = [this.connectTargetNote, note].sort(
-              sortMeasureData
-            );
-
-            const newNoteLine = NoteLineRecord.new({
-              guid: guid(),
-              head: head.guid,
-              tail: tail.guid
-            });
-
-            // ノートラインプレビュー
-            NoteLineRendererResolver.resolve(newNoteLine).render(
-              newNoteLine,
-              graphics,
-              chart.timeline.notes
-            );
-
-            if (isClick) {
-              // 同じノートを接続しようとしたら接続状態をリセットする
-              if (this.connectTargetNote === note) {
-                this.connectTargetNote = null;
-              } else {
-                chart.timeline.addNoteLine(newNoteLine);
-                chart.save();
-
-                console.log("接続 2");
-
-                this.connectTargetNote = note;
-              }
-            }
-          } else {
-            if (isClick) {
-              this.connectTargetNote = note;
-              console.log("接続 1");
-            }
-          }
-        }
-      }
-    }
-
     // 接続しようとしてるノートの枠を描画
     if (this.connectTargetNote) {
-      const bounds = NoteRendererResolver.resolve(
-        this.connectTargetNote
-      )!.getBounds(
-        this.connectTargetNote,
-        getLane(this.connectTargetNote),
-        getMeasure(this.connectTargetNote)
-      );
+      const bounds = this.connectTargetNote.getBounds();
 
       graphics
         .lineStyle(2, 0xff9900)
@@ -947,15 +908,12 @@ export default class Pixi extends InjectedComponent {
         )
       } as LanePoint;
 
-      //lane.renderer.update(graphics, chart.timeline.measures);
-
       if (isClick) {
         this.injected.editor.currentChart!.timeline.addLanePoint(newLanePoint);
         chart.save();
       } else {
         // プレビュー
-
-        getLanePointRenderer(newLanePoint).render(
+        LanePointRenderer.render(
           newLanePoint,
           graphics,
           chart.timeline.measures[newLanePoint.measureIndex]

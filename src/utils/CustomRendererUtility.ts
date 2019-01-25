@@ -1,19 +1,16 @@
+import * as PIXI from "pixi.js";
+import Pixi from "../containers/Pixi";
+import { inverseLerp, lerp, Vector2 } from "../math";
+import { Note } from "../objects/Note";
+import { defaultRender } from "../objects/NoteRenderer";
+import Editor from "../stores/EditorStore";
+import store from "../stores/stores";
 import { drawQuad, drawTriangle } from "./drawQuad";
 
 const __require = (window as any).require;
 
 const fs = __require("fs");
 const util = __require("util");
-
-import * as PIXI from "pixi.js";
-import Pixi from "../containers/Pixi";
-
-import { Vector2, lerp, inverseLerp } from "../math";
-import { defaultRender } from "../objects/NoteRenderer";
-
-import store from "../stores/stores";
-import { Note } from "../objects/Note";
-import Editor from "../stores/EditorStore";
 
 const textures = new Map<string, PIXI.Texture>();
 
@@ -82,10 +79,7 @@ class CustomRendererUtility {
   Pixi: any;
   defaultNoteRender = defaultRender;
 
-  *getHead(
-    note: Note,
-    callback: (note: Note) => boolean
-  ): IterableIterator<Note> {
+  *getHead(note: Note): IterableIterator<Note> {
     const chart = store.editor.currentChart;
 
     if (!chart) return;
@@ -103,10 +97,7 @@ class CustomRendererUtility {
       yield (prevNote = chart.timeline.noteMap.get(nl.head)!);
     }
   }
-  *getTail(
-    note: Note,
-    callback: (note: Note) => boolean
-  ): IterableIterator<Note> {
+  *getTail(note: Note): IterableIterator<Note> {
     const chart = store.editor.currentChart;
     if (!chart) return;
     let prevNote = note;
