@@ -1,3 +1,4 @@
+import * as _ from "lodash";
 import { action, observable } from "mobx";
 import * as Mousetrap from "mousetrap";
 import { Fraction } from "../math";
@@ -13,7 +14,6 @@ import AssetStore from "./Asset";
 import Chart from "./Chart";
 import EditorSetting from "./EditorSetting";
 import MusicGameSystem from "./MusicGameSystem";
-import _ = require("lodash");
 
 const { remote, ipcRenderer } = __require("electron");
 const { dialog } = remote;
@@ -270,11 +270,12 @@ export default class Editor {
     const guidMap = new Map<string, string>();
     for (let note of this.copiedNotes) {
       guidMap.set(note.guid, guid());
-      note = _.cloneDeep(note);
+      note = note.clone();
       note.guid = guidMap.get(note.guid)!;
       note.measureIndex += diff;
       this.currentChart!.timeline.addNote(note, false);
     }
+
     this.currentChart!.timeline.updateNoteMap();
 
     this.currentChart!.timeline.noteLines.forEach(line => {

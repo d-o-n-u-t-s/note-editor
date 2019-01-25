@@ -220,4 +220,11 @@ export class NoteRecord extends Record<NoteData>(defaultNoteData) {
 
     this.chart = chart;
   }
+
+  /**
+   * クローンする
+   */
+  clone() {
+    return NoteRecord.new(this.toJS(), this.chart);
+  }
 }
