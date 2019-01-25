@@ -2,11 +2,32 @@ import * as path from "path";
 import * as merge from "webpack-merge";
 import common from "./webpack.common";
 
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const src = path.resolve(__dirname, "./");
+var HardSourceWebpackPlugin = require("hard-source-webpack-plugin");
+
 export default merge(
   common,
   {
     mode: "development",
-    devtool: "eval"
+    devtool: "eval",
+
+    plugins: [
+      // new HardSourceWebpackPlugin(),
+      new HtmlWebpackPlugin({
+        template: src + "/index.dev.html",
+        filename: "index.html"
+      })
+    ],
+    externals: {
+      "pixi.js": "PIXI",
+      react: "React",
+      "react-dom": "ReactDOM",
+      mobx: "mobx",
+      "mobx-react": "mobxReact",
+      "material-ui": "window['material-ui']",
+      immutable: "Immutable"
+    }
   },
   {
     devServer: {
