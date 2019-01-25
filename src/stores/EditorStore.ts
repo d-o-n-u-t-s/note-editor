@@ -23,20 +23,34 @@ export default class Editor {
 
   copiedNotes: Note[] = [];
 
+  @observable.ref
+  notification: any = {};
+
+  /**
+   * 通知
+   * @param text 通知内容
+   */
+  @action
+  notify(text: string) {
+    this.notification = {
+      text,
+      guid: guid()
+    };
+  }
+
   @action
   setInspectorTarget(target: any) {
+    for (const target of this.inspectorTargets) {
+      target.isSelected = false;
+    }
     this.inspectorTargets = [target];
+    target.isSelected = true;
   }
 
   @action
   addInspectorTarget(target: any) {
-    const i = this.inspectorTargets.indexOf(target);
-    this.inspectorTargets = this.inspectorTargets.slice();
-    if (i >= 0) {
-      this.inspectorTargets.splice(i, 1);
-    } else {
-      this.inspectorTargets.push(target);
-    }
+    this.inspectorTargets = _.uniq([...this.inspectorTargets, target]);
+    target.isSelected = true;
   }
 
   getInspectNotes(): Note[] {
@@ -56,7 +70,7 @@ export default class Editor {
     return notes;
   }
 
-  @observable
+  @observable.ref
   currentChart: Chart | null = null;
 
   @observable
@@ -137,9 +151,27 @@ export default class Editor {
       }
     });
 
+    this.notify("譜面を保存しました");
+
     // イベント発火
     const onSave = this.currentChart.musicGameSystem!.eventListeners.onSave;
     if (onSave) onSave(this.currentChart);
+  }
+
+  @action
+  saveAs() {
+    var window = remote.getCurrentWindow();
+    var options = {
+      title: "タイトル",
+      filters: this.dialogFilters,
+      properties: ["openFile", "createDirectory"]
+    };
+    dialog.showSaveDialog(window, options, (filePath: any) => {
+      if (filePath) {
+        this.currentChart!.filePath = filePath;
+        this.save();
+      }
+    });
   }
 
   /**
@@ -183,22 +215,6 @@ export default class Editor {
   }
 
   private dialogFilters = [{ name: "譜面データ", extensions: ["json"] }];
-
-  @action
-  saveAs() {
-    var window = remote.getCurrentWindow();
-    var options = {
-      title: "タイトル",
-      filters: this.dialogFilters,
-      properties: ["openFile", "createDirectory"]
-    };
-    dialog.showSaveDialog(window, options, (filePath: any) => {
-      if (filePath) {
-        this.currentChart!.filePath = filePath;
-        this.save();
-      }
-    });
-  }
 
   saveConfirm(chartIndex: number) {
     if (
@@ -260,6 +276,8 @@ export default class Editor {
         this.currentChart!.timeline.addNoteLine(line);
       }
     });
+
+    this.notify(`${this.copiedNotes.length} 個のオブジェクトを貼り付けました`);
 
     if (this.copiedNotes.length > 0) this.currentChart!.save();
   }

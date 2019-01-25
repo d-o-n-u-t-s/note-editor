@@ -8,10 +8,13 @@ import {
 } from "@material-ui/core";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import classNames from "classnames";
-import { inject, observer, Provider } from "mobx-react";
+import { observer, Provider } from "mobx-react";
+import { SnackbarProvider } from "notistack";
 import * as React from "react";
+import Notification from "../components/Notification";
 import config from "../config";
 import Editor from "../stores/EditorStore";
+import { inject, InjectedComponent } from "../stores/inject";
 import stores from "../stores/stores";
 import Empty from "./Empty";
 import Inspector from "./Inspector";
@@ -96,9 +99,9 @@ interface Props extends WithStyles<typeof styles> {
   editor?: Editor;
 }
 
-@inject("editor")
+@inject
 @observer
-class T extends React.Component<{ editor?: Editor }, {}> {
+class T extends InjectedComponent<{ editor?: Editor }, {}> {
   render() {
     if (!this.props.editor || !this.props.editor!.currentChart) {
       return <Empty />;
@@ -112,9 +115,9 @@ class T extends React.Component<{ editor?: Editor }, {}> {
   }
 }
 
-@inject("editor")
+@inject
 @observer
-class T2 extends React.Component<{ editor?: Editor }, {}> {
+class T2 extends InjectedComponent<{ editor?: Editor }, {}> {
   render() {
     if (!this.props.editor || !this.props.editor!.currentChart) {
       return <div />;
@@ -124,61 +127,48 @@ class T2 extends React.Component<{ editor?: Editor }, {}> {
   }
 }
 
-class Application extends React.Component<Props, {}> {
-  state = {
-    hV: 0,
-    vV: 0,
+const Application = (props: Props) => {
+  const { classes } = props;
+  return (
+    <Provider {...stores}>
+      <div style={{ flexGrow: 1 }}>
+        <div className={classes.appFrame} style={{ height: "100vh" }}>
+          <AppBar
+            position="absolute"
+            color="default"
+            className={classNames(classes.appBar, classes[`appBar-left`])}
+          >
+            <Toolbar />
+            <Divider />
+            <ChartTab />
+          </AppBar>
 
-    tabIndex: 0
-  };
-
-  render() {
-    const { classes } = this.props;
-
-    return (
-      <Provider {...stores}>
-        <div style={{ flexGrow: 1 }}>
-          <div className={classes.appFrame} style={{ height: "100vh" }}>
-            <AppBar
-              position="absolute"
-              color="default"
-              className={classNames(classes.appBar, classes[`appBar-left`])}
-            >
-              <Toolbar />
-              <Divider />
-              <ChartTab />
-            </AppBar>
-
-            <Drawer
-              variant="permanent"
-              classes={{
-                paper: classes.drawerPaper
-              }}
-              anchor="left"
-            >
-              <Settings />
-              <Inspector />
-            </Drawer>
-
-            <main
-              className={classes.content}
-              style={{ display: "flex", flexDirection: "column" }}
-            >
-              <div
-                className={classes.toolbar}
-                style={{ marginBottom: "25px" }}
-              />
-
-              <T />
-              <T2 />
-            </main>
-
-            <Layer />
-          </div>
+          <Drawer
+            variant="permanent"
+            classes={{
+              paper: classes.drawerPaper
+            }}
+            anchor="left"
+          >
+            <Settings />
+            <Inspector />
+          </Drawer>
+          <main
+            className={classes.content}
+            style={{ display: "flex", flexDirection: "column" }}
+          >
+            <div className={classes.toolbar} style={{ marginBottom: "25px" }} />
+            <T />
+            <T2 />
+          </main>
+          <SnackbarProvider maxSnack={4}>
+            <Notification />
+          </SnackbarProvider>
+          <Layer />
         </div>
-      </Provider>
-    );
-  }
-}
+      </div>
+    </Provider>
+  );
+};
 
 export default withStyles(styles)(Application);
