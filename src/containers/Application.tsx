@@ -115,18 +115,6 @@ class T extends InjectedComponent<{ editor?: Editor }, {}> {
   }
 }
 
-@inject
-@observer
-class T2 extends InjectedComponent<{ editor?: Editor }, {}> {
-  render() {
-    if (!this.props.editor || !this.props.editor!.currentChart) {
-      return <div />;
-    }
-
-    return <Player />;
-  }
-}
-
 const Application = (props: Props) => {
   const { classes } = props;
   return (
@@ -159,7 +147,7 @@ const Application = (props: Props) => {
           >
             <div className={classes.toolbar} style={{ marginBottom: "25px" }} />
             <T />
-            <T2 />
+            <Player />
           </main>
           <SnackbarProvider maxSnack={4}>
             <Notification />

@@ -13,7 +13,7 @@ export default class ChartTab extends InjectedComponent {
   };
 
   private handleChartChange = (_: any, value: number) => {
-    this.injected.editor!.setCurrentChart(value);
+    this.injected.editor.setCurrentChart(value);
   };
 
   tabElements: HTMLElement[] = [];
@@ -60,29 +60,25 @@ export default class ChartTab extends InjectedComponent {
           ))}
         </div>
 
-        {editor ? (
-          <Tabs
-            value={editor.currentChartIndex}
-            onChange={this.handleChartChange}
-            variant="scrollable"
-            indicatorColor="primary"
-            textColor="primary"
-            scrollButtons="auto"
-          >
-            {editor.charts.map((chart, index) => (
-              <Tab
-                key={index}
-                label={chart.name}
-                buttonRef={el => {
-                  if (!el) return;
-                  this.tabElements.push(el);
-                }}
-              />
-            ))}
-          </Tabs>
-        ) : (
-          <div />
-        )}
+        <Tabs
+          value={editor.currentChartIndex}
+          onChange={this.handleChartChange}
+          variant="scrollable"
+          indicatorColor="primary"
+          textColor="primary"
+          scrollButtons="auto"
+        >
+          {editor.charts.map((chart, index) => (
+            <Tab
+              key={index}
+              label={chart.name}
+              buttonRef={el => {
+                if (!el) return;
+                this.tabElements.push(el);
+              }}
+            />
+          ))}
+        </Tabs>
       </div>
     );
   }

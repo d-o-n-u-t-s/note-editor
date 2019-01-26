@@ -37,7 +37,6 @@ import EditorSetting, {
   OtherObjectType
 } from "../stores/EditorSetting";
 import { inject, InjectedComponent } from "../stores/inject";
-import { safe } from "../util";
 
 function getEnumKeys(_enum: any): string[] {
   return Object.values(_enum).filter(
@@ -301,12 +300,11 @@ class Toolbar extends InjectedComponent<IProps> {
             }}
           >
             <ToggleButton value={ObjectCategory.Note}>
-              {safe(
-                () =>
-                  editor.currentChart!.musicGameSystem!.noteTypes[
-                    setting.editNoteTypeIndex
-                  ].name
-              )}
+              {
+                editor.currentChart!.musicGameSystem!.noteTypes[
+                  setting.editNoteTypeIndex
+                ].name
+              }
               <ArrowDropDownIcon
                 onClick={(e: any) =>
                   this.setState({ noteAnchorEl: e.currentTarget })
@@ -314,12 +312,11 @@ class Toolbar extends InjectedComponent<IProps> {
               />
             </ToggleButton>
             <ToggleButton value={ObjectCategory.Lane}>
-              {safe(
-                () =>
-                  editor.currentChart!.musicGameSystem!.laneTemplates[
-                    setting.editLaneTypeIndex
-                  ].name
-              )}
+              {
+                editor.currentChart!.musicGameSystem!.laneTemplates[
+                  setting.editLaneTypeIndex
+                ].name
+              }
               <ArrowDropDownIcon
                 onClick={(e: any) =>
                   this.setState({ laneAnchorEl: e.currentTarget })

@@ -48,7 +48,7 @@ export default withStyles(styles)((props: IProps) => {
     },
     {
       key: "アセット設定",
-      render: () => <AssetSetting base={0} />
+      render: () => <AssetSetting />
     }
   ];
 

@@ -1,28 +1,13 @@
 import { Button } from "@material-ui/core";
-import * as Electrom from "electron";
 import { observer } from "mobx-react";
 import * as React from "react";
 import { inject, InjectedComponent } from "../stores/inject";
 
-interface Props {
-  base: number;
-}
-
-const electron = (window as any).require("electron");
-const remote = electron.remote as Electrom.Remote;
-const BrowserWindow = remote.BrowserWindow;
-
 @inject
 @observer
-export default class AssetSetting extends InjectedComponent<Props> {
+export default class AssetSetting extends InjectedComponent {
   render() {
-    const editor = this.injected.editor;
-
-    this.props;
-
-    if (!editor) {
-      return <div />;
-    }
+    const { editor } = this.injected;
 
     return (
       <div>
@@ -30,9 +15,8 @@ export default class AssetSetting extends InjectedComponent<Props> {
           color="primary"
           aria-label="Add"
           onClick={() => {
-            editor!.asset.openAudioAssetDirectory();
+            editor.asset.openAudioAssetDirectory();
           }}
-          //className={classes.button}
         >
           load audio directory
         </Button>
