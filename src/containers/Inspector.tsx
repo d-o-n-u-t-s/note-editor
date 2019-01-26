@@ -151,7 +151,8 @@ export default class Inspector extends InjectedComponent {
 
     (window as any).GUI = GUI;
 
-    setInterval(() => {
+    // インスペクタの領域を調整する
+    new MutationObserver(_ => {
       const w = gui.domElement.offsetWidth;
       const h = gui.domElement.offsetHeight;
       gui.domElement.style.transform = `scale(${scale})`;
@@ -161,7 +162,7 @@ export default class Inspector extends InjectedComponent {
       gui.domElement.style.marginLeft = `${(w * scale - w) / 2}px`;
       gui.domElement.style.marginTop = `${(h * scale - h) / 2}px`;
       gui.domElement.style.marginBottom = `${(h * scale - h) / 2}px`;
-    }, 100);
+    }).observe(gui.domElement, { attributes: true, subtree: true });
 
     this.gameCanvas!.appendChild(gui.domElement);
   }
