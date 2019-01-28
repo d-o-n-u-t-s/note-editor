@@ -1,6 +1,9 @@
+import { ipcRenderer, remote } from "electron";
+import * as fs from "fs";
 import * as _ from "lodash";
 import { action, observable } from "mobx";
 import * as Mousetrap from "mousetrap";
+import * as util from "util";
 import { Fraction } from "../math";
 import { BpmChangeRecord } from "../objects/BPMChange";
 import { MeasureRecord } from "../objects/Measure";
@@ -9,13 +12,11 @@ import { SpeedChangeRecord } from "../objects/SpeedChange";
 import { TimelineData } from "../objects/Timeline";
 import BMSImporter from "../plugins/BMSImporter";
 import { guid } from "../util";
-import { fs, __require } from "../utils/node";
 import AssetStore from "./Asset";
 import Chart from "./Chart";
 import EditorSetting from "./EditorSetting";
 import MusicGameSystem from "./MusicGameSystem";
 
-const { remote, ipcRenderer } = __require("electron");
 const { dialog } = remote;
 
 export default class Editor {
@@ -151,7 +152,7 @@ export default class Editor {
 
     // 保存
     const data = this.currentChart!.toJSON();
-    fs.writeFile(this.currentChart!.filePath, data, "utf8", function(err: any) {
+    fs.writeFile(this.currentChart!.filePath!, data, "utf8", (err: any) => {
       if (err) {
         return console.log(err);
       }
@@ -245,7 +246,7 @@ export default class Editor {
 
   async openFiles(filePaths: string[]) {
     for (const filePath of filePaths) {
-      const file = await fs.readFile(filePath);
+      const file = await util.promisify(fs.readFile)(filePath);
       Chart.fromJSON(file.toString());
       this.currentChart!.filePath = filePath;
     }

@@ -1,4 +1,6 @@
+import * as fs from "fs";
 import * as PIXI from "pixi.js";
+import * as util from "util";
 import Pixi from "../containers/Pixi";
 import { inverseLerp, lerp, Vector2 } from "../math";
 import { Note } from "../objects/Note";
@@ -6,11 +8,6 @@ import { defaultRender } from "../objects/NoteRenderer";
 import Editor from "../stores/EditorStore";
 import store from "../stores/stores";
 import { drawQuad, drawTriangle } from "./drawQuad";
-
-const __require = (window as any).require;
-
-const fs = __require("fs");
-const util = __require("util");
 
 const textures = new Map<string, PIXI.Texture>();
 
@@ -29,13 +26,9 @@ async function getImage(imagePath: string) {
   var blob = new Blob([buffer], { type: "image/jpg" });
   const p = URL.createObjectURL(blob);
 
-  // a.set(imagePath, p);
-
   var texture = PIXI.Texture.fromImage(p);
 
   textures.set(imagePath, texture);
-
-  //  console.warn(texture);
 }
 
 const spriteMap = new WeakMap<any, PIXI.Sprite>();

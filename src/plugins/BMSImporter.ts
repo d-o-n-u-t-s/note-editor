@@ -1,14 +1,12 @@
-import { __require, fs } from "../utils/node";
-
-const { remote, ipcRenderer } = __require("electron");
-const { dialog } = remote;
-
+import { remote } from "electron";
+import * as fs from "fs";
+import * as util from "util";
+import { Fraction } from "../math";
+import { MeasureData } from "../objects/Measure";
 import Chart from "../stores/Chart";
 import store from "../stores/stores";
-import { Fraction } from "../math";
 import { guid } from "../util";
-import { MeasureData } from "../objects/Measure";
-import { number } from "prop-types";
+const { dialog } = remote;
 
 export default class BMSImporter {
   public static import() {
@@ -19,7 +17,7 @@ export default class BMSImporter {
       },
       async (filenames: string[]) => {
         for (const filename of filenames) {
-          const file = await fs.readFile(filename);
+          const file = await util.promisify(fs.readFile)(filename);
 
           this.importImplement(file.toString());
         }

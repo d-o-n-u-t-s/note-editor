@@ -1,5 +1,8 @@
-import * as Electrom from "electron";
+import { ipcRenderer, remote } from "electron";
+import * as fs from "fs";
 import { action, observable } from "mobx";
+import * as path from "path";
+import * as util from "util";
 import {
   CustomNoteLineRenderer,
   HowlPool,
@@ -9,16 +12,7 @@ import {
 } from "../stores/MusicGameSystem";
 import { guid } from "../util";
 import CustomRendererUtility from "../utils/CustomRendererUtility";
-import { __require } from "../utils/node";
 import MusicGameSystem from "./MusicGameSystem";
-
-const fs = (window as any).require("fs");
-const util = __require("util");
-const path = __require("path");
-
-const electron = (window as any).require("electron");
-const remote = electron.remote as Electrom.Remote;
-const ipcRenderer = electron.ipcRenderer as Electrom.IpcRenderer;
 
 function parseJSON(text: string) {
   try {

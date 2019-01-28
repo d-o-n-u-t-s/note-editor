@@ -1,8 +1,12 @@
+import { Configuration } from "webpack";
+
 export default {
   entry: "./src/index.tsx",
   output: {
     filename: "./dist/bundle.js"
   },
+
+  target: "electron-renderer",
 
   resolve: {
     extensions: [".ts", ".tsx", ".js"]
@@ -28,4 +32,4 @@ export default {
       }
     ]
   }
-};
+} as Configuration;
