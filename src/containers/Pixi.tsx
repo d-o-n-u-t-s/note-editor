@@ -739,9 +739,7 @@ export default class Pixi extends InjectedComponent {
           lane: targetNotePoint!.lane.guid,
           layer: chart.currentLayer.guid,
           editorProps: {
-            time: 0,
-            sePlayed: false,
-            color: 0
+            time: 0
           },
           customProps: {
             customColor: setting.customPropColor
@@ -990,10 +988,10 @@ export default class Pixi extends InjectedComponent {
 
       // 時間が巻き戻っていたら SE 再生済みフラグをリセットする
       if (currentTime < this.previousTime && currentTime < judgeTime) {
-        note.editorProps.sePlayed = false;
+        note.sePlayed = false;
       }
 
-      if (!chart.isPlaying || note.editorProps.sePlayed) continue;
+      if (!chart.isPlaying || note.sePlayed) continue;
 
       if (currentTime >= judgeTime) {
         // SE を鳴らす
@@ -1006,7 +1004,7 @@ export default class Pixi extends InjectedComponent {
             musicGameSystem.seMap.get(note.type)!.next()
           );
         }
-        note.editorProps.sePlayed = true;
+        note.sePlayed = true;
       }
     }
 

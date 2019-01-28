@@ -12,8 +12,6 @@ import { Measure } from "./Measure";
 
 interface INoteEditorProps {
   time: number;
-  color: number;
-  sePlayed: boolean;
 }
 
 export type NoteData = {
@@ -52,9 +50,7 @@ export type NoteData = {
 const defaultNoteData: NoteData = {
   guid: "GUID",
   editorProps: {
-    time: 1,
-    color: 0,
-    sePlayed: false
+    time: 1
   },
   measureIndex: -1,
   measurePosition: new Fraction(0, 1),
@@ -80,6 +76,9 @@ export class NoteRecord extends Record<NoteData>(defaultNoteData) {
     const note = new NoteRecord(data, chart);
     return Object.assign(note, note.asMutable());
   }
+
+  color: number = 0;
+  sePlayed: boolean = false;
 
   chart: Chart;
 
@@ -204,21 +203,22 @@ export class NoteRecord extends Record<NoteData>(defaultNoteData) {
 
         data.customProps = newProps;
 
-        if (noteType.editorProps.color === "$laneColor") {
-          data.editorProps.color = Number(
-            chart.musicGameSystem!.laneTemplateMap.get(
-              chart.timeline.laneMap.get(data.lane)!.templateName
-            )!.color
-          );
-        } else {
-          data.editorProps.color = Number(noteType.editorProps.color);
-        }
-
         return data;
       })()
     );
-
     this.chart = chart;
+
+    const noteType = chart.musicGameSystem!.noteTypeMap.get(data.type)!;
+
+    if (noteType.editorProps.color === "$laneColor") {
+      this.color = Number(
+        chart.musicGameSystem!.laneTemplateMap.get(
+          chart.timeline.laneMap.get(data.lane)!.templateName
+        )!.color
+      );
+    } else {
+      this.color = Number(noteType.editorProps.color);
+    }
   }
 
   /**

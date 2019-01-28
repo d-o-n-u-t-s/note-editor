@@ -11,7 +11,7 @@ export function defaultRender(
   area: LinePointInfo
 ) {
   graphics
-    .lineStyle(6, note.editorProps.color)
+    .lineStyle(6, note.color)
     .moveTo(area.point.x, area.point.y)
     .lineTo(area.point.x + area.width, area.point.y);
 }
