@@ -116,6 +116,19 @@ class Toolbar extends InjectedComponent<IProps> {
     this.setState({ anchorEl: null });
   };
 
+  /**
+   * リロード
+   */
+  handleReload = () => {
+    localStorage.setItem(
+      "filePaths",
+      JSON.stringify(
+        this.injected.editor.charts.map(c => c.filePath).filter(p => p)
+      )
+    );
+    location.reload();
+  };
+
   otherMenuValueTable: any = {
     BPM: ["bpm", "setBpm"],
     Speed: ["speed", "setSpeed"]
@@ -198,7 +211,7 @@ class Toolbar extends InjectedComponent<IProps> {
           <ArrowForwardIcon />
         </IconButton>
         {/* リロードボタン */}
-        <IconButton onClick={() => location.reload()}>
+        <IconButton onClick={this.handleReload}>
           <RefreshIcon />
         </IconButton>
 
