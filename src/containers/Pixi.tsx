@@ -23,7 +23,7 @@ import {
   OtherObjectType
 } from "../stores/EditorSetting";
 import { inject, InjectedComponent } from "../stores/inject";
-import { guid } from "../util";
+import { guid } from "../utils/guid";
 import CustomRendererUtility from "../utils/CustomRendererUtility";
 import * as key from "../utils/keyboard";
 import * as pool from "../utils/pool";

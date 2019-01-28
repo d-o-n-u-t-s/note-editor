@@ -5,7 +5,7 @@ import { Fraction } from "../math";
 import { MeasureData } from "../objects/Measure";
 import Chart from "../stores/Chart";
 import store from "../stores/stores";
-import { guid } from "../util";
+import { guid } from "../utils/guid";
 const { dialog } = remote;
 
 export default class BMSImporter {

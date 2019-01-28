@@ -4,7 +4,7 @@ import * as PIXI from "pixi.js";
 import { Fraction, IFraction } from "../math";
 import Chart from "../stores/Chart";
 import Editor from "../stores/EditorStore";
-import { GUID } from "../util";
+import { GUID } from "../utils/guid";
 import { Mutable } from "../utils/mutable";
 import { Lane, LinePointInfo } from "./Lane";
 import LaneRendererResolver from "./LaneRendererResolver";

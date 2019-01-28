@@ -1,6 +1,6 @@
 import { Record } from "immutable";
 import { Vector2 } from "../math";
-import { GUID } from "../util";
+import { GUID } from "../utils/guid";
 import { Mutable } from "../utils/mutable";
 import { Measure } from "./Measure";
 

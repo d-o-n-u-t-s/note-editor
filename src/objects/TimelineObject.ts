@@ -1,5 +1,5 @@
 import { Fraction } from "../math";
-import { GUID, guid } from "../util";
+import { GUID, guid } from "../utils/guid";
 
 export default class TimelineObject {
   guid: GUID = guid();

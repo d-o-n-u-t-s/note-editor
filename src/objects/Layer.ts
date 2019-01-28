@@ -1,5 +1,5 @@
 import { Record } from "immutable";
-import { GUID } from "../util";
+import { GUID } from "../utils/guid";
 import { Mutable } from "../utils/mutable";
 
 export type LayerData = {

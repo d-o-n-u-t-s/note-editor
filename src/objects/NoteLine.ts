@@ -1,6 +1,6 @@
 import { Record } from "immutable";
 import { Mutable } from "src/utils/mutable";
-import { GUID, guid } from "../util";
+import { GUID, guid } from "../utils/guid";
 
 export type NoteLineData = {
   guid: GUID;

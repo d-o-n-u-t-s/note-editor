@@ -12,7 +12,7 @@ import { Note, NoteRecord } from "../objects/Note";
 import { SpeedChangeRecord } from "../objects/SpeedChange";
 import { TimelineData } from "../objects/Timeline";
 import BMSImporter from "../plugins/BMSImporter";
-import { guid } from "../util";
+import { guid } from "../utils/guid";
 import AssetStore from "./Asset";
 import Chart from "./Chart";
 import EditorSetting from "./EditorSetting";

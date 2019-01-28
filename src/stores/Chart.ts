@@ -14,7 +14,7 @@ import {
   TimelineJsonData,
   TimelineRecord
 } from "../objects/Timeline";
-import { guid } from "../util";
+import { guid } from "../utils/guid";
 import HotReload from "../utils/HotReload";
 import Editor from "./EditorStore";
 import MusicGameSystem from "./MusicGameSystem";

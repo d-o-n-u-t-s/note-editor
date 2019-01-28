@@ -10,7 +10,7 @@ import {
   normalizeMusicGameSystem,
   NoteType
 } from "../stores/MusicGameSystem";
-import { guid } from "../util";
+import { guid } from "../utils/guid";
 import CustomRendererUtility from "../utils/CustomRendererUtility";
 import MusicGameSystem from "./MusicGameSystem";
 

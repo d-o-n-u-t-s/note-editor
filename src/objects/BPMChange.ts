@@ -1,7 +1,7 @@
 import { Record } from "immutable";
 import Pixi from "../containers/Pixi";
 import { Fraction, IFraction } from "../math";
-import { GUID, guid } from "../util";
+import { GUID, guid } from "../utils/guid";
 import { Mutable } from "../utils/mutable";
 import { Measure, sortMeasure } from "./Measure";
 
