@@ -3,6 +3,7 @@ import * as fs from "fs";
 import * as _ from "lodash";
 import { action, observable } from "mobx";
 import * as Mousetrap from "mousetrap";
+import { VariantType } from "notistack";
 import * as util from "util";
 import { Fraction } from "../math";
 import { BpmChangeRecord } from "../objects/BPMChange";
@@ -38,10 +39,11 @@ export default class Editor {
    * @param text 通知内容
    */
   @action
-  notify(text: string) {
+  notify(text: string, type: VariantType = "info") {
     this.notification = {
       text,
-      guid: guid()
+      guid: guid(),
+      type
     };
   }
 

@@ -17,7 +17,7 @@ class Notification extends InjectedComponent<InjectedNotistackProps> {
     if (!notification.guid) return;
 
     this.props.enqueueSnackbar(notification.text, {
-      variant: "success",
+      variant: notification.type,
       anchorOrigin: {
         vertical: "bottom",
         horizontal: "right"
