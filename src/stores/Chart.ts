@@ -190,9 +190,7 @@ export default class Chart {
     const jsonChart: Chart = JSON.parse(json);
 
     const musicGameSystem = editor.asset.musicGameSystems.find(
-      mgs =>
-        mgs.name === jsonChart.musicGameSystemName &&
-        mgs.version === jsonChart.musicGameSystemVersion
+      mgs => mgs.name === jsonChart.musicGameSystemName
     );
 
     if (!musicGameSystem) {
@@ -200,6 +198,13 @@ export default class Chart {
         "MusicGameSystem が見つかりません",
         jsonChart.musicGameSystemName,
         jsonChart.musicGameSystemVersion
+      );
+    }
+    if (musicGameSystem.version !== jsonChart.musicGameSystemVersion) {
+      // TODO: 更新処理を実装する
+      editor.notify(
+        `${musicGameSystem.name} のバージョンが異なります`,
+        "warning"
       );
     }
 
