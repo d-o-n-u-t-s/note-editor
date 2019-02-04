@@ -1,6 +1,6 @@
 {
   "name": "note-editor",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
   "main": "electron-main.js",
   "scripts": {
@@ -12,8 +12,7 @@
     "build:win": "yarn run prod && yarn run ts && electron-builder -w --dir",
     "build:mac": "yarn run prod && yarn run ts && electron-builder -m --dir"
   },
-  "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@material-ui/core": "3.9.0",
     "@material-ui/icons": "^3.0.2",
