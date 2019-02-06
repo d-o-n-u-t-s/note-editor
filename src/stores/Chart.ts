@@ -163,9 +163,7 @@ export default class Chart {
     const jsonChart: Chart = JSON.parse(json);
 
     const musicGameSystem = editor.asset.musicGameSystems.find(
-      mgs =>
-        mgs.name === jsonChart.musicGameSystemName &&
-        mgs.version === jsonChart.musicGameSystemVersion
+      mgs => mgs.name === jsonChart.musicGameSystemName
     );
 
     if (!musicGameSystem) {
