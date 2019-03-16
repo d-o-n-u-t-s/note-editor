@@ -226,7 +226,7 @@ export default class AssetStore {
     this.addMusicGameSystem(musicGameSystems);
   }
 
-  private assetPathResolve?: ((assetPath: IAssetPath) => void);
+  private assetPathResolve?: (assetPath: IAssetPath) => void;
 
   getAssetPath = new Promise<IAssetPath>(resolve => {
     this.assetPathResolve = resolve;
@@ -276,7 +276,7 @@ export default class AssetStore {
   openAudioAssetDirectory() {
     const [dir] = remote.dialog.showOpenDialog({
       properties: ["openDirectory"]
-    });
+    })!;
     this.checkAudioAssetDirectory(dir);
   }
 }

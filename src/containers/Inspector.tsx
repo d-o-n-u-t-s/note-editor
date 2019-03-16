@@ -2,10 +2,10 @@ import { GUI, GUIController } from "dat.gui";
 import { observer } from "mobx-react";
 import * as React from "react";
 import config from "../config";
-import { inject, InjectedComponent } from "../stores/inject";
-import guiUtil from "../utils/GuiUtility";
-import extensionUtility from "../utils/ExtensionUtility";
 import Editor from "../stores/EditorStore";
+import { inject, InjectedComponent } from "../stores/inject";
+import extensionUtility from "../utils/ExtensionUtility";
+import guiUtil from "../utils/GuiUtility";
 
 (window as any).extensionUtility = extensionUtility;
 
