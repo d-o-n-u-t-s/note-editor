@@ -49,9 +49,9 @@
   "dependencies": {
     "config": "^3.0.1",
     "dat.gui": "^0.7.5",
+    "fast-json-patch": "^2.0.7",
     "howler": "^2.1.1",
     "immutable": "^4.0.0-rc.12",
-    "jsondiffpatch": "^0.3.11",
     "lodash": "^4.17.11",
     "mathjs": "^5.4.1",
     "mobx": "^5.9.0",

@@ -198,14 +198,14 @@ class Toolbar extends InjectedComponent<IProps> {
       >
         {/* Undo */}
         <IconButton
-          disabled={!chart.undoable}
+          disabled={!chart.canUndo}
           onClick={() => chart!.timeline.undo()}
         >
           <ArrowBackIcon />
         </IconButton>
         {/* Redo */}
         <IconButton
-          disabled={!chart.redoable}
+          disabled={!chart.canRedo}
           onClick={() => chart!.timeline.redo()}
         >
           <ArrowForwardIcon />

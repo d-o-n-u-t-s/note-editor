@@ -174,10 +174,10 @@ export default class Chart {
   filePath: string | null = null;
 
   @observable
-  undoable = false;
+  canUndo = false;
 
   @observable
-  redoable = false;
+  canRedo = false;
 
   @action
   save() {
@@ -554,8 +554,8 @@ export default class Chart {
     delete chart.volume;
     delete chart.musicGameSystem;
     delete chart.currentLayerIndex;
-    delete chart.redoable;
-    delete chart.undoable;
+    delete chart.canRedo;
+    delete chart.canUndo;
 
     chart.musicGameSystemName = this.musicGameSystem!.name;
     chart.musicGameSystemVersion = this.musicGameSystem!.version;
