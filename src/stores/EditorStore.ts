@@ -281,14 +281,15 @@ export default class Editor {
 
     this.currentChart!.timeline.updateNoteMap();
 
-    this.currentChart!.timeline.noteLines.forEach(line => {
-      if (guidMap.has(line.head) && guidMap.has(line.tail)) {
-        line = _.cloneDeep(line);
-        line.head = guidMap.get(line.head)!;
-        line.tail = guidMap.get(line.tail)!;
-        this.currentChart!.timeline.addNoteLine(line);
-      }
-    });
+    // ノートラインを複製する
+    for (const line of this.currentChart!.timeline.noteLines) {
+      if (!guidMap.has(line.head) || !guidMap.has(line.tail)) continue;
+      const newLine = _.cloneDeep(line);
+      newLine.guid = guid();
+      newLine.head = guidMap.get(newLine.head)!;
+      newLine.tail = guidMap.get(newLine.tail)!;
+      this.currentChart!.timeline.addNoteLine(newLine);
+    }
 
     this.notify(`${this.copiedNotes.length} 個のオブジェクトを貼り付けました`);
 
