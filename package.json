@@ -5,7 +5,7 @@
   "main": "electron-main.js",
   "scripts": {
     "dev": "rm -rf node_modules/.cache && yarn run webpack-dev-server --colors --config ./webpack.dev.ts",
-    "prod": "yarn run webpack --colors --config ./webpack.prod.ts",
+    "prod": "node --max_old_space_size=4096 node_modules/webpack/bin/webpack.js --colors --config ./webpack.prod.ts",
     "ts": "tsc electron-main.ts --lib esnext --skipLibCheck",
     "plugin": "ts-node build-asset.ts",
     "dev:electron": "yarn run ts && cross-env NODE_ENV=development yarn run electron .",
