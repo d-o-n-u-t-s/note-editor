@@ -4,7 +4,6 @@ import * as PIXI from "pixi.js";
 import * as React from "react";
 import { Fraction } from "../math";
 import Vector2 from "../math/Vector2";
-import { BpmChangeRecord, BPMRenderer } from "../objects/BPMChange";
 import { Lane } from "../objects/Lane";
 import { LanePoint } from "../objects/LanePoint";
 import LanePointRenderer from "../objects/LanePointRenderer";
@@ -16,12 +15,13 @@ import { Note, NoteRecord } from "../objects/Note";
 import { NoteLineRecord } from "../objects/NoteLine";
 import NoteLineRendererResolver from "../objects/NoteLineRendererResolver";
 import NoteRendererResolver from "../objects/NoteRendererResolver";
-import { SpeedChange, SpeedRenderer } from "../objects/SpeedChange";
 import {
-  EditMode,
-  ObjectCategory,
+  OtherObject,
+  OtherObjectRenderer,
+  OtherObjectRecord,
   OtherObjectType
-} from "../stores/EditorSetting";
+} from "../objects/OtherObject";
+import { EditMode, ObjectCategory } from "../stores/EditorSetting";
 import { inject, InjectedComponent } from "../stores/inject";
 import { guid } from "../utils/guid";
 import CustomRendererUtility from "../utils/CustomRendererUtility";
@@ -260,13 +260,14 @@ export default class Pixi extends InjectedComponent {
     graphics.clear();
 
     // BPM が 1 つも存在しなかったら仮 BPM を先頭に配置する
-    if (!chart.timeline.bpmChanges.length) {
-      chart.timeline.addBpmChange(
-        BpmChangeRecord.new({
+    if (!chart.timeline.otherObjects.some(object => object.isBPM())) {
+      chart.timeline.addOtherObject(
+        OtherObjectRecord.new({
+          type: OtherObjectType.BPM,
           guid: guid(),
           measureIndex: 0,
           measurePosition: new Fraction(0, 1),
-          bpm: 120
+          value: 120
         })
       );
       chart.save();
@@ -437,17 +438,10 @@ export default class Pixi extends InjectedComponent {
       }
     }
 
-    // BPM 描画
-    for (const bpm of chart.timeline.bpmChanges) {
-      const measure = chart.timeline.measures[bpm.measureIndex];
-
-      BPMRenderer.render(bpm, graphics, measure);
-    }
-
-    // 速度変更描画
-    for (const speedChange of chart.timeline.speedChanges) {
-      const measure = chart.timeline.measures[speedChange.measureIndex];
-      SpeedRenderer.render(speedChange, graphics, measure);
+    // その他オブジェクト描画
+    for (const object of chart.timeline.otherObjects) {
+      const measure = chart.timeline.measures[object.measureIndex];
+      OtherObjectRenderer.render(object, graphics, measure);
     }
 
     // レーン中間点描画
@@ -630,44 +624,16 @@ export default class Pixi extends InjectedComponent {
       this.connectTargetNote = null;
     }
 
-    // BPM 選択
+    // その他オブジェクト選択/削除
     if (
-      setting.editMode === EditMode.Select &&
-      setting.editObjectCategory === ObjectCategory.Other &&
-      setting.editOtherTypeIndex === (OtherObjectType.BPM as number) - 1
+      (setting.editMode === EditMode.Select ||
+        setting.editMode === EditMode.Delete) &&
+      setting.editObjectCategory === ObjectCategory.Other
     ) {
-      for (const bpmChange of chart.timeline.bpmChanges) {
-        const bounds = BPMRenderer.getBounds(
-          bpmChange,
-          chart.timeline.measures[bpmChange.measureIndex]
-        );
-
-        if (bounds.contains(mousePosition.x, mousePosition.y)) {
-          graphics
-            .lineStyle(2, 0xff9900)
-            .drawRect(
-              bounds.x - 2,
-              bounds.y - 2,
-              bounds.width + 4,
-              bounds.height + 4
-            );
-          if (isClick) {
-            this.inspect(bpmChange);
-          }
-        }
-      }
-    }
-
-    // BPM 削除
-    if (
-      setting.editMode === EditMode.Delete &&
-      setting.editObjectCategory === ObjectCategory.Other &&
-      setting.editOtherTypeIndex === (OtherObjectType.BPM as number) - 1
-    ) {
-      for (const bpmChange of chart.timeline.bpmChanges) {
-        const bounds = BPMRenderer.getBounds(
-          bpmChange,
-          chart.timeline.measures[bpmChange.measureIndex]
+      for (const object of chart.timeline.otherObjects) {
+        const bounds = OtherObjectRenderer.getBounds(
+          object,
+          chart.timeline.measures[object.measureIndex]
         );
 
         if (bounds.contains(mousePosition.x, mousePosition.y)) {
@@ -681,38 +647,12 @@ export default class Pixi extends InjectedComponent {
             );
 
           if (isClick) {
-            chart.timeline.removeBpmChange(bpmChange);
-            chart.save();
-          }
-        }
-      }
-    }
-
-    // 速度変更削除
-    if (
-      setting.editMode === EditMode.Delete &&
-      setting.editObjectCategory === ObjectCategory.Other &&
-      setting.editOtherTypeIndex === (OtherObjectType.Speed as number) - 1
-    ) {
-      for (const bpmChange of chart.timeline.speedChanges) {
-        const bounds = SpeedRenderer.getBounds(
-          bpmChange,
-          chart.timeline.measures[bpmChange.measureIndex]
-        );
-
-        if (bounds.contains(mousePosition.x, mousePosition.y)) {
-          graphics
-            .lineStyle(2, 0xff9900)
-            .drawRect(
-              bounds.x - 2,
-              bounds.y - 2,
-              bounds.width + 4,
-              bounds.height + 4
-            );
-
-          if (isClick) {
-            chart.timeline.removeSpeedChange(bpmChange);
-            chart.save();
+            if (setting.editMode === EditMode.Select) {
+              this.inspect(object);
+            } else if (setting.editMode === EditMode.Delete) {
+              chart.timeline.removeOtherObject(object);
+              chart.save();
+            }
           }
         }
       }
@@ -919,71 +859,36 @@ export default class Pixi extends InjectedComponent {
       }
     }
 
-    // BPM 変更配置
+    // その他オブジェクト配置
     if (
       targetMeasure &&
       setting.editMode === EditMode.Add &&
-      setting.editObjectCategory === ObjectCategory.Other &&
-      setting.editOtherTypeIndex === (OtherObjectType.BPM as number) - 1
+      setting.editObjectCategory === ObjectCategory.Other
     ) {
       const [, ny] = normalizeContainsPoint(targetMeasure, mousePosition);
 
       const vlDiv = targetMeasureDivision;
 
-      const newBpmChange = BpmChangeRecord.new({
+      const newObject = {
+        type: setting.editOtherTypeIndex + 1,
         measureIndex: targetMeasure.index,
         measurePosition: new Fraction(
           vlDiv - 1 - _.clamp(Math.floor(ny * vlDiv), 0, vlDiv - 1),
           vlDiv
         ),
         guid: guid(),
-        bpm: setting.bpm
-      });
+        value: setting.otherValue
+      } as OtherObject;
 
       if (isClick) {
-        chart.timeline.addBpmChange(newBpmChange);
+        chart.timeline.addOtherObject(newObject);
         chart.save();
       } else {
         // プレビュー
-        BPMRenderer.render(
-          newBpmChange,
+        OtherObjectRenderer.render(
+          newObject,
           graphics,
-          chart.timeline.measures[newBpmChange.measureIndex]
-        );
-      }
-    }
-
-    // 速度変更配置
-    if (
-      targetMeasure &&
-      setting.editMode === EditMode.Add &&
-      setting.editObjectCategory === ObjectCategory.Other &&
-      setting.editOtherTypeIndex === (OtherObjectType.Speed as number) - 1
-    ) {
-      const [, ny] = normalizeContainsPoint(targetMeasure, mousePosition);
-
-      const vlDiv = targetMeasureDivision;
-      const newLanePoint = {
-        measureIndex: targetMeasure.index,
-        measurePosition: new Fraction(
-          vlDiv - 1 - _.clamp(Math.floor(ny * vlDiv), 0, vlDiv - 1),
-          vlDiv
-        ),
-        guid: guid(),
-        speed: setting.speed
-      } as SpeedChange;
-
-      if (isClick) {
-        this.injected.editor.currentChart!.timeline.addSpeedChange(
-          newLanePoint
-        );
-        chart.save();
-      } else {
-        // プレビュー
-        SpeedRenderer.render(
-          newLanePoint,
-          graphics,
-          chart.timeline.measures[newLanePoint.measureIndex]
+          chart.timeline.measures[newObject.measureIndex]
         );
       }
     }

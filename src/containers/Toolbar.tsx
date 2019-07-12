@@ -32,11 +32,9 @@ import * as React from "react";
 import { SketchPicker } from "react-color";
 import NewChartDialog from "../components/NewChartDialog";
 import VerticalDivider from "../components/VerticalDivider";
-import EditorSetting, {
-  ObjectCategory,
-  OtherObjectType
-} from "../stores/EditorSetting";
+import EditorSetting, { ObjectCategory } from "../stores/EditorSetting";
 import { inject, InjectedComponent } from "../stores/inject";
+import { OtherObjectType } from "../objects/OtherObject";
 
 function getEnumKeys(_enum: any): string[] {
   return Object.values(_enum).filter(
@@ -129,11 +127,6 @@ class Toolbar extends InjectedComponent<IProps> {
     location.reload();
   };
 
-  otherMenuValueTable: any = {
-    BPM: ["bpm", "setBpm"],
-    Speed: ["speed", "setSpeed"]
-  };
-
   renderOtherMenu() {
     const { setting } = this.injected.editor;
 
@@ -141,21 +134,12 @@ class Toolbar extends InjectedComponent<IProps> {
       setting.editOtherTypeIndex
     ];
 
-    if (!this.otherMenuValueTable[otherMenuKey]) {
-      return <span>{otherMenuKey}</span>;
-    }
-
-    const defaultValue = (setting as any)[
-      this.otherMenuValueTable[otherMenuKey][0]
-    ];
-    const setter = (setting as any)[this.otherMenuValueTable[otherMenuKey][1]];
-
     return (
       <span>
         {otherMenuKey}
         <TextField
           required
-          defaultValue={defaultValue}
+          defaultValue={setting.otherValue}
           margin="none"
           type="number"
           InputProps={{
@@ -169,8 +153,7 @@ class Toolbar extends InjectedComponent<IProps> {
           }}
           style={{ height: "24px" }}
           onChange={({ target: { value } }) => {
-            console.log(setter, value);
-            setter.call(setting, Number(value));
+            setting.setOtherValue(Number(value));
           }}
         />
       </span>
