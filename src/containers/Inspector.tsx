@@ -6,6 +6,7 @@ import Editor from "../stores/EditorStore";
 import { inject, InjectedComponent } from "../stores/inject";
 import extensionUtility from "../utils/ExtensionUtility";
 import guiUtil from "../utils/GuiUtility";
+import _ = require("lodash");
 
 (window as any).extensionUtility = extensionUtility;
 
@@ -37,6 +38,7 @@ export default class Inspector extends InjectedComponent {
 
   gameCanvas?: HTMLDivElement;
 
+  currentObjects: any[] = [];
   gui = new GUI({ autoPlace: false });
   folders: GUI[] = [];
   controllers: GUIController[] = [];
@@ -44,8 +46,15 @@ export default class Inspector extends InjectedComponent {
   /**
    * オブジェクトをインスペクタにバインドする
    */
-  bind(target: any) {
-    if (!target) return;
+  bind(targets: any[]) {
+    // 今表示しているものと完全に一致したら更新しない
+    if (
+      _.difference(targets, this.currentObjects).length == 0 &&
+      _.difference(this.currentObjects, targets).length == 0
+    ) {
+      return;
+    }
+    this.currentObjects = targets;
 
     // 既存のコントローラーを削除する
     for (const controller of this.controllers) {
@@ -137,7 +146,7 @@ export default class Inspector extends InjectedComponent {
       }
     };
 
-    add(this.gui, target, target);
+    add(this.gui, targets, targets);
   }
 
   guiScale = 1.2;
