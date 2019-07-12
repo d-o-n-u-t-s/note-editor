@@ -40,6 +40,11 @@ export interface NoteType {
   };
 }
 
+export interface OtherObjectType {
+  name: string;
+  color: string;
+}
+
 export interface CustomNoteLineRenderer {
   target: string;
   renderer: string;
@@ -90,6 +95,7 @@ interface MusicGameSystem {
   initialLanes: InitialLane[];
   measureHorizontalDivision: number;
   noteTypes: NoteType[];
+  otherObjectTypes: OtherObjectType[];
 
   /**
    * key: ノートタイプ
@@ -124,6 +130,7 @@ export function normalizeMusicGameSystem(
       customProps: [],
       editorProps: [],
       noteTypes: [],
+      otherObjectTypes: [],
 
       measure: {
         renderer: "default",

@@ -4,15 +4,10 @@ import { Fraction } from "../math";
 import { GUID } from "../utils/guid";
 import { Mutable } from "../utils/mutable";
 import { Measure } from "./Measure";
-
-export enum OtherObjectType {
-  BPM = 1,
-  Speed,
-  Skill
-}
+import { OtherObjectType } from "src/stores/MusicGameSystem";
 
 export type OtherObjectData = {
-  type: OtherObjectType;
+  type: number;
   value: number;
   guid: GUID;
 
@@ -49,15 +44,16 @@ export class OtherObjectRecord extends Record<OtherObjectData>(
   }
 
   isBPM() {
-    return this.type == OtherObjectType.BPM;
+    return this.type == 0;
   }
 }
 
 class _OtherObjectRenderer {
-  private colors = [null, 0xff0000, 0x00ff00, 0xff00ff];
-  private labels = [null, "bpm", "speed", "skill"];
-
-  getBounds(otherObject: OtherObject, measure: Measure): PIXI.Rectangle {
+  getBounds(
+    otherObjectTypes: OtherObjectType[],
+    otherObject: OtherObject,
+    measure: Measure
+  ): PIXI.Rectangle {
     const lane = measure;
 
     const y =
@@ -66,24 +62,30 @@ class _OtherObjectRenderer {
       (lane.height / otherObject.measurePosition!.denominator) *
         otherObject.measurePosition!.numerator;
 
+    const colliderW = measure.width / otherObjectTypes.length;
     const colliderH = 10;
-    const _x = measure.x + (measure.width / 3) * (otherObject.type - 1);
+    const _x = measure.x + colliderW * otherObject.type;
     const _y = y - colliderH / 2;
 
-    return new PIXI.Rectangle(_x, _y, measure.width / 3, colliderH);
+    return new PIXI.Rectangle(_x, _y, colliderW, colliderH);
   }
 
-  render(object: OtherObject, graphics: PIXI.Graphics, measure: Measure) {
-    const bounds = this.getBounds(object, measure);
+  render(
+    otherObjectTypes: OtherObjectType[],
+    object: OtherObject,
+    graphics: PIXI.Graphics,
+    measure: Measure
+  ) {
+    const bounds = this.getBounds(otherObjectTypes, object, measure);
 
     graphics
       .lineStyle(0)
-      .beginFill(this.colors[object.type]!, 0.5)
+      .beginFill(Number(otherObjectTypes[object.type].color), 0.5)
       .drawRect(measure.x, bounds.y, measure.width, bounds.height)
       .endFill();
 
     Pixi.instance!.drawText(
-      `${this.labels[object.type]}: ${object.value}`,
+      `${otherObjectTypes[object.type].name}: ${object.value}`,
       bounds.x + bounds.width / 2,
       bounds.y + bounds.height / 2,
       {},

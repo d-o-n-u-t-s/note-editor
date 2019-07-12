@@ -18,7 +18,7 @@ import { guid } from "../utils/guid";
 import HotReload from "../utils/HotReload";
 import Editor from "./EditorStore";
 import MusicGameSystem from "./MusicGameSystem";
-import { OtherObjectData, OtherObjectType } from "../objects/OtherObject";
+import { OtherObjectData } from "../objects/OtherObject";
 
 type ChartData = {
   name: string;
@@ -258,13 +258,13 @@ export default class Chart {
       console.warn("譜面フォーマットをアップデートします。");
       timelineData.otherObjects = chartData.timeline.bpmChanges.map(
         (object: any) => {
-          object.type = OtherObjectType.BPM;
+          object.type = 0;
           object.value = object.bpm;
           return object as OtherObjectData;
         }
       );
       chartData.timeline.speedChanges.map((object: any) => {
-        object.type = OtherObjectType.Speed;
+        object.type = 1;
         object.value = object.speed;
         timelineData.otherObjects.push(object as OtherObjectData);
       });

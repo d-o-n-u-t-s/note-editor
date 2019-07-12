@@ -34,13 +34,6 @@ import NewChartDialog from "../components/NewChartDialog";
 import VerticalDivider from "../components/VerticalDivider";
 import EditorSetting, { ObjectCategory } from "../stores/EditorSetting";
 import { inject, InjectedComponent } from "../stores/inject";
-import { OtherObjectType } from "../objects/OtherObject";
-
-function getEnumKeys(_enum: any): string[] {
-  return Object.values(_enum).filter(
-    key => typeof key === "string"
-  ) as string[];
-}
 
 /**
  * 編集モード
@@ -127,39 +120,6 @@ class Toolbar extends InjectedComponent<IProps> {
     location.reload();
   };
 
-  renderOtherMenu() {
-    const { setting } = this.injected.editor;
-
-    const otherMenuKey = getEnumKeys(OtherObjectType)[
-      setting.editOtherTypeIndex
-    ];
-
-    return (
-      <span>
-        {otherMenuKey}
-        <TextField
-          required
-          defaultValue={setting.otherValue}
-          margin="none"
-          type="number"
-          InputProps={{
-            inputProps: {
-              style: {
-                width: "4rem",
-                marginRight: "-.8rem",
-                textAlign: "center"
-              }
-            }
-          }}
-          style={{ height: "24px" }}
-          onChange={({ target: { value } }) => {
-            setting.setOtherValue(Number(value));
-          }}
-        />
-      </span>
-    );
-  }
-
   render() {
     const { editor } = this.injected;
     const { setting } = editor;
@@ -171,6 +131,7 @@ class Toolbar extends InjectedComponent<IProps> {
     if (!editor.currentChart) return <div />;
 
     const chart = editor.currentChart!;
+    const otherTypes = chart.musicGameSystem!.otherObjectTypes;
 
     return (
       <div
@@ -321,7 +282,28 @@ class Toolbar extends InjectedComponent<IProps> {
             </ToggleButton>
             {/* その他オブジェクトメニュー */}
             <ToggleButton value={ObjectCategory.Other}>
-              {this.renderOtherMenu()}
+              <span>
+                {otherTypes[setting.editOtherTypeIndex].name}
+                <TextField
+                  required
+                  defaultValue={setting.otherValue}
+                  margin="none"
+                  type="number"
+                  InputProps={{
+                    inputProps: {
+                      style: {
+                        width: "4rem",
+                        marginRight: "-.8rem",
+                        textAlign: "center"
+                      }
+                    }
+                  }}
+                  style={{ height: "24px" }}
+                  onChange={({ target: { value } }) => {
+                    setting.setOtherValue(Number(value));
+                  }}
+                />
+              </span>
               <ArrowDropDownIcon
                 onClick={(e: any) =>
                   this.setState({ otherAnchorEl: e.currentTarget })
@@ -391,7 +373,7 @@ class Toolbar extends InjectedComponent<IProps> {
           {(() => {
             if (!editor.currentChart!.musicGameSystem) return;
 
-            return getEnumKeys(OtherObjectType).map((name, index) => (
+            return otherTypes.map(({ name }, index) => (
               <MenuItem
                 key={index}
                 onClick={() => {

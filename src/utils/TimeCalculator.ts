@@ -1,11 +1,7 @@
 import { Fraction, IFraction } from "../math";
 import { guid } from "./guid";
 import { Measure, sortMeasure } from "../objects/Measure";
-import {
-  OtherObject,
-  OtherObjectData,
-  OtherObjectType
-} from "../objects/OtherObject";
+import { OtherObject, OtherObjectData } from "../objects/OtherObject";
 
 class BPMChangeData {
   measurePosition: number;
@@ -58,7 +54,7 @@ export class TimeCalculator {
       const newBpm = bpmAndBeatMap.has(i)
         ? bpmAndBeatMap.get(i)!
         : {
-            type: OtherObjectType.BPM,
+            type: 0,
             guid: guid(),
             measureIndex: i,
             measurePosition: new Fraction(0, 1),

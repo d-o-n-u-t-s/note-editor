@@ -18,8 +18,7 @@ import NoteRendererResolver from "../objects/NoteRendererResolver";
 import {
   OtherObject,
   OtherObjectRenderer,
-  OtherObjectRecord,
-  OtherObjectType
+  OtherObjectRecord
 } from "../objects/OtherObject";
 import { EditMode, ObjectCategory } from "../stores/EditorSetting";
 import { inject, InjectedComponent } from "../stores/inject";
@@ -263,7 +262,7 @@ export default class Pixi extends InjectedComponent {
     if (!chart.timeline.otherObjects.some(object => object.isBPM())) {
       chart.timeline.addOtherObject(
         OtherObjectRecord.new({
-          type: OtherObjectType.BPM,
+          type: 0,
           guid: guid(),
           measureIndex: 0,
           measurePosition: new Fraction(0, 1),
@@ -441,7 +440,12 @@ export default class Pixi extends InjectedComponent {
     // その他オブジェクト描画
     for (const object of chart.timeline.otherObjects) {
       const measure = chart.timeline.measures[object.measureIndex];
-      OtherObjectRenderer.render(object, graphics, measure);
+      OtherObjectRenderer.render(
+        chart.musicGameSystem!.otherObjectTypes,
+        object,
+        graphics,
+        measure
+      );
     }
 
     // レーン中間点描画
@@ -632,6 +636,7 @@ export default class Pixi extends InjectedComponent {
     ) {
       for (const object of chart.timeline.otherObjects) {
         const bounds = OtherObjectRenderer.getBounds(
+          chart.musicGameSystem!.otherObjectTypes,
           object,
           chart.timeline.measures[object.measureIndex]
         );
@@ -870,7 +875,7 @@ export default class Pixi extends InjectedComponent {
       const vlDiv = targetMeasureDivision;
 
       const newObject = {
-        type: setting.editOtherTypeIndex + 1,
+        type: setting.editOtherTypeIndex,
         measureIndex: targetMeasure.index,
         measurePosition: new Fraction(
           vlDiv - 1 - _.clamp(Math.floor(ny * vlDiv), 0, vlDiv - 1),
@@ -886,6 +891,7 @@ export default class Pixi extends InjectedComponent {
       } else {
         // プレビュー
         OtherObjectRenderer.render(
+          chart.musicGameSystem!.otherObjectTypes,
           newObject,
           graphics,
           chart.timeline.measures[newObject.measureIndex]

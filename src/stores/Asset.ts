@@ -117,6 +117,16 @@ export default class AssetStore {
   async loadMusicGameSystem(json: any, rootPath: string, directory: string) {
     const musicGameSystems = normalizeMusicGameSystem(json);
 
+    // その他オブジェクトのデフォルト値を追加
+    musicGameSystems.otherObjectTypes.unshift({
+      name: "Speed",
+      color: "0x00ff00"
+    });
+    musicGameSystems.otherObjectTypes.unshift({
+      name: "BPM",
+      color: "0xff0000"
+    });
+
     // イベントリスナーを読み込む
     if (musicGameSystems.eventListener) {
       musicGameSystems.eventListeners = await this.import(
