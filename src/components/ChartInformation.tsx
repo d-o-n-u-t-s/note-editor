@@ -24,7 +24,12 @@ export default withStyles(styles)((props: IProps) => {
   if (!props.chart) return <div />;
 
   // type でグループ化したノーツ
-  const map = _.groupBy(props.chart.timeline.notes, "type");
+  const groups = Object.entries(
+    _.groupBy(
+      props.chart.timeline.notes,
+      props.chart.musicGameSystem!.eventListeners.getGroup || "type"
+    )
+  ).sort();
 
   return (
     <Menu open={props.open} onClose={props.onClose} anchorEl={props.anchorEl}>
@@ -32,7 +37,7 @@ export default withStyles(styles)((props: IProps) => {
         <TableHead>
           <TableRow>
             <TableCell>合計</TableCell>
-            {[...Object.keys(map)].map(key => (
+            {groups.map(([key, _]) => (
               <TableCell align="right" key={key}>
                 {key}
               </TableCell>
@@ -42,7 +47,7 @@ export default withStyles(styles)((props: IProps) => {
         <TableBody>
           <TableRow>
             <TableCell>{props.chart.timeline.notes.length}</TableCell>
-            {[...Object.entries(map)].map(([key, notes]) => (
+            {groups.map(([key, notes]) => (
               <TableCell align="right" key={key}>
                 {notes.length}
               </TableCell>

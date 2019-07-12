@@ -531,6 +531,9 @@ export default class Pixi extends InjectedComponent {
       );
     }
 
+    // マウスがノート上にあるか
+    let isMouseOnNote = false;
+
     // ノート描画
     for (const note of chart.timeline.notes) {
       if (!note.isVisible) continue;
@@ -547,6 +550,7 @@ export default class Pixi extends InjectedComponent {
 
       const bounds = note.getBounds();
       if (!bounds.contains(mousePosition.x, mousePosition.y)) continue;
+      isMouseOnNote = true;
 
       // ノート選択 or 削除
       if (
@@ -619,6 +623,11 @@ export default class Pixi extends InjectedComponent {
           }
         }
       }
+    }
+
+    // 接続モードじゃないかノート外をタップしたら接続対象ノートを解除
+    if (setting.editMode !== EditMode.Connect || (isClick && !isMouseOnNote)) {
+      this.connectTargetNote = null;
     }
 
     // BPM 選択
