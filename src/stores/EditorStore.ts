@@ -164,7 +164,10 @@ export default class Editor {
 
     // イベント発火
     const onSave = this.currentChart.musicGameSystem!.eventListeners.onSave;
-    if (onSave) onSave(this.currentChart);
+    if (onSave) {
+      const alert = onSave(this.currentChart);
+      if (alert) this.notify(alert, "error");
+    }
   }
 
   @action
