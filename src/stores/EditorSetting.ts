@@ -29,11 +29,6 @@ export enum ObjectCategory {
   Other
 }
 
-export enum OtherObjectType {
-  BPM = 1,
-  Speed
-}
-
 export interface ObjectVisibility {
   lanePoint: boolean;
 }
@@ -211,18 +206,11 @@ export default class EditorSetting {
   setObjectSize = (value: number) => (this.objectSize = value);
 
   @observable
-  bpm = 120;
+  otherValue = 120;
 
   @action
-  setBpm(bpm: number) {
-    this.bpm = bpm;
-  }
-  @observable
-  speed = 1.0;
-
-  @action
-  setSpeed(speed: number) {
-    this.speed = speed;
+  setOtherValue(value: number) {
+    this.otherValue = value;
   }
 
   measureLayouts: IMeasureLayout[] = [

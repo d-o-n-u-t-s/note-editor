@@ -6,10 +6,9 @@ import * as Mousetrap from "mousetrap";
 import { VariantType } from "notistack";
 import * as util from "util";
 import { Fraction } from "../math";
-import { BpmChangeRecord } from "../objects/BPMChange";
 import { MeasureRecord } from "../objects/Measure";
 import { Note, NoteRecord } from "../objects/Note";
-import { SpeedChangeRecord } from "../objects/SpeedChange";
+import { OtherObjectRecord } from "../objects/OtherObject";
 import { TimelineData } from "../objects/Timeline";
 import BMSImporter from "../plugins/BMSImporter";
 import { guid } from "../utils/guid";
@@ -201,20 +200,11 @@ export default class Editor {
         if (note) this.inspectorTargets.push(note);
       }
 
-      // BPM 変更
-      else if (t instanceof BpmChangeRecord) {
+      // その他オブジェクト
+      else if (t instanceof OtherObjectRecord) {
         this.inspectorTargets.push(
-          this.currentChart!.timeline.bpmChanges.find(
-            bpmChange => bpmChange.guid === t.guid
-          )
-        );
-      }
-
-      // 速度変更
-      else if (t instanceof SpeedChangeRecord) {
-        this.inspectorTargets.push(
-          this.currentChart!.timeline.speedChanges.find(
-            speedChange => speedChange.guid === t.guid
+          this.currentChart!.timeline.otherObjects.find(
+            object => object.guid === t.guid
           )
         );
       }

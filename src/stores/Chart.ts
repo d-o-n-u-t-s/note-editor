@@ -18,6 +18,7 @@ import { guid } from "../utils/guid";
 import HotReload from "../utils/HotReload";
 import Editor from "./EditorStore";
 import MusicGameSystem from "./MusicGameSystem";
+import { OtherObjectData } from "../objects/OtherObject";
 
 type ChartData = {
   name: string;
@@ -60,6 +61,8 @@ class ChartRecord extends Record<ChartData>({
 export default class Chart {
   // TODO: Record にする
   // data = new ChartRecord();
+
+  version: number = 1;
 
   timeline: Timeline;
 
@@ -250,6 +253,23 @@ export default class Chart {
     console.log("譜面を読み込みます", chartData);
 
     const timelineData: TimelineJsonData = chartData.timeline;
+
+    if (chartData.version === undefined || chartData.version < this.version) {
+      console.warn("譜面フォーマットをアップデートします。");
+      timelineData.otherObjects = chartData.timeline.bpmChanges.map(
+        (object: any) => {
+          object.type = 0;
+          object.value = object.bpm;
+          return object as OtherObjectData;
+        }
+      );
+      chartData.timeline.speedChanges.map((object: any) => {
+        object.type = 1;
+        object.value = object.speed;
+        timelineData.otherObjects.push(object as OtherObjectData);
+      });
+      console.log(timelineData.otherObjects);
+    }
 
     // 1000 小節まで生成する
     for (let i = timelineData.measures.length; i <= 999; i++) {

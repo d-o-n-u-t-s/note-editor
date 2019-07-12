@@ -1,85 +1,7 @@
-import { Record } from "immutable";
-import Pixi from "../containers/Pixi";
 import { Fraction, IFraction } from "../math";
-import { GUID, guid } from "../utils/guid";
-import { Mutable } from "../utils/mutable";
-import { Measure, sortMeasure } from "./Measure";
-
-export type BpmChangeData = {
-  bpm: number;
-  guid: GUID;
-
-  /**
-   * 小節インデックス
-   */
-  measureIndex: number;
-  /**
-   * 小節内の位置
-   */
-  measurePosition: Fraction;
-};
-
-const defaultBpmChangeData: BpmChangeData = {
-  guid: "GUID",
-
-  measureIndex: 0,
-  measurePosition: Fraction.none,
-  bpm: 0
-};
-
-export type BpmChange = Mutable<BpmChangeRecord>;
-
-export class BpmChangeRecord extends Record<BpmChangeData>(
-  defaultBpmChangeData
-) {
-  static new(data: BpmChangeData): BpmChange {
-    const bpmChange = new BpmChangeRecord(data);
-    return Object.assign(bpmChange, bpmChange.asMutable());
-  }
-
-  private constructor(data: BpmChangeData) {
-    super(data);
-  }
-}
-
-class _BPMRenderer {
-  getBounds(bpmChange: BpmChange, measure: Measure): PIXI.Rectangle {
-    const lane = measure;
-
-    const y =
-      lane.y +
-      lane.height -
-      (lane.height / bpmChange.measurePosition!.denominator) *
-        bpmChange.measurePosition!.numerator;
-
-    const colliderH = 20;
-
-    const _x = measure.x;
-    const _y = y - colliderH / 2;
-
-    return new PIXI.Rectangle(_x, _y, measure.width, colliderH);
-  }
-
-  render(bpm: BpmChange, graphics: PIXI.Graphics, measure: Measure) {
-    const bounds = this.getBounds(bpm, measure);
-
-    graphics
-      .lineStyle(0)
-      .beginFill(0xff0000)
-      .drawRect(bounds.x, bounds.y, bounds.width, bounds.height)
-      .endFill();
-
-    Pixi.instance!.drawText(
-      `bpm: ${bpm.bpm}`,
-      bounds.x + bounds.width / 2,
-      bounds.y + bounds.height / 2,
-      {},
-      measure.width
-    );
-  }
-}
-
-export const BPMRenderer = new _BPMRenderer();
+import { guid } from "./guid";
+import { Measure, sortMeasure } from "../objects/Measure";
+import { OtherObject, OtherObjectData } from "../objects/OtherObject";
 
 class BPMChangeData {
   measurePosition: number;
@@ -89,7 +11,7 @@ class BPMChangeData {
   constructor(current: IBPMChangeAndBeat, prev: BPMChangeData) {
     this.measurePosition =
       current.measureIndex + Fraction.to01(current.measurePosition);
-    this.unitTime = (240 / current.bpm) * Fraction.to01(current.beat);
+    this.unitTime = (240 / current.value) * Fraction.to01(current.beat);
     this.time = prev ? prev.getTime(this.measurePosition) : 0;
   }
 
@@ -101,18 +23,19 @@ class BPMChangeData {
 /**
  * BPM 変更命令 + 拍子
  */
-interface IBPMChangeAndBeat extends BpmChangeData {
+interface IBPMChangeAndBeat extends OtherObjectData {
   beat: IFraction;
 }
 
 export class TimeCalculator {
   data: BPMChangeData[] = [];
-  constructor(data: BpmChange[], measures: Measure[]) {
+  constructor(data: OtherObject[], measures: Measure[]) {
     // 小節番号をキーにした BPM と拍子の変更命令マップ
     const bpmAndBeatMap = new Map<number, IBPMChangeAndBeat>();
 
     // 小節の開始位置に配置されている BPM 変更命令に拍子情報を追加
     let bpmChanges = data
+      .filter(object => object.isBPM())
       .map(bpmChange => {
         const bpmAndBeat = Object.assign(bpmChange, {
           beat: measures[bpmChange.measureIndex].beat
@@ -131,10 +54,11 @@ export class TimeCalculator {
       const newBpm = bpmAndBeatMap.has(i)
         ? bpmAndBeatMap.get(i)!
         : {
+            type: 0,
             guid: guid(),
             measureIndex: i,
             measurePosition: new Fraction(0, 1),
-            bpm: prevBpm,
+            value: prevBpm,
             beat: measures[i].beat
           };
 
@@ -144,13 +68,13 @@ export class TimeCalculator {
           bpmAndBeatMap.has(i) &&
           bpmAndBeatMap.get(i)!.measurePosition.numerator === 0
         ) &&
-          prevBpm !== newBpm.bpm) ||
+          prevBpm !== newBpm.value) ||
         !Fraction.equal(prevBeat, newBpm.beat)
       ) {
         bpmChanges.push(newBpm);
       }
 
-      prevBpm = newBpm.bpm;
+      prevBpm = newBpm.value;
       prevBeat = newBpm.beat;
     }
     bpmChanges = bpmChanges.sort(sortMeasure);

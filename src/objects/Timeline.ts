@@ -5,27 +5,21 @@ import { Mutable } from "src/utils/mutable";
 import { Fraction } from "../math";
 import Chart from "../stores/Chart";
 import Editor from "../stores/EditorStore";
-import {
-  BpmChange,
-  BpmChangeData,
-  BpmChangeRecord,
-  TimeCalculator
-} from "./BPMChange";
+import { TimeCalculator } from "../utils/TimeCalculator";
 import { Lane, LaneData, LaneRecord } from "./Lane";
 import { LanePoint, LanePointData, LanePointRecord } from "./LanePoint";
 import { Measure, MeasureData, MeasureRecord, sortMeasure } from "./Measure";
 import { Note, NoteData, NoteRecord } from "./Note";
 import { NoteLine, NoteLineData, NoteLineRecord } from "./NoteLine";
-import { SpeedChange, SpeedChangeData, SpeedChangeRecord } from "./SpeedChange";
+import { OtherObject, OtherObjectData, OtherObjectRecord } from "./OtherObject";
 
 export type TimelineJsonData = {
   notes: NoteData[];
   noteLines: NoteLineData[];
   measures: MeasureData[];
-  lanePoints: LanePointData[];
-  bpmChanges: BpmChangeData[];
   lanes: LaneData[];
-  speedChanges: SpeedChangeData[];
+  lanePoints: LanePointData[];
+  otherObjects: OtherObjectData[];
 };
 
 export type TimelineData = {
@@ -34,8 +28,7 @@ export type TimelineData = {
   measures: Measure[];
   lanes: Lane[];
   lanePoints: LanePoint[];
-  bpmChanges: BpmChange[];
-  speedChanges: SpeedChange[];
+  otherObjects: OtherObject[];
 };
 
 const defaultTimelineData: TimelineData = {
@@ -44,8 +37,7 @@ const defaultTimelineData: TimelineData = {
   measures: [],
   lanes: [],
   lanePoints: [],
-  bpmChanges: [],
-  speedChanges: []
+  otherObjects: []
 };
 
 type History = {
@@ -86,11 +78,8 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
     this.mutable.lanePoints = data.lanePoints.map(lanePoint =>
       LanePointRecord.new(lanePoint)
     );
-    this.mutable.bpmChanges = data.bpmChanges.map(bpmChange =>
-      BpmChangeRecord.new(bpmChange)
-    );
-    this.mutable.speedChanges = data.speedChanges.map(speedChange =>
-      SpeedChangeRecord.new(speedChange)
+    this.mutable.otherObjects = data.otherObjects.map(object =>
+      OtherObjectRecord.new(object)
     );
 
     this.updateNoteMap();
@@ -115,7 +104,7 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
   @action
   calculateTime() {
     this.timeCalculator = new TimeCalculator(
-      [...this.bpmChanges].sort(sortMeasure),
+      [...this.otherObjects].sort(sortMeasure),
       this.measures
     );
 
@@ -135,29 +124,19 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
   @observable
   horizontalLaneDivision: number = 16;
 
-  addBpmChange(value: BpmChange) {
-    this.bpmChanges.push(value);
-    this.calculateTime();
+  addOtherObject(object: OtherObject) {
+    this.otherObjects.push(object);
+    if (object.isBPM()) this.calculateTime();
   }
 
-  removeBpmChange(bpmChange: BpmChange) {
-    this.mutable.bpmChanges = this.bpmChanges.filter(bc => bc !== bpmChange);
-    this.calculateTime();
+  removeOtherObject(object: OtherObject) {
+    this.mutable.otherObjects = this.otherObjects.filter(obj => obj !== object);
+    if (object.isBPM()) this.calculateTime();
   }
 
   @action
   setMeasures(measures: Measure[]) {
     this.mutable.measures = measures;
-  }
-
-  addSpeedChange(speedChange: SpeedChange) {
-    this.speedChanges.push(speedChange);
-  }
-
-  removeSpeedChange(speedChange: SpeedChange) {
-    this.mutable.speedChanges = this.speedChanges.filter(
-      sc => sc !== speedChange
-    );
   }
 
   private histories: History[] = [];
