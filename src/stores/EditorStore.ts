@@ -382,6 +382,13 @@ export default class Editor {
       this.setting.setEditNoteTypeIndex(Math.min(index, max));
     });
 
+    // 制御
+    ipcRenderer.on("toggleMusicPlaying", () =>
+      this.currentChart!.isPlaying
+        ? this.currentChart!.pause()
+        : this.currentChart!.play()
+    );
+
     ipcRenderer.on("close", () => {
       for (let i = 0; i < this.charts.length; i++) this.saveConfirm(i);
       localStorage.setItem(

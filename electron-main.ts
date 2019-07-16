@@ -181,10 +181,6 @@ function initWindowMenu() {
       label: "選択",
       submenu: [
         {
-          label: "すべてを選択",
-          role: "selectall"
-        },
-        {
           label: "小節分割数",
           submenu: [
             {
@@ -266,6 +262,18 @@ function initWindowMenu() {
               }
             }))
           ]
+        }
+      ]
+    },
+    {
+      label: "制御",
+      submenu: [
+        {
+          label: "再生/一時停止",
+          accelerator: "P",
+          click() {
+            mainWindow!.webContents.send("toggleMusicPlaying");
+          }
         }
       ]
     }
