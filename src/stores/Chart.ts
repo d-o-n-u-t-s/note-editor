@@ -521,7 +521,7 @@ export default class Chart {
 
     const musicGameSystem = this.musicGameSystem!;
 
-    for (const initialLane of musicGameSystem.initialLanes) {
+    musicGameSystem.initialLanes.forEach((initialLane, index) => {
       const laneTemplate = musicGameSystem.laneTemplateMap.get(
         initialLane.template
       )!;
@@ -546,13 +546,13 @@ export default class Chart {
       });
 
       const newLane = {
-        guid: guid(),
+        guid: "initialLane" + index,
         templateName: laneTemplate.name,
         division: laneTemplate.division,
         points: lanePoints
       } as Lane;
       this.timeline.addLane(newLane);
-    }
+    });
   }
 
   @action
