@@ -22,18 +22,15 @@ interface IProps extends WithStyles<typeof styles> {}
 @inject
 @observer
 class ChartSetting extends InjectedComponent<IProps> {
-  handleAudioChange = async (newValue: number | null) => {
+  handleAudioChange = async (newValue: string) => {
     // 音源リセット
     if (newValue === null) {
       this.injected.editor.currentChart!.resetAudio();
       return;
     }
 
-    const path = this.injected.editor.asset.audioAssetPaths[newValue];
-
-    const nn = await this.injected.editor.asset.loadAudioAsset(path);
-
-    this.injected.editor.currentChart!.setAudio(nn, path);
+    const buffer = this.injected.editor.asset.loadAudioAsset(newValue);
+    if (buffer) this.injected.editor.currentChart!.setAudio(buffer, newValue);
   };
 
   handleMusicGameSystemsChange = async (newValue: number | null) => {
@@ -80,9 +77,7 @@ class ChartSetting extends InjectedComponent<IProps> {
           chart!.setName(value)
         )}
         <AudioSelect
-          value={editor.asset.audioAssetPaths.findIndex(
-            path => path === editor.currentChart!.audioSource
-          )}
+          value={editor.currentChart!.audioSource || ""}
           onChange={this.handleAudioChange}
         />
         {this.renderTextField(

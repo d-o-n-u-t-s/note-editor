@@ -30,7 +30,7 @@ interface IAssetPath {
 
 export default class AssetStore {
   @observable
-  audioAssetPaths: string[] = [];
+  audioAssetPath: string = "";
 
   @observable
   musicGameSystems: MusicGameSystem[] = [];
@@ -42,8 +42,8 @@ export default class AssetStore {
   async loadAssets() {
     const urlParams = await this.getAssetPath;
 
-    // 音源を読み込む
-    await this.checkAudioAssetDirectory(decodeURIComponent(urlParams.aap));
+    // 音源のパスを設定する
+    this.audioAssetPath = decodeURIComponent(urlParams.aap);
 
     // MusicGameSystem を読み込む
     {
@@ -253,33 +253,26 @@ export default class AssetStore {
     })();
   }
 
-  @action
-  pushAudioAssetPath(path: string) {
-    this.audioAssetPaths.push(path);
-  }
+  loadAudioAsset(fileName: string) {
+    // サブディレクトリも検索
+    const findRecursive = (dir: string): string | undefined => {
+      for (const file of fs.readdirSync(dir)) {
+        const filePath = path.join(dir, file);
+        if (file == fileName) return filePath;
+        if (fs.statSync(filePath).isDirectory()) {
+          const result = findRecursive(filePath);
+          if (result) return result;
+        }
+      }
+    };
 
-  loadAudioAsset(path: string) {
-    console.log("loadAudioAsset", path);
+    console.log("loadAudioAsset", fileName);
+    const foundPath = findRecursive(this.audioAssetPath);
+    if (!foundPath) return;
 
-    const buffer: Buffer = fs.readFileSync(path);
+    const buffer: Buffer = fs.readFileSync(foundPath);
 
     return buffer;
-  }
-
-  @action
-  private async checkAudioAssetDirectory(dir: string) {
-    const files: any[] = await util.promisify(fs.readdir)(dir);
-
-    var fileList = files.filter(function(file) {
-      return (
-        fs.statSync(path.join(dir, file)).isFile() &&
-        /.*\.(wav|mp3)$/.test(file)
-      ); //絞り込み
-    });
-
-    for (const fileName of fileList) {
-      this.pushAudioAssetPath(`${dir}/${fileName}`);
-    }
   }
 
   @action
@@ -287,6 +280,6 @@ export default class AssetStore {
     const [dir] = remote.dialog.showOpenDialog({
       properties: ["openDirectory"]
     })!;
-    this.checkAudioAssetDirectory(dir);
+    this.audioAssetPath = dir;
   }
 }

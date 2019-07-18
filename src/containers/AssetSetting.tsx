@@ -20,20 +20,6 @@ export default class AssetSetting extends InjectedComponent {
         >
           load audio directory
         </Button>
-
-        <div style={{ overflow: "scroll" }}>
-          {editor.asset.audioAssetPaths.map((audioAssetPath, index) => (
-            <div
-              key={index}
-              style={{
-                margin: "0 .5rem",
-                fontSize: "0.8rem"
-              }}
-            >
-              {audioAssetPath.split("/").pop()}
-            </div>
-          ))}
-        </div>
       </div>
     );
   }
