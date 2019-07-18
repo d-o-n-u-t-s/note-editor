@@ -211,15 +211,7 @@ export default class Chart {
       );
     }
 
-    const audioPath = editor.asset.audioAssetPaths.find(aap =>
-      aap.endsWith(jsonChart.audioSource!)
-    );
-
-    if (!audioPath) {
-      return console.error("音源が見つかりません", jsonChart.audioSource);
-    }
-
-    const chart = editor.newChart(musicGameSystem, audioPath);
+    const chart = editor.newChart(musicGameSystem, jsonChart.audioSource!);
     chart.load(json);
     editor.setCurrentChart(editor.charts.length - 1);
   }
@@ -462,11 +454,12 @@ export default class Chart {
 
   @action
   async setAudioFromSource(source: string) {
-    const audioBuffer = await Editor.instance!.asset.loadAudioAsset(source);
-    this.setAudio(audioBuffer, source);
+    const audioBuffer = Editor.instance!.asset.loadAudioAsset(source);
+    if (audioBuffer) this.setAudio(audioBuffer, source);
   }
 
   updateTime() {
+    if (!this.audio) return;
     const time = this.audio!.seek() as number;
     if (this.time !== time) this.setTime(time);
   }
@@ -605,8 +598,6 @@ export default class Chart {
 
     chart.musicGameSystemName = this.musicGameSystem!.name;
     chart.musicGameSystemVersion = this.musicGameSystem!.version;
-
-    chart.audioSource = (chart.audioSource || "").split("/").pop();
 
     chart.timeline = TimelineRecord.newnew(this, chart.timeline.toJS());
 

@@ -18,7 +18,7 @@ class NewChartDialog extends InjectedComponent {
   state = {
     open: false,
 
-    audioIndex: null,
+    audioPath: "",
     musicGameSystemIndex: null
   };
 
@@ -35,7 +35,7 @@ class NewChartDialog extends InjectedComponent {
 
     const newChart = editor.newChart(
       editor.asset.musicGameSystems[Number(this.state.musicGameSystemIndex)],
-      editor.asset.audioAssetPaths[Number(this.state.audioIndex)]
+      this.state.audioPath
     );
     newChart.loadInitialMeasures();
     newChart.loadInitialLanes();
@@ -84,10 +84,10 @@ class NewChartDialog extends InjectedComponent {
             </div>
             <div style={{ marginTop: ".5rem" }}>
               <AudioSelect
-                value={this.state.audioIndex}
+                value={this.state.audioPath}
                 onChange={newValue =>
                   this.setState({
-                    audioIndex: newValue
+                    audioPath: newValue
                   })
                 }
               />

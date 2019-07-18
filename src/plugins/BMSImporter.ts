@@ -483,7 +483,7 @@ export default class BMSImporter {
         },
         startTime: 0,
         name: "新規譜面",
-        audioSource: store.editor.asset.audioAssetPaths[16],
+        audioSource: "",
         musicGameSystemName: "BMS",
         musicGameSystemVersion: 0.1
       })

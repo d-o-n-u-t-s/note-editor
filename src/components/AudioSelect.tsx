@@ -10,10 +10,11 @@ import { observer } from "mobx-react";
 import * as React from "react";
 import { inject, InjectedComponent } from "../stores/inject";
 import styles from "../styles/styles";
+import { remote } from "electron";
 
 interface IProps extends WithStyles<typeof styles> {
-  value: number | null;
-  onChange: (newValue: number | null) => void;
+  value: string;
+  onChange: (newValue: string) => void;
 }
 
 @inject
@@ -33,25 +34,17 @@ class AudioSelect extends InjectedComponent<IProps> {
           音源
         </InputLabel>
         <Select
-          value={this.props.value === null ? -1 : this.props.value}
-          onChange={(e: any) => {
-            const v = e.target.value;
-            this.props.onChange(v === -1 ? null : v);
+          value={0}
+          onClick={(e: any) => {
+            const result = remote.dialog.showOpenDialog({
+              defaultPath: editor.asset.audioAssetPath,
+              filters: [{ name: "音源", extensions: ["mp3", "wav"] }]
+            });
+            if (result) this.props.onChange(result[0].split("/").pop()!);
           }}
-          inputProps={{
-            className: classes.input,
-            name: "currentAudio",
-            id: "audio"
-          }}
+          inputProps={{ disabled: true }}
         >
-          <MenuItem value={-1}>
-            <em>None</em>
-          </MenuItem>
-          {editor.asset.audioAssetPaths.map((c, i) => (
-            <MenuItem value={i} key={i}>
-              {c.split("/").pop()}
-            </MenuItem>
-          ))}
+          <MenuItem value="0">{this.props.value || <em>None</em>}</MenuItem>
         </Select>
       </FormControl>
     );
