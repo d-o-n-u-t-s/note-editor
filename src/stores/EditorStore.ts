@@ -258,6 +258,19 @@ export default class Editor {
   paste() {
     if (this.inspectorTargets.length != 1) return;
     if (!(this.inspectorTargets[0] instanceof MeasureRecord)) return;
+    if (this.copiedNotes.length == 0) return;
+
+    const oldChart = this.copiedNotes[0].chart;
+    if (oldChart.musicGameSystem != this.currentChart!.musicGameSystem) {
+      this.notify("musicGameSystemが一致しません", "error");
+      return;
+    }
+
+    const tl = this.currentChart!.timeline;
+    if (!this.copiedNotes.every(note => tl.laneMap.has(note.lane))) {
+      this.notify("レーンIDが一致しません", "error");
+      return;
+    }
 
     const diff =
       this.inspectorTargets[0].index -
@@ -269,19 +282,21 @@ export default class Editor {
       note = note.clone();
       note.guid = guidMap.get(note.guid)!;
       note.measureIndex += diff;
-      this.currentChart!.timeline.addNote(note, false);
+      note.layer = this.currentChart!.currentLayer.guid;
+      note.chart = this.currentChart!;
+      tl.addNote(note, false);
     }
 
-    this.currentChart!.timeline.updateNoteMap();
+    tl.updateNoteMap();
 
     // ノートラインを複製する
-    for (const line of this.currentChart!.timeline.noteLines) {
+    for (const line of oldChart.timeline.noteLines) {
       if (!guidMap.has(line.head) || !guidMap.has(line.tail)) continue;
       const newLine = _.cloneDeep(line);
       newLine.guid = guid();
       newLine.head = guidMap.get(newLine.head)!;
       newLine.tail = guidMap.get(newLine.tail)!;
-      this.currentChart!.timeline.addNoteLine(newLine);
+      tl.addNoteLine(newLine);
     }
 
     this.notify(`${this.copiedNotes.length} 個のオブジェクトを貼り付けました`);
