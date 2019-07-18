@@ -62,7 +62,7 @@ export default class Chart {
   // TODO: Record にする
   // data = new ChartRecord();
 
-  version: number = 1;
+  version: number = 2;
 
   timeline: Timeline;
 
@@ -254,8 +254,13 @@ export default class Chart {
 
     const timelineData: TimelineJsonData = chartData.timeline;
 
-    if (chartData.version === undefined || chartData.version < this.version) {
+    chartData.version = chartData.version | 0;
+    if (chartData.version < this.version) {
       console.warn("譜面フォーマットをアップデートします。");
+    }
+
+    // BPM変更と速度変更をOtherObjectsに統合
+    if (chartData.version === 0) {
       timelineData.otherObjects = chartData.timeline.bpmChanges.map(
         (object: any) => {
           object.type = 0;
@@ -269,6 +274,27 @@ export default class Chart {
         timelineData.otherObjects.push(object as OtherObjectData);
       });
       console.log(timelineData.otherObjects);
+    }
+
+    // 初期レーンのguidを固定
+    if (chartData.version <= 1) {
+      for (let i = 0; i < this.musicGameSystem!.initialLanes.length; i++) {
+        const guid = "initialLane" + i;
+        const oldGuid = chartData.timeline.lanes[i].guid;
+        chartData.timeline.lanes[i].guid = guid;
+        for (const note of chartData.timeline.notes) {
+          if (note.lane == oldGuid) {
+            note.lane = guid;
+          }
+        }
+      }
+      // 以前コピペされたゴミデータを削除
+      const layers = chartData.layers.map((lane: any) => lane.guid);
+      layers.push(undefined);
+      const lanes = chartData.timeline.lanes.map((lane: any) => lane.guid);
+      chartData.timeline.notes = chartData.timeline.notes.filter(
+        (note: any) => layers.includes(note.layer) && lanes.includes(note.lane)
+      );
     }
 
     // 1000 小節まで生成する
@@ -521,7 +547,7 @@ export default class Chart {
 
     const musicGameSystem = this.musicGameSystem!;
 
-    for (const initialLane of musicGameSystem.initialLanes) {
+    musicGameSystem.initialLanes.forEach((initialLane, index) => {
       const laneTemplate = musicGameSystem.laneTemplateMap.get(
         initialLane.template
       )!;
@@ -546,13 +572,13 @@ export default class Chart {
       });
 
       const newLane = {
-        guid: guid(),
+        guid: "initialLane" + index,
         templateName: laneTemplate.name,
         division: laneTemplate.division,
         points: lanePoints
       } as Lane;
       this.timeline.addLane(newLane);
-    }
+    });
   }
 
   @action
