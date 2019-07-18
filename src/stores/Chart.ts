@@ -288,6 +288,13 @@ export default class Chart {
           }
         }
       }
+      // 以前コピペされたゴミデータを削除
+      const layers = chartData.layers.map((lane: any) => lane.guid);
+      layers.push(undefined);
+      const lanes = chartData.timeline.lanes.map((lane: any) => lane.guid);
+      chartData.timeline.notes = chartData.timeline.notes.filter(
+        (note: any) => layers.includes(note.layer) && lanes.includes(note.lane)
+      );
     }
 
     // 1000 小節まで生成する
