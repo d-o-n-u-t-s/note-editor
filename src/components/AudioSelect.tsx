@@ -40,7 +40,7 @@ class AudioSelect extends InjectedComponent<IProps> {
               defaultPath: editor.asset.audioAssetPath,
               filters: [{ name: "音源", extensions: ["mp3", "wav"] }]
             });
-            if (result) this.props.onChange(result[0].split("/").pop()!);
+            if (result) this.props.onChange(result[0].split(/[\/\\]/).pop()!);
           }}
           inputProps={{ disabled: true }}
         >
