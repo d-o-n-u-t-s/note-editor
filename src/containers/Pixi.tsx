@@ -15,11 +15,7 @@ import { Note, NoteRecord } from "../objects/Note";
 import { NoteLineRecord } from "../objects/NoteLine";
 import NoteLineRendererResolver from "../objects/NoteLineRendererResolver";
 import NoteRendererResolver from "../objects/NoteRendererResolver";
-import {
-  OtherObject,
-  OtherObjectRenderer,
-  OtherObjectRecord
-} from "../objects/OtherObject";
+import { OtherObjectRenderer, OtherObjectRecord } from "../objects/OtherObject";
 import { EditMode, ObjectCategory } from "../stores/EditorSetting";
 import { inject, InjectedComponent } from "../stores/inject";
 import { guid } from "../utils/guid";
@@ -874,7 +870,7 @@ export default class Pixi extends InjectedComponent {
 
       const vlDiv = targetMeasureDivision;
 
-      const newObject = {
+      const newObject = OtherObjectRecord.new({
         type: setting.editOtherTypeIndex,
         measureIndex: targetMeasure.index,
         measurePosition: new Fraction(
@@ -883,7 +879,7 @@ export default class Pixi extends InjectedComponent {
         ),
         guid: guid(),
         value: setting.otherValue
-      } as OtherObject;
+      });
 
       if (isClick) {
         chart.timeline.addOtherObject(newObject);
