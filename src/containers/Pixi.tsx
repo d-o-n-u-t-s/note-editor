@@ -188,16 +188,6 @@ export default class Pixi extends InjectedComponent {
 
   seMap = new Map<string, Howl>();
 
-  private getMeasureDivision(measure?: Measure) {
-    if (!measure) return 1;
-    return this.injected.editor.setting.measureDivisionMultiplyBeat
-      ? Math.round(
-          this.injected.editor.setting.measureDivision *
-            Fraction.to01(measure.beat)
-        )
-      : this.injected.editor.setting.measureDivision;
-  }
-
   /**
    * canvas を再描画する
    */
@@ -373,7 +363,10 @@ export default class Pixi extends InjectedComponent {
     const targetMeasure = chart.timeline.measures.find(measure =>
       measure.containsPoint(mousePosition)
     );
-    const targetMeasureDivision = this.getMeasureDivision(targetMeasure);
+    const measureDivision = this.injected.editor.setting.measureDivision;
+    const targetMeasureDivision = !targetMeasure
+      ? 1
+      : measureDivision * Fraction.to01(targetMeasure.beat);
 
     if (targetMeasure) {
       // ターゲット小節の枠を描画
@@ -395,9 +388,9 @@ export default class Pixi extends InjectedComponent {
       // ターゲット小節の分割線を描画
       const div = targetMeasureDivision;
       for (var i = 1; i < div; ++i) {
-        const y = s.y + (s.height / div) * i;
+        const y = s.y + (s.height / div) * (div - i);
         graphics
-          .lineStyle(2, 0xffffff, (4 * i) % div === 0 ? 1 : 0.6)
+          .lineStyle(2, 0xffffff, (4 * i) % measureDivision === 0 ? 1 : 0.6)
           .moveTo(s.x, y)
           .lineTo(s.x + measureWidth, y);
       }

@@ -126,20 +126,6 @@ class EditorSetting extends InjectedComponent<IProps> {
           <FormControlLabel
             control={
               <Switch
-                checked={setting.measureDivisionMultiplyBeat}
-                onChange={(_, value) =>
-                  setting.setMeasureDivisionMultiplyBeat(value)
-                }
-                value="checkedB"
-                color="primary"
-              />
-            }
-            label="拍子を考慮した小節分割"
-          />
-
-          <FormControlLabel
-            control={
-              <Switch
                 checked={setting.preserve3D}
                 onChange={(_, value) =>
                   setting.set3D(
