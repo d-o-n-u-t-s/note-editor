@@ -321,9 +321,9 @@ export default class Pixi extends InjectedComponent {
 
         cx = x + measureWidth / 2;
         cy = setting.measureLayout.getScrollOffsetY(
-          setting,
+          $y,
           measure,
-          measure.currentTimePosition
+          chart.timeline.measures
         );
 
         graphics
@@ -355,7 +355,7 @@ export default class Pixi extends InjectedComponent {
     // 対象タイムラインを画面中央に配置する
     graphics.x = w / 2 - cx;
 
-    graphics.x -= (measureWidth + padding) * (cy - 0.5);
+    graphics.x += (measureWidth + padding) * (cy - 0.5);
 
     if (graphics.x > 0) graphics.x = 0;
 
