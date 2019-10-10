@@ -159,20 +159,6 @@ export default class EditorSetting {
   }
 
   /**
-   * 小節分割数に拍子を乗算するか
-   */
-  @observable
-  measureDivisionMultiplyBeat = true;
-
-  /**
-   * 小節分割数に拍子を乗算するか
-   */
-  @action
-  setMeasureDivisionMultiplyBeat(value: boolean) {
-    this.measureDivisionMultiplyBeat = value;
-  }
-
-  /**
    * 1 小節の分割数
    */
   @observable

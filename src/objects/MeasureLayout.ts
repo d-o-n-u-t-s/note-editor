@@ -16,11 +16,7 @@ export interface IMeasureLayout {
     measures: Measure[]
   ): void;
 
-  getScrollOffsetY(
-    editorSetting: EditorSetting,
-    measure: Measure,
-    position: number
-  ): number;
+  getScrollOffsetY(y: number, measure: Measure, measures: Measure[]): number;
 }
 
 export class DefaultMeasureLayout implements IMeasureLayout {
@@ -36,42 +32,34 @@ export class DefaultMeasureLayout implements IMeasureLayout {
     const padding = editorSetting.padding;
     const laneWidth = editorSetting.measureWidth;
 
-    let index = 0;
+    const baseHeight = (renderer.height - padding * 2) / hC;
 
-    const w = renderer.width;
-    const h = renderer.height;
+    let x = padding;
+    let y = renderer.height - padding;
 
     // レーンを描画
-    draw_lane: for (var $x = 0; ; ++$x) {
-      for (var i = hC - 1; i >= 0; --i) {
-        var hh = (h - padding * 2) / hC;
-
-        const x = padding + $x * (laneWidth + padding);
-        const y = padding + hh * i;
-
-        const measure = measures[index];
-
-        // 画面内に表示されているか
-        measure.isVisible = x + laneWidth > -graphics.x && x < -graphics.x + w;
-
-        measure.x = x;
-        measure.y = y;
-        measure.width = laneWidth;
-        measure.height = hh;
-
-        if (++index >= measures.length) break draw_lane;
+    for (const measure of measures) {
+      measure.width = laneWidth;
+      measure.height = baseHeight * Fraction.to01(measure.beat);
+      y -= measure.height;
+      // 収まりきらないなら次の列へ
+      if (y < 0) {
+        x += laneWidth + padding;
+        y = renderer.height - padding - measure.height;
       }
+      measure.x = x;
+      measure.y = y;
+
+      // 画面内に表示されているか
+      measure.isVisible =
+        x + laneWidth > -graphics.x && x < -graphics.x + renderer.width;
     }
   }
 
-  getScrollOffsetY(
-    editorSetting: EditorSetting,
-    measure: Measure,
-    position: number
-  ) {
-    const hC = editorSetting.verticalLaneCount;
-    const i = hC - 1 - (measure.index % hC);
-    return (hC - 1 - i + position) / hC;
+  getScrollOffsetY(y: number, measure: Measure, measures: Measure[]) {
+    measures = measures.filter(m => m.x == measure.x);
+    const top = measures[measures.length - 1].y;
+    return (y - top) / (measures[0].y + measures[0].height - top);
   }
 }
 
@@ -117,11 +105,7 @@ export class GameMeasureLayout implements IMeasureLayout {
     }
   }
 
-  getScrollOffsetY(
-    editorSetting: EditorSetting,
-    measure: Measure,
-    position: number
-  ) {
+  getScrollOffsetY(y: number, measure: Measure, measures: Measure[]) {
     return 0.5;
   }
 }
