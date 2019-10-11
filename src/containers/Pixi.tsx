@@ -917,7 +917,10 @@ export default class Pixi extends InjectedComponent {
       }
     }
 
-    for (const se of this.seMap.values()) se.play();
+    for (const se of this.seMap.values()) {
+      se.volume(chart.seVolume);
+      se.play();
+    }
 
     this.previousTime = currentTime;
 

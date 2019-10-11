@@ -24,10 +24,11 @@ export default withStyles(styles)((props: IProps) => {
   if (!props.chart) return <div />;
 
   // type でグループ化したノーツ
+  const getGroup = props.chart.musicGameSystem!.eventListeners.getGroup;
   const groups = Object.entries(
     _.groupBy(
       props.chart.timeline.notes,
-      props.chart.musicGameSystem!.eventListeners.getGroup || "type"
+      getGroup ? n => getGroup(n, props.chart) : "type"
     )
   ).sort();
 

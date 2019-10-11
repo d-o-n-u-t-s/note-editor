@@ -10,6 +10,8 @@ import PauseIcon from "@material-ui/icons/Pause";
 import PlayArrow from "@material-ui/icons/PlayArrow";
 import SettingsIcon from "@material-ui/icons/Settings";
 import SpeakerIcon from "@material-ui/icons/VolumeUp";
+import SpeedIcon from "@material-ui/icons/Speed";
+import SeVolumeIcon from "@material-ui/icons/SurroundSound";
 import Slider from "@material-ui/lab/Slider";
 import { observer } from "mobx-react";
 import * as React from "react";
@@ -133,6 +135,12 @@ class Player extends InjectedComponent<Props> {
             </IconButton>
           )}
 
+          <span style={{ color: "#fff" }}>
+            {this.formatTime(chart.audioBuffer!.duration * time)}
+            {" / "}
+            {this.formatTime(chart.audioBuffer!.duration)}
+          </span>
+
           <IconButton
             style={{ color: "#fff" }}
             className={classes.playerButton}
@@ -148,7 +156,7 @@ class Player extends InjectedComponent<Props> {
             max={1}
             style={{
               marginBottom: "4px",
-              marginRight: "2rem",
+              marginRight: "10px",
               width: "100px",
               display: "inline-block"
             }}
@@ -161,11 +169,12 @@ class Player extends InjectedComponent<Props> {
             }}
           />
 
-          <span style={{ color: "#fff" }}>
-            {this.formatTime(chart.audioBuffer!.duration * time)}
-            {" / "}
-            {this.formatTime(chart.audioBuffer!.duration)}
-          </span>
+          <IconButton
+            style={{ color: "#fff" }}
+            className={classes.playerButton}
+          >
+            <SpeedIcon />
+          </IconButton>
 
           <Slider
             value={chart.speed}
@@ -174,7 +183,7 @@ class Player extends InjectedComponent<Props> {
             step={0.1}
             style={{
               marginBottom: "4px",
-              marginLeft: "1rem",
+              marginRight: "10px",
               width: "100px",
               display: "inline-block"
             }}
@@ -184,6 +193,33 @@ class Player extends InjectedComponent<Props> {
             }}
             onChange={(_, value) => {
               chart.setSpeed(value);
+            }}
+          />
+
+          <IconButton
+            style={{ color: "#fff" }}
+            className={classes.playerButton}
+          >
+            <SeVolumeIcon />
+          </IconButton>
+
+          <Slider
+            value={chart.seVolume}
+            min={0}
+            max={1}
+            step={0.1}
+            style={{
+              marginBottom: "4px",
+              marginRight: "10px",
+              width: "100px",
+              display: "inline-block"
+            }}
+            classes={{
+              track: classes.volumeSliderTrack,
+              thumb: classes.volumeSliderThumb
+            }}
+            onChange={(_, value) => {
+              chart.setSeVolume(value);
             }}
           />
 

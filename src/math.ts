@@ -26,6 +26,22 @@ export class Fraction {
     return fraction;
   }
 
+  static mul(a: IFraction, b: IFraction) {
+    const fraction = {
+      numerator: a.numerator * b.numerator,
+      denominator: a.denominator * b.denominator
+    };
+    this.reduce(fraction);
+    return fraction;
+  }
+
+  static div(a: IFraction, b: IFraction) {
+    return Fraction.mul(a, {
+      numerator: b.denominator,
+      denominator: b.numerator
+    });
+  }
+
   // 約分
   static reduce(fraction: IFraction) {
     const div = math.gcd(fraction.numerator, fraction.denominator);
