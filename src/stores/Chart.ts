@@ -107,9 +107,7 @@ export default class Chart {
       // TODO: 専用のダイアログを作成する
       if (
         window.confirm(
-          `${
-            removeNotes.length
-          } 個のノートが削除されます\nレイヤーを削除しますか？`
+          `${removeNotes.length} 個のノートが削除されます\nレイヤーを削除しますか？`
         )
       ) {
         // TODO: 一括削除する
@@ -375,6 +373,9 @@ export default class Chart {
   speed: number = 1.0;
 
   @observable
+  seVolume: number = 1.0;
+
+  @observable
   startTime: number = 0.0;
 
   @action
@@ -392,6 +393,11 @@ export default class Chart {
   setSpeed(value: number) {
     this.speed = value;
     this.audio!.rate(value);
+  }
+
+  @action
+  setSeVolume(value: number) {
+    this.seVolume = value;
   }
 
   @computed
