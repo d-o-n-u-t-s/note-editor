@@ -280,6 +280,18 @@ export default class Editor {
     for (let note of this.copiedNotes) {
       guidMap.set(note.guid, guid());
       note = note.clone();
+
+      // 新旧小節の拍子を考慮して位置を調整
+      note.measurePosition = Fraction.mul(
+        note.measurePosition,
+        Fraction.div(
+          oldChart.timeline.measures[note.measureIndex].beat,
+          tl.measures[note.measureIndex + diff].beat
+        )
+      );
+      if (note.measurePosition.numerator >= note.measurePosition.denominator)
+        continue;
+
       note.guid = guidMap.get(note.guid)!;
       note.measureIndex += diff;
       note.layer = this.currentChart!.currentLayer.guid;
@@ -337,9 +349,13 @@ export default class Editor {
   moveDivision(index: number) {
     const frac = new Fraction(index, this.setting.measureDivision);
     const notes = this.getInspectNotes();
+    const measures = this.currentChart!.timeline.measures;
 
     notes.forEach(note => {
-      const p = Fraction.add(note.measurePosition, frac);
+      const p = Fraction.add(
+        note.measurePosition,
+        Fraction.div(frac, measures[note.measureIndex].beat)
+      );
       if (p.numerator < 0 && note.measureIndex != 0) {
         note.measureIndex--;
         p.numerator += p.denominator;
