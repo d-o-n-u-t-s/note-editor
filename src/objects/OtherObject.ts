@@ -1,10 +1,10 @@
 import { Record } from "immutable";
 import Pixi from "../containers/Pixi";
 import { Fraction } from "../math";
+import { OtherObjectType } from "../stores/MusicGameSystem";
 import { GUID } from "../utils/guid";
 import { Mutable } from "../utils/mutable";
 import { Measure } from "./Measure";
-import { OtherObjectType } from "src/stores/MusicGameSystem";
 
 export type OtherObjectData = {
   type: number;
@@ -43,8 +43,25 @@ export class OtherObjectRecord extends Record<OtherObjectData>(
     super(data);
   }
 
-  isBPM() {
+  /**
+   * 小節位置を取得する
+   */
+  public getMeasurePosition() {
+    return this.measureIndex + Fraction.to01(this.measurePosition);
+  }
+
+  /**
+   * BPMオブジェクトか
+   */
+  public isBPM() {
     return this.type == 0;
+  }
+
+  /**
+   * 停止オブジェクトか
+   */
+  public isStop() {
+    return this.type == 2;
   }
 }
 
