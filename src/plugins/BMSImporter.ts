@@ -8,6 +8,12 @@ import store from "../stores/stores";
 import { guid } from "../utils/guid";
 const { dialog } = remote;
 
+type Stop = {
+  value: number;
+  laneIndex: number;
+  position: Fraction;
+};
+
 export default class BMSImporter {
   public static import() {
     dialog.showOpenDialog(
@@ -88,6 +94,8 @@ export default class BMSImporter {
         if (id == 18) note.id = 6;
         if (id == 19) note.id = 7;
 
+        if (note.id === -1) continue;
+
         notes.push(note);
 
         // フリースクラッチ
@@ -145,8 +153,11 @@ export default class BMSImporter {
     const bpms: any[] = [];
     const exBpms = new Map<number, number>();
 
+    const stopDefines = new Map<number, number>();
+    const stops: Stop[] = [];
+
     const bpmN = (laneIndex: number, source: string) => {
-      const values = source.match(/.{2}/)!;
+      const values = source.match(/.{2}/g)!;
 
       const denominator = values.length;
       let count = 0;
@@ -174,13 +185,10 @@ export default class BMSImporter {
 
     const bpmEx = (laneIndex: number, source: string) => {
       const values = source.match(/.{2}/g)!;
-      console.log(values);
 
       const denominator = values.length;
 
       for (const [index, value] of values.entries()) {
-        console.log("拡張BPM を読み込みます", index, value, bpms);
-
         if (value === "00") continue;
 
         // 00 ~ FF
@@ -193,6 +201,26 @@ export default class BMSImporter {
         });
       }
     };
+
+    const parseStop = (laneIndex: number, source: string) => {
+      const values = source.match(/.{2}/g)!;
+
+      const denominator = values.length;
+
+      for (const [index, value] of values.entries()) {
+        if (value === "00") continue;
+
+        // 00 ~ FF
+        const bpmIndex = parseInt(value, 16);
+
+        stops.push({
+          value: stopDefines.get(bpmIndex)!,
+          laneIndex: laneIndex,
+          position: new Fraction(index, denominator)
+        });
+      }
+    };
+
     const channel = (index: number, id: number, values: string) => {
       const laneIndex = index;
 
@@ -203,9 +231,9 @@ export default class BMSImporter {
         return;
       }
 
+      // xxx09: 停止命令
       if (id == 9) {
-        //   addStop(laneIndex, values);
-
+        parseStop(laneIndex, values);
         return;
       }
 
@@ -255,6 +283,8 @@ export default class BMSImporter {
     };
 
     const lines = bmsChart.split("\n");
+
+    let title = "";
 
     // レーン数を算出する
     let laneLength = -1;
@@ -311,6 +341,11 @@ export default class BMSImporter {
                     
 */
 
+        if (line.match(/#TITLE .+/)) {
+          title = line.substr(7).trim();
+          continue;
+        }
+
         if (line.match(/#BPM .+/)) {
           const bpm = Number(line.substr(5));
 
@@ -336,19 +371,11 @@ export default class BMSImporter {
           continue;
         }
 
-        if (line.match(/#STOP[0-9A-Z]{2} .+/)) {
-          /*
-                        BMS_Header header = new BMS_Header(line, 36);
-
-                        int stop = header.intValue();
-
-                        println("Stop", header.id.ToString(), stop.ToString());
-
-
-                        HeaderCollection_STOP.Add(header.id, header);
-
-                        */
-
+        // STOP
+        if (line.match(/#STOP[0-9A-F]{2} .+/)) {
+          const value = Number(headerN(line));
+          const id = parseInt(line.substr(5, 2), 16);
+          stopDefines.set(id, value);
           continue;
         }
       } catch (e) {
@@ -363,12 +390,13 @@ export default class BMSImporter {
       horizontalSize: 1,
       horizontalPosition: {
         numerator: note.id,
-        denominator: 9
+        denominator: 8
       },
       measureIndex: note.laneIndex,
       measurePosition: note.position,
       type: "tap",
       lane: "60914b20c1205ff1563407fa2d2b233d",
+      layer: "<layer>",
       editorProps: {}
     });
 
@@ -410,15 +438,34 @@ export default class BMSImporter {
 
     Chart.fromJSON(
       JSON.stringify({
+        version: 2,
+        layers: [
+          {
+            guid: "<layer>",
+            name: "defaultLayer",
+            visible: true,
+            lock: true
+          }
+        ],
         timeline: {
           speedChanges: [],
-          horizontalLaneDivision: 9,
-          bpmChanges: bpms.map(bpm => ({
-            measureIndex: bpm.laneIndex,
-            measurePosition: bpm.position,
-            bpm: bpm.bpm,
-            guid: guid()
-          })),
+          horizontalLaneDivision: 8,
+          otherObjects: [
+            ...bpms.map(bpm => ({
+              type: 0,
+              measureIndex: bpm.laneIndex,
+              measurePosition: bpm.position,
+              value: bpm.bpm,
+              guid: guid()
+            })),
+            ...stops.map(stop => ({
+              type: 2,
+              measureIndex: stop.laneIndex,
+              measurePosition: stop.position,
+              value: stop.value,
+              guid: guid()
+            }))
+          ],
           lanePoints: [
             {
               measureIndex: 0,
@@ -470,7 +517,7 @@ export default class BMSImporter {
             {
               guid: "60914b20c1205ff1563407fa2d2b233d",
               templateName: "normal",
-              division: 9,
+              division: 8,
               points: [
                 "2937357cffe6bec2c44cb9c13e3b17e4",
                 "a90db42627230b200865d972b31196dc"
@@ -483,7 +530,7 @@ export default class BMSImporter {
         },
         startTime: 0,
         name: "新規譜面",
-        audioSource: "",
+        audioSource: title + ".wav",
         musicGameSystemName: "BMS",
         musicGameSystemVersion: 0.1
       })

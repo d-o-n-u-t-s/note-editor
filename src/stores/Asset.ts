@@ -119,6 +119,10 @@ export default class AssetStore {
 
     // その他オブジェクトのデフォルト値を追加
     musicGameSystems.otherObjectTypes.unshift({
+      name: "Stop",
+      color: "0x0000ff"
+    });
+    musicGameSystems.otherObjectTypes.unshift({
       name: "Speed",
       color: "0x00ff00"
     });
