@@ -11,7 +11,7 @@ export interface IMeasureLayout {
    */
   layout(
     editorSetting: EditorSetting,
-    renderer: PIXI.WebGLRenderer | PIXI.CanvasRenderer,
+    renderer: PIXI.Renderer,
     graphics: PIXI.Graphics,
     measures: Measure[]
   ): void;
@@ -23,7 +23,7 @@ export class DefaultMeasureLayout implements IMeasureLayout {
   name = "default";
   layout(
     editorSetting: EditorSetting,
-    renderer: PIXI.WebGLRenderer | PIXI.CanvasRenderer,
+    renderer: PIXI.Renderer,
     graphics: PIXI.Graphics,
     measures: Measure[]
   ) {
@@ -67,7 +67,7 @@ export class GameMeasureLayout implements IMeasureLayout {
   name = "game";
   layout(
     editorSetting: EditorSetting,
-    renderer: PIXI.WebGLRenderer | PIXI.CanvasRenderer,
+    renderer: PIXI.Renderer,
     graphics: PIXI.Graphics,
     measures: Measure[]
   ) {

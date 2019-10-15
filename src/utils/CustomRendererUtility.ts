@@ -26,7 +26,7 @@ async function getImage(imagePath: string) {
   var blob = new Blob([buffer], { type: "image/jpg" });
   const p = URL.createObjectURL(blob);
 
-  var texture = PIXI.Texture.fromImage(p);
+  var texture = PIXI.Texture.from(p);
 
   textures.set(imagePath, texture);
 }
