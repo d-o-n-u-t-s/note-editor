@@ -1,5 +1,6 @@
 import { ipcRenderer, remote } from "electron";
 import * as fs from "fs";
+import * as _ from "lodash";
 import { action, observable } from "mobx";
 import * as path from "path";
 import * as util from "util";
@@ -10,9 +11,10 @@ import {
   normalizeMusicGameSystem,
   NoteType
 } from "../stores/MusicGameSystem";
-import { guid } from "../utils/guid";
 import CustomRendererUtility from "../utils/CustomRendererUtility";
+import { guid } from "../utils/guid";
 import MusicGameSystem from "./MusicGameSystem";
+import IMusicGameSystemEventListener from "./musicGameSystem/eventListener";
 
 function parseJSON(text: string) {
   try {
@@ -133,8 +135,22 @@ export default class AssetStore {
 
     // イベントリスナーを読み込む
     if (musicGameSystems.eventListener) {
-      musicGameSystems.eventListeners = await this.import(
-        path.join(rootPath, directory, musicGameSystems.eventListener)
+      // 1 ファイルだけなら配列にする
+      if (_.isString(musicGameSystems.eventListener)) {
+        musicGameSystems.eventListener = [musicGameSystems.eventListener];
+      }
+
+      const importedEventListeners: IMusicGameSystemEventListener[] = [];
+      for (const eventListener of musicGameSystems.eventListener) {
+        importedEventListeners.push(
+          await this.import(path.join(rootPath, directory, eventListener))
+        );
+      }
+
+      // 複数のイベントリスナーをマージする
+      musicGameSystems.eventListeners = importedEventListeners.reduce(
+        (a, b) => Object.assign(a, b),
+        {}
       );
     }
 
