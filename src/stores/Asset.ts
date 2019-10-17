@@ -103,6 +103,7 @@ export default class AssetStore {
       .toString()
       .replace(`exports.__esModule = true;`, "")
       .replace("export default", `window["${key}"] = `)
+      .replace("exports.default", `window["${key}"]`)
       .replace(`exports["default"]`, `window["${key}"]`);
 
     eval(source);
@@ -148,9 +149,9 @@ export default class AssetStore {
       }
 
       // 複数のイベントリスナーをマージする
-      musicGameSystems.eventListeners = importedEventListeners.reduce(
-        (a, b) => Object.assign(a, b),
-        {}
+      musicGameSystems.eventListeners = Object.assign(
+        {},
+        ...importedEventListeners
       );
     }
 
