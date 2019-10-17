@@ -1,26 +1,24 @@
 import { Configuration } from "webpack";
 
-export default {
+const configuration: Configuration = {
   entry: "./src/index.tsx",
   output: {
     filename: "./dist/bundle.js"
   },
-
   target: "electron-renderer",
-
   resolve: {
     extensions: [".ts", ".tsx", ".js"]
   },
-
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
+        test: /\.(ts|tsx)?$/,
         use: [
           {
             loader: "ts-loader"
           }
-        ]
+        ],
+        exclude: [/assets/, /node_modules/]
       },
       {
         test: /\.(wav|mp3)?$/,
@@ -32,4 +30,6 @@ export default {
       }
     ]
   }
-} as Configuration;
+};
+
+export default configuration;

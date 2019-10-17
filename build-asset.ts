@@ -2,29 +2,35 @@ import * as fs from "fs";
 import * as path from "path";
 import * as ts from "typescript";
 
-const readSubDirSync = (folderPath: string) => {
-  let result: any[] = [];
+/**
+ * ファイルを列挙する
+ * @param directoryPath 対象ディレクトリ
+ */
+const enumerateFiles = (directoryPath: string) => {
+  const files: string[] = [];
 
-  const readTopDirSync = (folderPath: string) => {
-    let items = fs.readdirSync(folderPath);
-    items = items.map(itemName => {
-      return path.join(folderPath, itemName);
+  const readTopDirSync = (directoryPath: string) => {
+    const items = fs.readdirSync(directoryPath).map(itemName => {
+      return path.join(directoryPath, itemName);
     });
-    items.forEach(itemPath => {
-      result.push(itemPath);
+
+    for (const itemPath of items) {
+      files.push(itemPath);
       if (fs.statSync(itemPath).isDirectory()) {
         readTopDirSync(itemPath);
-        //再帰処理
       }
-    });
+    }
   };
-  readTopDirSync(folderPath);
-  return result;
+
+  readTopDirSync(directoryPath);
+  return files;
 };
 
+/**
+ * import を変換する
+ * @param src 変換ソース
+ */
 function replaceImports(src: string) {
-  // console.log(src);
-
   return src.replace(/import[\s\S]+?;/g, (...args) => {
     const from = args[0].slice(
       args[0].indexOf(`"`) + 1,
@@ -49,18 +55,50 @@ function replaceImports(src: string) {
   });
 }
 
-const files = readSubDirSync("./assets/musicGameSystems");
+const directoryPath = "./assets/musicGameSystems";
 
-for (const file of files.filter(f => f.endsWith(".ts"))) {
-  var data = fs.readFileSync(file, "utf-8");
+const files = enumerateFiles(directoryPath).filter(f => f.match(/src\/.*.ts$/));
 
-  const data2 = replaceImports(data);
+console.log(files);
 
-  let result = ts.transpileModule(data2, {
+function sleep(time: number) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve();
+    }, time);
+  });
+}
+
+/**
+ * .ts を .js にトランスパイルする
+ * @param file 対象 .ts ファイル
+ */
+const transpile = async (file: string) => {
+  await sleep(100);
+
+  let data = fs.readFileSync("./" + file, "utf-8");
+  data = replaceImports(data);
+
+  const result = ts.transpileModule(data, {
     compilerOptions: {
       module: ts.ModuleKind.CommonJS
     }
   });
 
-  fs.writeFileSync(file.replace(".ts", ".js"), result.outputText);
+  fs.writeFileSync(
+    "./" + file.replace(".ts", ".js").replace("/src/", "/dest/"),
+    result.outputText
+  );
+  console.log("transpiled: ", file, result.outputText.length);
+};
+
+// ファイルの更新を監視する
+for (const file of files) {
+  fs.watch(file, () => transpile(file));
 }
+
+for (const file of files) {
+  transpile(file);
+}
+
+console.log("watch...");
