@@ -13,6 +13,7 @@ import {
 } from "../stores/MusicGameSystem";
 import CustomRendererUtility from "../utils/CustomRendererUtility";
 import { guid } from "../utils/guid";
+import { replaceAsync } from "../utils/string";
 import MusicGameSystem from "./MusicGameSystem";
 import IMusicGameSystemEventListener from "./musicGameSystem/eventListener";
 
@@ -89,18 +90,34 @@ export default class AssetStore {
   }
 
   /**
-   * 外部のスクリプトをインポートする
-   * @param path *.js ファイルのパス
+   * 外部のスクリプトを読み込む
+   * @param scriptPath *.js ファイルのパス
    */
-  async import(path: string) {
-    const buffer: Buffer = await util.promisify(fs.readFile)(path);
+  private async readScript(scriptPath: string): Promise<string> {
+    const source = (await util.promisify(fs.readFile)(scriptPath)).toString();
 
+    // include コメントを処理する
+    return await replaceAsync(source, /\/\/ *include.+/g, async match => {
+      const includePath = path.join(
+        path.dirname(scriptPath),
+        match.split(" ").pop()!
+      );
+      return await this.readScript(includePath);
+    });
+  }
+
+  /**
+   * 外部のスクリプトをインポートする
+   * @param scriptPath *.js ファイルのパス
+   */
+  private async import(scriptPath: string) {
     const key = guid();
 
     (window as any).exports = { __esModule: true };
 
-    const source = buffer
-      .toString()
+    const script = await this.readScript(scriptPath);
+
+    const source = script
       .replace(`exports.__esModule = true;`, "")
       .replace("export default", `window["${key}"] = `)
       .replace("exports.default", `window["${key}"]`)
