@@ -111,7 +111,7 @@ interface MusicGameSystem {
 
   measure: MusicGameSystemMeasure;
 
-  eventListener: string | null;
+  eventListener: string | string[] | null;
   eventListeners: IMusicGameSystemEventListener;
 }
 /**

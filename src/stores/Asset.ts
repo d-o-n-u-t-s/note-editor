@@ -1,5 +1,6 @@
 import { ipcRenderer, remote } from "electron";
 import * as fs from "fs";
+import * as _ from "lodash";
 import { action, observable } from "mobx";
 import * as path from "path";
 import * as util from "util";
@@ -10,9 +11,11 @@ import {
   normalizeMusicGameSystem,
   NoteType
 } from "../stores/MusicGameSystem";
-import { guid } from "../utils/guid";
 import CustomRendererUtility from "../utils/CustomRendererUtility";
+import { guid } from "../utils/guid";
+import { replaceAsync } from "../utils/string";
 import MusicGameSystem from "./MusicGameSystem";
+import IMusicGameSystemEventListener from "./musicGameSystem/eventListener";
 
 function parseJSON(text: string) {
   try {
@@ -87,20 +90,37 @@ export default class AssetStore {
   }
 
   /**
-   * 外部のスクリプトをインポートする
-   * @param path *.js ファイルのパス
+   * 外部のスクリプトを読み込む
+   * @param scriptPath *.js ファイルのパス
    */
-  async import(path: string) {
-    const buffer: Buffer = await util.promisify(fs.readFile)(path);
+  private async readScript(scriptPath: string): Promise<string> {
+    const source = (await util.promisify(fs.readFile)(scriptPath)).toString();
 
+    // include コメントを処理する
+    return await replaceAsync(source, /\/\/ *include.+/g, async match => {
+      const includePath = path.join(
+        path.dirname(scriptPath),
+        match.split(" ").pop()!
+      );
+      return await this.readScript(includePath);
+    });
+  }
+
+  /**
+   * 外部のスクリプトをインポートする
+   * @param scriptPath *.js ファイルのパス
+   */
+  private async import(scriptPath: string) {
     const key = guid();
 
     (window as any).exports = { __esModule: true };
 
-    const source = buffer
-      .toString()
+    const script = await this.readScript(scriptPath);
+
+    const source = script
       .replace(`exports.__esModule = true;`, "")
       .replace("export default", `window["${key}"] = `)
+      .replace("exports.default", `window["${key}"]`)
       .replace(`exports["default"]`, `window["${key}"]`);
 
     eval(source);
@@ -133,8 +153,22 @@ export default class AssetStore {
 
     // イベントリスナーを読み込む
     if (musicGameSystems.eventListener) {
-      musicGameSystems.eventListeners = await this.import(
-        path.join(rootPath, directory, musicGameSystems.eventListener)
+      // 1 ファイルだけなら配列にする
+      if (_.isString(musicGameSystems.eventListener)) {
+        musicGameSystems.eventListener = [musicGameSystems.eventListener];
+      }
+
+      const importedEventListeners: IMusicGameSystemEventListener[] = [];
+      for (const eventListener of musicGameSystems.eventListener) {
+        importedEventListeners.push(
+          await this.import(path.join(rootPath, directory, eventListener))
+        );
+      }
+
+      // 複数のイベントリスナーをマージする
+      musicGameSystems.eventListeners = Object.assign(
+        {},
+        ...importedEventListeners
       );
     }
 
