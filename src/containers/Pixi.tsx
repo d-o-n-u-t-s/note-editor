@@ -32,7 +32,9 @@ export default class Pixi extends InjectedComponent {
   private currentFrame = 0;
 
   componentDidMount() {
-    this.app = new PIXI.Application(window.innerWidth, window.innerHeight, {
+    this.app = new PIXI.Application({
+      width: window.innerWidth,
+      height: window.innerHeight,
       antialias: true
     });
 
@@ -120,7 +122,7 @@ export default class Pixi extends InjectedComponent {
     maxWidth?: number
   ) {
     if (this.tempTextIndex >= this.temporaryTexts.length) {
-      const t = new PIXI.Text();
+      const t = new PIXI.Text("");
       t.anchor.set(0.5, 0.5);
       this.graphics!.addChild(t);
       this.temporaryTexts.push(t);
