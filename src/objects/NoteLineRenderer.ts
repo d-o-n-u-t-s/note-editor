@@ -46,7 +46,7 @@ class NoteLineRenderer implements INoteLineRenderer {
       graphics
         .lineStyle(1, head.color, 1)
         .moveTo(line.start.point.x + line.start.width, line.start.point.y)
-        .lineTo(line.end.point.x + line.start.width, line.end.point.y);
+        .lineTo(line.end.point.x + line.end.width, line.end.point.y);
     }
   }
 
