@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import { withSnackbarProps, withSnackbar } from "notistack";
+import { WithSnackbarProps, withSnackbar } from "notistack";
 import * as React from "react";
 import { inject, InjectedComponent } from "../stores/inject";
 
@@ -8,7 +8,7 @@ import { inject, InjectedComponent } from "../stores/inject";
  */
 @inject
 @observer
-class Notification extends InjectedComponent<withSnackbarProps> {
+class Notification extends InjectedComponent<WithSnackbarProps> {
   /**
    * 通知する
    */
