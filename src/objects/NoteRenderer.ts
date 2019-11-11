@@ -1,5 +1,6 @@
 import { LinePointInfo } from "./Lane";
 import { Note } from "./Note";
+import * as PIXI from "pixi.js";
 
 export interface INoteRenderer {
   render(target: Note, graphics: PIXI.Graphics): void;

@@ -1,4 +1,5 @@
 import Pixi from "../containers/Pixi";
+import * as PIXI from "pixi.js";
 import * as _ from "lodash";
 
 export default class GraphicObject {

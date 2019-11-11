@@ -1,4 +1,5 @@
 import { Record } from "immutable";
+import * as PIXI from "pixi.js";
 import Pixi from "../containers/Pixi";
 import { Fraction } from "../math";
 import { OtherObjectType } from "../stores/MusicGameSystem";

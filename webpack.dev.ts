@@ -18,16 +18,7 @@ export default merge(
         template: src + "/index.dev.html",
         filename: "index.html"
       })
-    ],
-    externals: {
-      "pixi.js": "PIXI",
-      react: "React",
-      "react-dom": "ReactDOM",
-      mobx: "mobx",
-      "mobx-react": "mobxReact",
-      "material-ui": "window['material-ui']",
-      immutable: "Immutable"
-    }
+    ]
   },
   {
     devServer: {

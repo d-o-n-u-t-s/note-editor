@@ -1,4 +1,5 @@
 import Pixi from "../containers/Pixi";
+import * as PIXI from "pixi.js";
 import { Fraction } from "../math";
 import Vector2 from "../math/Vector2";
 import { drawQuad } from "../utils/drawQuad";
