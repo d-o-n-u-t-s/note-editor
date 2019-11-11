@@ -1,5 +1,6 @@
 import { LanePoint } from "./LanePoint";
 import { Measure } from "./Measure";
+import * as PIXI from "pixi.js";
 
 class LanePointRenderer {
   getBounds(lanePoint: LanePoint, measure: Measure): PIXI.Rectangle {
