@@ -132,6 +132,19 @@ export default class Editor {
     }
 
     this.currentChart = this.charts[chartIndex];
+
+    this.setting.editNoteTypeIndex = Math.min(
+      this.setting.editNoteTypeIndex,
+      this.currentChart.musicGameSystem!.noteTypes.length - 1
+    );
+    this.setting.editLaneTypeIndex = Math.min(
+      this.setting.editLaneTypeIndex,
+      this.currentChart.musicGameSystem!.laneTemplates.length - 1
+    );
+    this.setting.editOtherTypeIndex = Math.min(
+      this.setting.editOtherTypeIndex,
+      this.currentChart.musicGameSystem!.otherObjectTypes.length - 1
+    );
   }
 
   public static instance: Editor | null = null;
