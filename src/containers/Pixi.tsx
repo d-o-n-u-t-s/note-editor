@@ -118,7 +118,7 @@ export default class Pixi extends InjectedComponent {
     text: string,
     x: number,
     y: number,
-    option?: PIXI.TextStyleOptions,
+    option?: any,
     maxWidth?: number
   ) {
     if (this.tempTextIndex >= this.temporaryTexts.length) {
@@ -130,7 +130,7 @@ export default class Pixi extends InjectedComponent {
 
     const t: PIXI.Text & {
       // 前フレームのスタイル
-      previousStyleOptions?: PIXI.TextStyleOptions;
+      previousStyleOptions?: any;
       previousMaxWidth?: number;
     } = this.temporaryTexts[this.tempTextIndex];
 
