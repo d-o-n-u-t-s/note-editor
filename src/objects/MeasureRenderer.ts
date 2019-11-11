@@ -1,4 +1,5 @@
 import { Measure } from "./Measure";
+import * as PIXI from "pixi.js";
 
 export interface IMeasureRenderer {
   render(graphics: PIXI.Graphics, measure: Measure, measures: Measure[]): void;

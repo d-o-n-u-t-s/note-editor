@@ -1,4 +1,5 @@
 import Pixi from "../containers/Pixi";
+import * as PIXI from "pixi.js";
 import { Fraction, IFraction, inverseLerp, lerp, Vector2 } from "../math";
 import { sortMeasure } from "../objects/Measure";
 import { LaneTemplate, NoteType } from "../stores/MusicGameSystem";

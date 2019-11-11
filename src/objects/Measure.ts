@@ -1,6 +1,7 @@
 import { Record } from "immutable";
 import * as _ from "lodash";
 import Pixi from "../containers/Pixi";
+import * as PIXI from "pixi.js";
 import { Fraction, IFraction } from "../math";
 import {
   MusicGameSystemMeasure,
