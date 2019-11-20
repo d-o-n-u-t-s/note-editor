@@ -358,6 +358,38 @@ export default class Editor {
     if (notes.length > 0) this.currentChart!.save();
   }
 
+  /**
+   * 選択中のノートを左右に移動する
+   * @param value 移動量
+   */
+  @action
+  private moveSelectedNotes(value: number) {
+    const notes = this.getInspectNotes();
+
+    for (const note of notes) {
+      const { numerator, denominator } = note.horizontalPosition;
+      note.horizontalPosition.numerator = _.clamp(
+        numerator + value,
+        0,
+        denominator - note.horizontalSize
+      );
+    }
+  }
+
+  /**
+   * 選択中のノートを左右反転する
+   */
+  @action
+  private flipSelectedNotes() {
+    const notes = this.getInspectNotes();
+
+    for (const note of notes) {
+      const { numerator, denominator } = note.horizontalPosition;
+      note.horizontalPosition.numerator =
+        denominator - 1 - numerator - (note.horizontalSize - 1);
+    }
+  }
+
   @action
   moveDivision(index: number) {
     const frac = new Fraction(index, this.setting.measureDivision);
@@ -404,12 +436,14 @@ export default class Editor {
     ipcRenderer.on("moveDivision", (_: any, index: number) =>
       this.moveDivision(index)
     );
-    ipcRenderer.on("moveLane", (_: any, index: number) =>
-      this.moveLane(i => i + index)
-    );
-    ipcRenderer.on("flipLane", () =>
-      this.moveLane(i => this.currentChart!.timeline.lanes.length - i - 1)
-    );
+    ipcRenderer.on("moveLane", (_: any, index: number) => {
+      this.moveLane(i => i + index);
+      this.moveSelectedNotes(index);
+    });
+    ipcRenderer.on("flipLane", () => {
+      this.moveLane(i => this.currentChart!.timeline.lanes.length - i - 1);
+      this.flipSelectedNotes();
+    });
 
     // 選択
     ipcRenderer.on("changeMeasureDivision", (_: any, index: number) =>
