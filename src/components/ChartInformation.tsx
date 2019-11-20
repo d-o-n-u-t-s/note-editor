@@ -23,17 +23,19 @@ interface IProps extends WithStyles<typeof styles> {
 export default withStyles(styles)((props: IProps) => {
   if (!props.chart) return <div />;
 
-  // type でグループ化したノーツ
-  const getGroup = props.chart.musicGameSystem!.eventListeners.getGroup;
-  const groups = Object.entries(
-    _.groupBy(
-      props.chart.timeline.notes,
-      getGroup ? n => getGroup(n, props.chart) : "type"
-    )
-  ).sort();
+  function renderTable() {
+    if (!props.open) return <div />;
 
-  return (
-    <Menu open={props.open} onClose={props.onClose} anchorEl={props.anchorEl}>
+    // type でグループ化したノーツ
+    const getGroup = props.chart.musicGameSystem!.eventListeners.getGroup;
+    const groups = Object.entries(
+      _.groupBy(
+        props.chart.timeline.notes,
+        getGroup ? n => getGroup(n, props.chart) : "type"
+      )
+    ).sort();
+
+    return (
       <Table className={props.classes.table}>
         <TableHead>
           <TableRow>
@@ -56,6 +58,12 @@ export default withStyles(styles)((props: IProps) => {
           </TableRow>
         </TableBody>
       </Table>
+    );
+  }
+
+  return (
+    <Menu open={props.open} onClose={props.onClose} anchorEl={props.anchorEl}>
+      {renderTable()}
     </Menu>
   );
 });
