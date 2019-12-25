@@ -94,7 +94,7 @@ class ChartSetting extends InjectedComponent<IProps> {
           <Select
             value={chart.difficulty}
             onChange={({ target: { value } }) => {
-              chart.setDifficulty(parseInt(value));
+              chart.setDifficulty(parseInt(value as string));
             }}
             inputProps={{
               className: classes.input,

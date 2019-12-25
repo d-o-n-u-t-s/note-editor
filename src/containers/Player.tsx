@@ -1,6 +1,7 @@
 import {
   createStyles,
   IconButton,
+  Slider,
   withStyles,
   WithStyles
 } from "@material-ui/core";
@@ -9,10 +10,9 @@ import NotesIcon from "@material-ui/icons/Notes";
 import PauseIcon from "@material-ui/icons/Pause";
 import PlayArrow from "@material-ui/icons/PlayArrow";
 import SettingsIcon from "@material-ui/icons/Settings";
-import SpeakerIcon from "@material-ui/icons/VolumeUp";
 import SpeedIcon from "@material-ui/icons/Speed";
 import SeVolumeIcon from "@material-ui/icons/SurroundSound";
-import Slider from "@material-ui/lab/Slider";
+import SpeakerIcon from "@material-ui/icons/VolumeUp";
 import { observer } from "mobx-react";
 import * as React from "react";
 import ChartInformation from "../components/ChartInformation";
@@ -165,7 +165,7 @@ class Player extends InjectedComponent<Props> {
               thumb: classes.volumeSliderThumb
             }}
             onChange={(_, value) => {
-              editor!.currentChart!.setVolume(value);
+              editor!.currentChart!.setVolume(value as number);
             }}
           />
 
@@ -192,7 +192,7 @@ class Player extends InjectedComponent<Props> {
               thumb: classes.volumeSliderThumb
             }}
             onChange={(_, value) => {
-              chart.setSpeed(value);
+              chart.setSpeed(value as number);
             }}
           />
 
@@ -219,7 +219,7 @@ class Player extends InjectedComponent<Props> {
               thumb: classes.volumeSliderThumb
             }}
             onChange={(_, value) => {
-              chart.setSeVolume(value);
+              chart.setSeVolume(value as number);
             }}
           />
 

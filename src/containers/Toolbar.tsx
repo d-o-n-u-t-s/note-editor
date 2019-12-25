@@ -59,12 +59,12 @@ const styles = (theme: Theme) =>
 
     displaySetting: {
       outline: 0,
-      padding: theme.spacing.unit * 2
+      padding: theme.spacing(2)
     },
 
     toggleContainer: {
       // height: 56,
-      padding: `${theme.spacing.unit}px ${theme.spacing.unit * 2}px`,
+      padding: `${theme.spacing()}px ${theme.spacing(2)}px`,
       display: "flex",
       alignItems: "center",
       justifyContent: "flex-start"

@@ -41,7 +41,7 @@ export default class ChartTab extends InjectedComponent {
               style={{ marginLeft: "-1.5rem" }}
               key={index}
               aria-label="Delete"
-              buttonRef={el => {
+              buttonRef={(el: HTMLElement) => {
                 if (!el) return;
                 this.closeButtons.push({ chart, el });
               }}
@@ -72,7 +72,7 @@ export default class ChartTab extends InjectedComponent {
             <Tab
               key={index}
               label={chart.name}
-              buttonRef={el => {
+              buttonRef={(el: HTMLElement) => {
                 if (!el) return;
                 this.tabElements.push(el);
               }}
