@@ -149,24 +149,32 @@ export default class Editor {
 
   public static instance: Editor | null = null;
 
+  /**
+   * 譜面を保存する
+   */
   @action
-  save() {
-    if (!this.currentChart) {
+  private save() {
+    const chart = this.currentChart;
+
+    if (!chart) {
       console.warn("譜面を開いていません");
       return;
     }
 
-    if (!this.currentChart!.filePath) {
+    if (!chart.filePath) {
       this.saveAs();
       return;
     }
 
     // 譜面を最適化する
-    this.currentChart!.timeline.optimise();
+    chart.timeline.optimise();
+
+    chart.musicGameSystem!.eventListeners.onSerialize?.(chart);
 
     // 保存
-    const data = this.currentChart!.toJSON();
-    fs.writeFile(this.currentChart!.filePath!, data, "utf8", (err: any) => {
+    const data = chart.toJSON();
+
+    fs.writeFile(chart.filePath!, data, "utf8", (err: any) => {
       if (err) {
         return console.log(err);
       }
@@ -175,9 +183,9 @@ export default class Editor {
     this.notify("譜面を保存しました");
 
     // イベント発火
-    const onSave = this.currentChart.musicGameSystem!.eventListeners.onSave;
+    const onSave = chart.musicGameSystem!.eventListeners.onSave;
     if (onSave) {
-      const alert = onSave(this.currentChart);
+      const alert = onSave(chart);
       if (alert) this.notify(alert, "error");
     }
   }
