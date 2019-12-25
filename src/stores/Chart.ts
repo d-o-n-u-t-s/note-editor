@@ -8,6 +8,7 @@ import { LanePoint } from "../objects/LanePoint";
 import { Layer, LayerData, LayerRecord } from "../objects/Layer";
 import { MeasureRecord } from "../objects/Measure";
 import { Note } from "../objects/Note";
+import { OtherObjectData } from "../objects/OtherObject";
 import {
   Timeline,
   TimelineData,
@@ -18,7 +19,6 @@ import { guid } from "../utils/guid";
 import HotReload from "../utils/HotReload";
 import Editor from "./EditorStore";
 import MusicGameSystem from "./MusicGameSystem";
-import { OtherObjectData } from "../objects/OtherObject";
 
 type ChartData = {
   name: string;
@@ -71,6 +71,8 @@ export default class Chart {
 
   @observable
   currentLayerIndex = 0;
+
+  customProps: any = {};
 
   @computed
   get currentLayer() {
@@ -265,6 +267,22 @@ export default class Chart {
       });
       console.log(timelineData.otherObjects);
     }
+
+    // 譜面のカスタムオプションを読み込む
+    (() => {
+      const data = chartData.customProps || {};
+
+      const newProps: any = {};
+      for (const prop of this.musicGameSystem!.customProps) {
+        if (prop.key in data) {
+          newProps[prop.key] = data[prop.key];
+        } else {
+          newProps[prop.key] = prop.defaultValue;
+        }
+      }
+
+      this.customProps = newProps;
+    })();
 
     // 初期レーンのguidを固定
     if (chartData.version <= 1) {

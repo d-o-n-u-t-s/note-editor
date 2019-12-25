@@ -111,6 +111,12 @@ interface MusicGameSystem {
 
   measure: MusicGameSystemMeasure;
 
+  customProps: {
+    key: string;
+    defaultValue: any;
+    config: string[] | null;
+  }[];
+
   eventListener: string | string[] | null;
   eventListeners: IMusicGameSystemEventListener;
 }
@@ -150,6 +156,7 @@ export function normalizeMusicGameSystem(
       },
       noteType.editorProps
     );
+    noteType.excludeLanes = noteType.excludeLanes || [];
     noteType.connectableTypes = noteType.connectableTypes || [];
   }
 

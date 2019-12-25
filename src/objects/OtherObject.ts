@@ -59,6 +59,13 @@ export class OtherObjectRecord extends Record<OtherObjectData>(
   }
 
   /**
+   * 速度変更オブジェクトか
+   */
+  public isSpeed() {
+    return this.type == 1;
+  }
+
+  /**
    * 停止オブジェクトか
    */
   public isStop() {

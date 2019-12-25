@@ -5,7 +5,8 @@ import {
   Select,
   TextField,
   WithStyles,
-  withStyles
+  withStyles,
+  Button
 } from "@material-ui/core";
 import { observer } from "mobx-react";
 import * as React from "react";
@@ -86,7 +87,6 @@ class ChartSetting extends InjectedComponent<IProps> {
           (value: any) => editor.currentChart!.setStartTime(parseFloat(value)),
           "number"
         )}
-
         <FormControl style={{ width: "100%", margin: "6px 0" }}>
           <InputLabel htmlFor="difficulty" className={classes.label}>
             難易度
@@ -108,7 +108,6 @@ class ChartSetting extends InjectedComponent<IProps> {
             ))}
           </Select>
         </FormControl>
-
         <MusicGameSystemSelect
           value={editor.asset.musicGameSystems.findIndex(
             path => path === chart.musicGameSystem
@@ -123,6 +122,12 @@ class ChartSetting extends InjectedComponent<IProps> {
             background: "#eee"
           }}
         />
+        <Button
+          variant="outlined"
+          onClick={() => editor.setInspectorTarget(chart.customProps)}
+        >
+          カスタム設定
+        </Button>
       </div>
     );
   }
