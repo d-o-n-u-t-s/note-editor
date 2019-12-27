@@ -14,7 +14,7 @@ import BMSImporter from "../plugins/BMSImporter";
 import { guid } from "../utils/guid";
 import AssetStore from "./Asset";
 import Chart from "./Chart";
-import EditorSetting from "./EditorSetting";
+import EditorSetting, { EditMode } from "./EditorSetting";
 import MusicGameSystem from "./MusicGameSystem";
 
 const { dialog } = remote;
@@ -122,8 +122,12 @@ export default class Editor {
     this.setCurrentChart(0);
   }
 
+  /**
+   * 譜面を切り替える
+   * @param chartIndex 切り替える譜面のインデックス
+   */
   @action
-  setCurrentChart(chartIndex: number) {
+  public setCurrentChart(chartIndex: number) {
     this.currentChartIndex = chartIndex;
 
     if (!this.charts.length) {
@@ -132,6 +136,9 @@ export default class Editor {
     }
 
     this.currentChart = this.charts[chartIndex];
+
+    // 譜面を切り替えたときは選択ツールに切り替える
+    this.setting.setEditMode(EditMode.Select);
 
     this.setting.editNoteTypeIndex = Math.min(
       this.setting.editNoteTypeIndex,
