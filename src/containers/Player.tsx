@@ -48,6 +48,7 @@ const TimeSlider = (props: Props & { time: number; onChange: any }) => (
     value={props.time}
     min={0}
     max={1}
+    step={Number.EPSILON}
     classes={{
       track: props.classes.timeSliderTrack,
       thumb: props.classes.timeSliderThumb
@@ -157,6 +158,7 @@ class Player extends InjectedComponent<Props> {
             value={chart.volume}
             min={0}
             max={1}
+            step={Number.EPSILON}
             style={{
               marginBottom: "-10px",
               marginRight: "10px",
