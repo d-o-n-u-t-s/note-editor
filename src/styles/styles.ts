@@ -20,6 +20,6 @@ export default (theme: Theme) =>
       // minWidth: 700,
 
       outline: 0,
-      padding: theme.spacing.unit * 2
+      padding: theme.spacing(2)
     }
   });

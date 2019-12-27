@@ -5,7 +5,6 @@ import {
   IconButton,
   Menu,
   MenuItem,
-  TextField,
   withStyles,
   WithStyles
 } from "@material-ui/core";
@@ -13,37 +12,22 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import Switch from "@material-ui/core/Switch";
 import {
-  Clear as ClearIcon,
-  Create as CreateIcon,
   Menu as MenuIcon,
   Refresh as RefreshIcon,
-  ShowChart as ShowChartIcon,
   Visibility as VisibilityIcon
 } from "@material-ui/icons";
 import AddIcon from "@material-ui/icons/Add";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
-import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
-import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
-import ToggleButton from "@material-ui/lab/ToggleButton";
-import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
 import { observer } from "mobx-react";
 import * as React from "react";
 import { SketchPicker } from "react-color";
+import EditModeSelect from "../components/EditModeSelect";
+import EditTargetSelect from "../components/EditTargetSelect";
 import NewChartDialog from "../components/NewChartDialog";
 import VerticalDivider from "../components/VerticalDivider";
-import EditorSetting, { ObjectCategory } from "../stores/EditorSetting";
+import EditorSetting from "../stores/EditorSetting";
 import { inject, InjectedComponent } from "../stores/inject";
-
-/**
- * 編集モード
- */
-enum EditMode {
-  Select = 1,
-  Add,
-  Delete,
-  Connect
-}
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -56,20 +40,9 @@ const styles = (theme: Theme) =>
           : theme.palette.grey[900]
       }`
     },
-
     displaySetting: {
       outline: 0,
-      padding: theme.spacing.unit * 2
-    },
-
-    toggleContainer: {
-      // height: 56,
-      padding: `${theme.spacing.unit}px ${theme.spacing.unit * 2}px`,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "flex-start"
-      // margin: `${theme.spacing.unit}px 0`,
-      // background: theme.palette.background.default
+      padding: theme.spacing(2)
     }
   });
 
@@ -224,94 +197,28 @@ class Toolbar extends InjectedComponent<IProps> {
               </MenuItem>
             ))}
         </Menu>
-        <div className={classes.toggleContainer}>
-          <ToggleButtonGroup
-            value={setting.editMode}
-            exclusive
-            onChange={(_, value: EditMode | null) => {
-              if (value === null) return;
-              setting.setEditMode(value);
-            }}
-          >
-            <ToggleButton value={EditMode.Select}>
-              <ArrowUpwardIcon />
-            </ToggleButton>
-            <ToggleButton value={EditMode.Add}>
-              <CreateIcon />
-            </ToggleButton>
-            <ToggleButton value={EditMode.Delete}>
-              <ClearIcon />
-            </ToggleButton>
-            <ToggleButton value={EditMode.Connect}>
-              <ShowChartIcon />
-            </ToggleButton>
-          </ToggleButtonGroup>
-        </div>
-        <div className={classes.toggleContainer}>
-          <ToggleButtonGroup
-            value={setting.editObjectCategory}
-            exclusive
-            onChange={(_, value: ObjectCategory | null) => {
-              if (value === null) return;
-              setting.setEditObjectCategory(value);
-            }}
-          >
-            <ToggleButton value={ObjectCategory.Note}>
-              {
-                editor.currentChart!.musicGameSystem!.noteTypes[
-                  setting.editNoteTypeIndex
-                ].name
-              }
-              <ArrowDropDownIcon
-                onClick={(e: any) =>
-                  this.setState({ noteAnchorEl: e.currentTarget })
-                }
-              />
-            </ToggleButton>
-            <ToggleButton value={ObjectCategory.Lane}>
-              {
-                editor.currentChart!.musicGameSystem!.laneTemplates[
-                  setting.editLaneTypeIndex
-                ].name
-              }
-              <ArrowDropDownIcon
-                onClick={(e: any) =>
-                  this.setState({ laneAnchorEl: e.currentTarget })
-                }
-              />
-            </ToggleButton>
-            {/* その他オブジェクトメニュー */}
-            <ToggleButton value={ObjectCategory.Other}>
-              <span>
-                {otherTypes[setting.editOtherTypeIndex].name}
-                <TextField
-                  required
-                  defaultValue={setting.otherValue}
-                  margin="none"
-                  type="number"
-                  InputProps={{
-                    inputProps: {
-                      style: {
-                        width: "4rem",
-                        marginRight: "-.8rem",
-                        textAlign: "center"
-                      }
-                    }
-                  }}
-                  style={{ height: "24px" }}
-                  onChange={({ target: { value } }) => {
-                    setting.setOtherValue(Number(value));
-                  }}
-                />
-              </span>
-              <ArrowDropDownIcon
-                onClick={(e: any) =>
-                  this.setState({ otherAnchorEl: e.currentTarget })
-                }
-              />
-            </ToggleButton>
-          </ToggleButtonGroup>
-        </div>
+
+        <EditModeSelect
+          value={setting.editMode}
+          onChange={editMode => setting.setEditMode(editMode)}
+        />
+
+        <EditTargetSelect
+          value={setting.editObjectCategory}
+          onChange={editObjectCategory =>
+            setting.setEditObjectCategory(editObjectCategory)
+          }
+          musicGameSystem={chart.musicGameSystem!}
+          editNoteTypeIndex={setting.editNoteTypeIndex}
+          editLaneTypeIndex={setting.editLaneTypeIndex}
+          editOtherTypeIndex={setting.editOtherTypeIndex}
+          otherValue={setting.otherValue}
+          onOtherValueChange={otherValue => setting.setOtherValue(otherValue)}
+          onNote={noteAnchorEl => this.setState({ noteAnchorEl })}
+          onLane={laneAnchorEl => this.setState({ laneAnchorEl })}
+          onOther={otherAnchorEl => this.setState({ otherAnchorEl })}
+        />
+
         {/* 配置ノートタイプ */}
         <Menu
           anchorEl={this.state.noteAnchorEl}

@@ -12,6 +12,7 @@ import { observer, Provider } from "mobx-react";
 import { SnackbarProvider } from "notistack";
 import * as React from "react";
 import Notification from "../components/Notification";
+import Settings from "../components/Settings";
 import config from "../config";
 import Editor from "../stores/EditorStore";
 import { inject, InjectedComponent } from "../stores/inject";
@@ -21,7 +22,6 @@ import Inspector from "./Inspector";
 import Layer from "./Layer";
 import Pixi from "./Pixi";
 import Player from "./Player";
-import Settings from "../components/Settings";
 import ChartTab from "./Tab";
 import Toolbar from "./Toolbar";
 
@@ -38,15 +38,15 @@ const styles = (theme: Theme) =>
       width: drawerWidth
     },
     button: {
-      margin: theme.spacing.unit
+      margin: theme.spacing()
     },
 
     playerButton: {},
 
     fab: {
       position: "absolute",
-      top: theme.spacing.unit * 0.5,
-      right: theme.spacing.unit * 2,
+      top: theme.spacing(0.5),
+      right: theme.spacing(2),
       zIndex: 10000
     },
 
