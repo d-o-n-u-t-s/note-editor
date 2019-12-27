@@ -413,4 +413,11 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
       if (!f) break;
     }
   }
+
+  /**
+   * BPM変更オブジェクトを取得する
+   */
+  public get bpmChanges() {
+    return this.otherObjects.filter(object => object.isBPM());
+  }
 }
