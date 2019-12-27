@@ -89,13 +89,16 @@ class Player extends InjectedComponent<Props> {
       editor.currentChart!.time / editor.currentChart!.audio!.duration();
 
     return (
-      <div>
+      <div
+        style={{
+          marginTop: "calc((62px - 48px) * -1)"
+        }}
+      >
         <div
           style={{
             display: "flex",
             background: "#000",
-            margin: "0 14px",
-            marginBottom: "14px"
+            margin: "0 14px"
           }}
         >
           <TimeSlider
@@ -155,7 +158,7 @@ class Player extends InjectedComponent<Props> {
             min={0}
             max={1}
             style={{
-              marginBottom: "4px",
+              marginBottom: "-10px",
               marginRight: "10px",
               width: "100px",
               display: "inline-block"
@@ -182,7 +185,7 @@ class Player extends InjectedComponent<Props> {
             max={1}
             step={0.1}
             style={{
-              marginBottom: "4px",
+              marginBottom: "-10px",
               marginRight: "10px",
               width: "100px",
               display: "inline-block"
@@ -209,7 +212,7 @@ class Player extends InjectedComponent<Props> {
             max={1}
             step={0.1}
             style={{
-              marginBottom: "4px",
+              marginBottom: "-10px",
               marginRight: "10px",
               width: "100px",
               display: "inline-block"
