@@ -42,6 +42,9 @@ export default observer(function Layer() {
         paper: classes.rightDrawer
       }}
       anchor="right"
+      style={{
+        marginTop: editor.setting.tabHeight - 48
+      }}
     >
       <List
         component="nav"

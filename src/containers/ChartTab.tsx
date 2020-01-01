@@ -4,11 +4,13 @@ import { observer } from "mobx-react";
 import * as React from "react";
 import { useEffect } from "react";
 import Chart from "../stores/Chart";
+import { ChartTabLabelType } from "../stores/EditorSetting";
 import { useStores } from "../stores/stores";
 
 const closeButtonContainerId = "closeButtonContainerId";
 let tabElements: HTMLElement[] = [];
 let closeButtons: { chart: Chart; el: HTMLElement }[] = [];
+let container: HTMLDivElement | null = null;
 
 export default observer(function ChartTab() {
   const { editor } = useStores();
@@ -17,18 +19,30 @@ export default observer(function ChartTab() {
     editor.setCurrentChart(value);
   }
 
+  function getTabLabel(chart: Chart) {
+    switch (editor.setting.tabLabelType) {
+      case ChartTabLabelType.Name:
+        return chart.name;
+      case ChartTabLabelType.FilePath:
+        return chart.filePath ?? "新規譜面";
+      default:
+        throw editor.setting.tabLabelType;
+    }
+  }
+
   // componentDidUpdate
   useEffect(() => {
     for (let i = 0; i < tabElements.length; i++) {
       tabElements[i].appendChild(closeButtons[i].el);
     }
+    editor.setting.tabHeight = container?.clientHeight ?? 0;
   });
 
   tabElements = [];
   closeButtons = [];
 
   return (
-    <div>
+    <div ref={el => (container = el)}>
       <div id={closeButtonContainerId}>
         {editor.charts.map((chart, index) => (
           <IconButton
@@ -65,7 +79,7 @@ export default observer(function ChartTab() {
         {editor.charts.map((chart, index) => (
           <Tab
             key={index}
-            label={chart.name}
+            label={getTabLabel(chart)}
             buttonRef={(el: HTMLElement) => {
               if (!el) return;
               tabElements.push(el);

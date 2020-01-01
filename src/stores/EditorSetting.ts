@@ -6,6 +6,7 @@ import {
   GameMeasureLayout,
   IMeasureLayout
 } from "../objects/MeasureLayout";
+import box from "../utils/mobx-box";
 
 /**
  * 編集モード
@@ -27,6 +28,14 @@ export enum ObjectCategory {
   Lane,
   // 特殊
   Other
+}
+
+/**
+ * 譜面タブのラベル
+ */
+export enum ChartTabLabelType {
+  Name,
+  FilePath
 }
 
 export interface ObjectVisibility {
@@ -236,4 +245,10 @@ export default class EditorSetting {
     this.scale3D = scale;
     this.perspective = perspective;
   }
+
+  @box
+  public tabLabelType = ChartTabLabelType.Name;
+
+  @box
+  public tabHeight = 0;
 }

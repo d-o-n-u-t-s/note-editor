@@ -7,19 +7,18 @@ import {
 } from "@material-ui/core";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import classNames from "classnames";
-import { observer, Provider } from "mobx-react";
+import { Provider } from "mobx-react";
 import { SnackbarProvider } from "notistack";
 import * as React from "react";
 import Notification from "../components/Notification";
 import Settings from "../components/Settings";
 import config from "../config";
-import stores, { useStores } from "../stores/stores";
-import Empty from "./Empty";
+import stores from "../stores/stores";
+import ChartEditor from "./ChartEditor";
+import ChartTab from "./ChartTab";
 import Inspector from "./Inspector";
 import Layer from "./Layer";
-import Pixi from "./Pixi";
 import Player from "./Player";
-import ChartTab from "./Tab";
 import Toolbar from "./Toolbar";
 
 const drawerWidth: number = config.sidebarWidth;
@@ -93,20 +92,6 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const T = observer(() => {
-  const { editor } = useStores();
-
-  if (!editor.currentChart) {
-    return <Empty />;
-  }
-
-  return (
-    <div style={{ flex: 1, display: "flex" }}>
-      <Pixi />
-    </div>
-  );
-});
-
 function Application() {
   const classes = useStyles();
   return (
@@ -136,8 +121,7 @@ function Application() {
             className={classes.content}
             style={{ display: "flex", flexDirection: "column" }}
           >
-            <div className={classes.toolbar} style={{ marginBottom: "25px" }} />
-            <T />
+            <ChartEditor />
             <Player />
           </main>
           <SnackbarProvider maxSnack={4}>

@@ -9,6 +9,7 @@ import {
 } from "@material-ui/core";
 import { observer } from "mobx-react";
 import * as React from "react";
+import { ChartTabLabelType } from "../stores/EditorSetting";
 import { useStores } from "../stores/stores";
 import { useStyles } from "../styles/styles";
 
@@ -125,6 +126,21 @@ export default observer(function EditorSetting() {
             />
           }
           label="3D モード"
+        />
+
+        <FormControlLabel
+          control={
+            <Switch
+              checked={setting.tabLabelType == ChartTabLabelType.FilePath}
+              onChange={(_, value) =>
+                (setting.tabLabelType = value
+                  ? ChartTabLabelType.FilePath
+                  : ChartTabLabelType.Name)
+              }
+              color="primary"
+            />
+          }
+          label="タブにファイル名を表示"
         />
 
         {renderTextField(
