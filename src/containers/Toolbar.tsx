@@ -27,6 +27,7 @@ import NewChartDialog from "../components/NewChartDialog";
 import ThemeButton from "../components/ThemeButton";
 import VerticalDivider from "../components/VerticalDivider";
 import EditorSetting from "../stores/EditorSetting";
+import { emptyChart, IEmptyChart } from "../stores/EmptyChart";
 import { useStores } from "../stores/stores";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -108,9 +109,8 @@ export default observer(function Toolbar() {
 
   const { anchorEl } = state;
 
-  if (!editor.currentChart) return <div />;
+  const chart: IEmptyChart = editor.currentChart ?? emptyChart;
 
-  const chart = editor.currentChart!;
   const otherTypes = chart.musicGameSystem!.otherObjectTypes;
 
   return (
@@ -235,20 +235,18 @@ export default observer(function Toolbar() {
         }}
       >
         {(() => {
-          if (!editor.currentChart!.musicGameSystem) return;
-          return editor.currentChart!.musicGameSystem!.noteTypes.map(
-            ({ name }, index) => (
-              <MenuItem
-                key={index}
-                onClick={() => {
-                  setting.setEditNoteTypeIndex(index);
-                  setState({ ...state, noteAnchorEl: null });
-                }}
-              >
-                {index + 1}: {name}
-              </MenuItem>
-            )
-          );
+          if (!chart.musicGameSystem) return;
+          return chart.musicGameSystem!.noteTypes.map(({ name }, index) => (
+            <MenuItem
+              key={index}
+              onClick={() => {
+                setting.setEditNoteTypeIndex(index);
+                setState({ ...state, noteAnchorEl: null });
+              }}
+            >
+              {index + 1}: {name}
+            </MenuItem>
+          ));
         })()}
       </Menu>
       {/* 配置レーンタイプ */}
@@ -260,20 +258,18 @@ export default observer(function Toolbar() {
         }}
       >
         {(() => {
-          if (!editor.currentChart!.musicGameSystem) return;
-          return editor.currentChart!.musicGameSystem!.laneTemplates.map(
-            ({ name }, index) => (
-              <MenuItem
-                key={index}
-                onClick={() => {
-                  setting.setEditLaneTypeIndex(index);
-                  setState({ ...state, laneAnchorEl: null });
-                }}
-              >
-                {name}
-              </MenuItem>
-            )
-          );
+          if (!chart.musicGameSystem) return;
+          return chart.musicGameSystem!.laneTemplates.map(({ name }, index) => (
+            <MenuItem
+              key={index}
+              onClick={() => {
+                setting.setEditLaneTypeIndex(index);
+                setState({ ...state, laneAnchorEl: null });
+              }}
+            >
+              {name}
+            </MenuItem>
+          ));
         })()}
       </Menu>
       {/* その他オブジェクトメニュー */}
@@ -285,7 +281,7 @@ export default observer(function Toolbar() {
         }}
       >
         {(() => {
-          if (!editor.currentChart!.musicGameSystem) return;
+          if (!chart.musicGameSystem) return;
 
           return otherTypes.map(({ name }, index) => (
             <MenuItem

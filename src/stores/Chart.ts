@@ -17,6 +17,7 @@ import {
 } from "../objects/Timeline";
 import { guid } from "../utils/guid";
 import HotReload from "../utils/HotReload";
+import box from "../utils/mobx-box";
 import Editor from "./EditorStore";
 import MusicGameSystem from "./MusicGameSystem";
 
@@ -350,7 +351,7 @@ export default class Chart {
   constructor(musicGameSystem: MusicGameSystem, audioSource: string) {
     this.timeline = TimelineRecord.new(this);
 
-    this.setMusicGameSystem(musicGameSystem);
+    this.musicGameSystem = musicGameSystem;
     this.setAudioFromSource(audioSource);
   }
 
@@ -368,12 +369,8 @@ export default class Chart {
     this.difficulty = difficulty;
   }
 
-  @observable
-  musicGameSystem?: MusicGameSystem;
-
-  @action
-  setMusicGameSystem = (value: MusicGameSystem) =>
-    (this.musicGameSystem = value);
+  @box
+  public musicGameSystem: MusicGameSystem;
 
   @observable
   audio?: Howl;

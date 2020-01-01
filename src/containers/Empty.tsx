@@ -1,12 +1,10 @@
+import { Box } from "@material-ui/core";
 import * as React from "react";
-import NewChartDialog from "../components/NewChartDialog";
 
 export default function Empty() {
   return (
-    <div>
+    <Box color="text.primary" fontSize="h6.fontSize" style={{ margin: "2rem" }}>
       譜面が存在しません
-      <br />
-      <NewChartDialog />
-    </div>
+    </Box>
   );
 }

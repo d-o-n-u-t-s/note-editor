@@ -106,46 +106,52 @@ const darkTheme = createMuiTheme({
 });
 
 const Application = observer(function Application() {
-  const { editor } = useStores();
   const classes = useStyles();
+  return (
+    <div style={{ flexGrow: 1 }}>
+      <div className={classes.appFrame} style={{ height: "100vh" }}>
+        <AppBar
+          position="absolute"
+          color="default"
+          className={classNames(classes.appBar, classes[`appBar-left`])}
+        >
+          <Toolbar />
+          <Divider />
+          <ChartTab />
+        </AppBar>
+        <Drawer
+          variant="permanent"
+          classes={{
+            paper: classes.drawerPaper
+          }}
+          anchor="left"
+        >
+          <Settings />
+          <Inspector />
+        </Drawer>
+        <main
+          className={classes.content}
+          style={{ display: "flex", flexDirection: "column" }}
+        >
+          <ChartEditor />
+          <Player />
+        </main>
+        <SnackbarProvider maxSnack={4}>
+          <Notification />
+        </SnackbarProvider>
+        <Layer />
+      </div>
+    </div>
+  );
+});
+
+const ThemeProvider = observer(function ThemeProvider() {
+  const { editor } = useStores();
   return (
     <MuiThemeProvider
       theme={editor.setting.muiThemeType === "light" ? lightTheme : darkTheme}
     >
-      <div style={{ flexGrow: 1 }}>
-        <div className={classes.appFrame} style={{ height: "100vh" }}>
-          <AppBar
-            position="absolute"
-            color="default"
-            className={classNames(classes.appBar, classes[`appBar-left`])}
-          >
-            <Toolbar />
-            <Divider />
-            <ChartTab />
-          </AppBar>
-          <Drawer
-            variant="permanent"
-            classes={{
-              paper: classes.drawerPaper
-            }}
-            anchor="left"
-          >
-            <Settings />
-            <Inspector />
-          </Drawer>
-          <main
-            className={classes.content}
-            style={{ display: "flex", flexDirection: "column" }}
-          >
-            <ChartEditor />
-            <Player />
-          </main>
-          <SnackbarProvider maxSnack={4}>
-            <Notification />
-          </SnackbarProvider>
-          <Layer />
-        </div>
-      </div>
+      <Application />
     </MuiThemeProvider>
   );
 });
@@ -153,7 +159,7 @@ const Application = observer(function Application() {
 export default function ApplicationProvider() {
   return (
     <Provider {...stores}>
-      <Application />
+      <ThemeProvider />
     </Provider>
   );
 }
