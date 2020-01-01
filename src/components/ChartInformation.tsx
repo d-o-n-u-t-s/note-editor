@@ -29,7 +29,7 @@ export default observer(function ChartInformation(props: IProps) {
     if (!chart || !props.open) return <div />;
 
     // type でグループ化したノーツ
-    const getGroup = chart.musicGameSystem!.eventListeners.getGroup;
+    const getGroup = chart.musicGameSystem.eventListeners.getGroup;
     const groups = Object.entries(
       _.groupBy(
         chart.timeline.notes,

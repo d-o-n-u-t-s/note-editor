@@ -142,15 +142,15 @@ export default class Editor {
 
     this.setting.editNoteTypeIndex = Math.min(
       this.setting.editNoteTypeIndex,
-      this.currentChart.musicGameSystem!.noteTypes.length - 1
+      this.currentChart.musicGameSystem.noteTypes.length - 1
     );
     this.setting.editLaneTypeIndex = Math.min(
       this.setting.editLaneTypeIndex,
-      this.currentChart.musicGameSystem!.laneTemplates.length - 1
+      this.currentChart.musicGameSystem.laneTemplates.length - 1
     );
     this.setting.editOtherTypeIndex = Math.min(
       this.setting.editOtherTypeIndex,
-      this.currentChart.musicGameSystem!.otherObjectTypes.length - 1
+      this.currentChart.musicGameSystem.otherObjectTypes.length - 1
     );
   }
 
@@ -176,7 +176,7 @@ export default class Editor {
     // 譜面を最適化する
     chart.timeline.optimise();
 
-    chart.musicGameSystem!.eventListeners.onSerialize?.(chart);
+    chart.musicGameSystem.eventListeners.onSerialize?.(chart);
 
     // 保存
     const data = chart.toJSON();
@@ -190,7 +190,7 @@ export default class Editor {
     this.notify("譜面を保存しました");
 
     // イベント発火
-    const onSave = chart.musicGameSystem!.eventListeners.onSave;
+    const onSave = chart.musicGameSystem.eventListeners.onSave;
     if (onSave) {
       const alert = onSave(chart);
       if (alert) this.notify(alert, "error");
@@ -368,7 +368,7 @@ export default class Editor {
       if (lane === undefined) return;
 
       // 置けないならやめる
-      const typeMap = this.currentChart!.musicGameSystem!.noteTypeMap;
+      const typeMap = this.currentChart!.musicGameSystem.noteTypeMap;
       const excludeLanes = typeMap.get(note.type)!.excludeLanes || [];
       if (excludeLanes.includes(lane.templateName)) return;
 
@@ -475,7 +475,7 @@ export default class Editor {
       this.setting.setEditMode(index)
     );
     ipcRenderer.on("changeNoteTypeIndex", (_: any, index: number) => {
-      const max = this.currentChart!.musicGameSystem!.noteTypes.length - 1;
+      const max = this.currentChart!.musicGameSystem.noteTypes.length - 1;
       this.setting.setEditNoteTypeIndex(Math.min(index, max));
     });
 

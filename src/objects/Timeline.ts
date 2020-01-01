@@ -72,7 +72,7 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
       NoteLineRecord.new(noteLine)
     );
     this.mutable.measures = data.measures.map(measure =>
-      MeasureRecord.new(measure, this.chart!.musicGameSystem!.measure)
+      MeasureRecord.new(measure, this.chart!.musicGameSystem.measure)
     );
     this.mutable.lanes = data.lanes.map(lane => LaneRecord.new(lane));
     this.mutable.lanePoints = data.lanePoints.map(lanePoint =>

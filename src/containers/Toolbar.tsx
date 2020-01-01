@@ -111,7 +111,7 @@ export default observer(function Toolbar() {
 
   const chart: IEmptyChart = editor.currentChart ?? emptyChart;
 
-  const otherTypes = chart.musicGameSystem!.otherObjectTypes;
+  const otherTypes = chart.musicGameSystem.otherObjectTypes;
 
   return (
     <div
@@ -215,7 +215,7 @@ export default observer(function Toolbar() {
         onChange={editObjectCategory =>
           setting.setEditObjectCategory(editObjectCategory)
         }
-        musicGameSystem={chart.musicGameSystem!}
+        musicGameSystem={chart.musicGameSystem}
         editNoteTypeIndex={setting.editNoteTypeIndex}
         editLaneTypeIndex={setting.editLaneTypeIndex}
         editOtherTypeIndex={setting.editOtherTypeIndex}
@@ -236,7 +236,7 @@ export default observer(function Toolbar() {
       >
         {(() => {
           if (!chart.musicGameSystem) return;
-          return chart.musicGameSystem!.noteTypes.map(({ name }, index) => (
+          return chart.musicGameSystem.noteTypes.map(({ name }, index) => (
             <MenuItem
               key={index}
               onClick={() => {
@@ -259,7 +259,7 @@ export default observer(function Toolbar() {
       >
         {(() => {
           if (!chart.musicGameSystem) return;
-          return chart.musicGameSystem!.laneTemplates.map(({ name }, index) => (
+          return chart.musicGameSystem.laneTemplates.map(({ name }, index) => (
             <MenuItem
               key={index}
               onClick={() => {

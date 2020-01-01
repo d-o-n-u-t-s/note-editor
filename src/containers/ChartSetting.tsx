@@ -96,7 +96,7 @@ export default observer(function ChartSetting() {
             id: "difficulty"
           }}
         >
-          {chart.musicGameSystem!.difficulties.map((difficulty, index) => (
+          {chart.musicGameSystem.difficulties.map((difficulty, index) => (
             <MenuItem value={index} key={difficulty}>
               {difficulty}
             </MenuItem>

@@ -6,7 +6,7 @@ export default class NoteRendererResolver {
   private static renderers = new WeakMap<any, any>();
 
   static resolve(note: Note): INoteRenderer {
-    const noteType = Pixi.instance!.injected.editor!.currentChart!.musicGameSystem!.noteTypeMap.get(
+    const noteType = Pixi.instance!.injected.editor!.currentChart!.musicGameSystem.noteTypeMap.get(
       note.type
     )!;
 

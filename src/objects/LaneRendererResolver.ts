@@ -5,7 +5,7 @@ import Pixi from "../containers/Pixi";
 export default class LaneRendererResolver {
   static resolve(lane: Lane): ILaneRenderer {
     // レーンテンプレート
-    const laneTemplate = Pixi.instance!.injected.editor!.currentChart!.musicGameSystem!.laneTemplateMap.get(
+    const laneTemplate = Pixi.instance!.injected.editor!.currentChart!.musicGameSystem.laneTemplateMap.get(
       lane.templateName
     )!;
 

@@ -215,7 +215,7 @@ export default class Pixi extends InjectedComponent {
     const { theme, padding, measureWidth } = setting;
 
     const chart = editor.currentChart!;
-    const musicGameSystem = chart.musicGameSystem!;
+    const musicGameSystem = chart.musicGameSystem;
 
     const timeCalculator = chart.timeline.timeCalculator;
 
@@ -432,7 +432,7 @@ export default class Pixi extends InjectedComponent {
     for (const object of chart.timeline.otherObjects) {
       const measure = chart.timeline.measures[object.measureIndex];
       OtherObjectRenderer.render(
-        chart.musicGameSystem!.otherObjectTypes,
+        chart.musicGameSystem.otherObjectTypes,
         object,
         graphics,
         measure
@@ -450,7 +450,7 @@ export default class Pixi extends InjectedComponent {
 
     let targetNotePoint: NotePointInfo | null = null;
 
-    const newNoteType = chart.musicGameSystem!.noteTypes[
+    const newNoteType = chart.musicGameSystem.noteTypes[
       setting.editNoteTypeIndex
     ];
 
@@ -480,7 +480,7 @@ export default class Pixi extends InjectedComponent {
           continue;
         }
 
-        const newNoteType = chart.musicGameSystem!.noteTypes[
+        const newNoteType = chart.musicGameSystem.noteTypes[
           setting.editNoteTypeIndex
         ];
 
@@ -627,7 +627,7 @@ export default class Pixi extends InjectedComponent {
     ) {
       for (const object of chart.timeline.otherObjects) {
         const bounds = OtherObjectRenderer.getBounds(
-          chart.musicGameSystem!.otherObjectTypes,
+          chart.musicGameSystem.otherObjectTypes,
           object,
           chart.timeline.measures[object.measureIndex]
         );
@@ -661,7 +661,7 @@ export default class Pixi extends InjectedComponent {
       setting.editMode === EditMode.Add &&
       setting.editObjectCategory === ObjectCategory.Note
     ) {
-      const newNoteType = chart.musicGameSystem!.noteTypes[
+      const newNoteType = chart.musicGameSystem.noteTypes[
         setting.editNoteTypeIndex
       ];
 
@@ -743,7 +743,7 @@ export default class Pixi extends InjectedComponent {
         ) {
           // console.log("接続！", lanePoint);
 
-          const laneTemplate = chart.musicGameSystem!.laneTemplateMap.get(
+          const laneTemplate = chart.musicGameSystem.laneTemplateMap.get(
             lanePoint.templateName
           )!;
 
@@ -807,7 +807,7 @@ export default class Pixi extends InjectedComponent {
       setting.editObjectCategory === ObjectCategory.Lane
     ) {
       // レーンテンプレ
-      const laneTemplate = editor.currentChart!.musicGameSystem!.laneTemplates[
+      const laneTemplate = editor.currentChart!.musicGameSystem.laneTemplates[
         editor.setting!.editLaneTypeIndex
       ];
 
@@ -882,7 +882,7 @@ export default class Pixi extends InjectedComponent {
       } else {
         // プレビュー
         OtherObjectRenderer.render(
-          chart.musicGameSystem!.otherObjectTypes,
+          chart.musicGameSystem.otherObjectTypes,
           newObject,
           graphics,
           chart.timeline.measures[newObject.measureIndex]
