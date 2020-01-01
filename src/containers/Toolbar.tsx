@@ -24,6 +24,7 @@ import { SketchPicker } from "react-color";
 import EditModeSelect from "../components/EditModeSelect";
 import EditTargetSelect from "../components/EditTargetSelect";
 import NewChartDialog from "../components/NewChartDialog";
+import ThemeButton from "../components/ThemeButton";
 import VerticalDivider from "../components/VerticalDivider";
 import EditorSetting from "../stores/EditorSetting";
 import { useStores } from "../stores/stores";
@@ -304,6 +305,9 @@ export default observer(function Toolbar() {
           <AddIcon />
         </IconButton>
       ))}
+
+      <VerticalDivider />
+
       {/* 表示設定 */}
       <IconButton
         onClick={event => {
@@ -341,7 +345,7 @@ export default observer(function Toolbar() {
         </FormGroup>
       </Menu>
 
-      <VerticalDivider />
+      <ThemeButton />
 
       <Menu
         style={{ marginTop: "2rem" }}

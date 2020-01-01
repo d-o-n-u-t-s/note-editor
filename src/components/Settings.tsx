@@ -15,16 +15,16 @@ import EditorSetting from "../containers/EditorSetting";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    summary: {
-      fontSize: "14px"
-    },
-
-    root: {
-      boxShadow: "none"
-    },
-    test: {
+    panel: {
       boxShadow: "none",
-      margin: 0
+      marginBottom: "0 !important"
+    },
+    panelSummary: {
+      fontSize: 14
+    },
+    panelDetails: {
+      background: theme.palette.background.default,
+      borderTop: `solid 1px ${theme.palette.divider}`
     }
   })
 );
@@ -51,33 +51,23 @@ export default function Settings() {
   ];
 
   return (
-    <div>
+    <>
       {settings.map((setting, index) => (
         <div key={index}>
-          <ExpansionPanel
-            classes={{
-              expanded: classes.test,
-              root: classes.root
-            }}
-          >
+          <ExpansionPanel className={classes.panel}>
             <ExpansionPanelSummary
               expandIcon={<ExpandMoreIcon />}
-              className={classes.summary}
+              className={classes.panelSummary}
             >
               {setting.key}
             </ExpansionPanelSummary>
-            <ExpansionPanelDetails
-              style={{
-                background: "#f5f5f5",
-                borderTop: "solid 1px #d7d7d7"
-              }}
-            >
+            <ExpansionPanelDetails className={classes.panelDetails}>
               {setting.render()}
             </ExpansionPanelDetails>
           </ExpansionPanel>
           <Divider />
         </div>
       ))}
-    </div>
+    </>
   );
 }

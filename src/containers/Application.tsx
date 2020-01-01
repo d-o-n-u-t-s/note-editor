@@ -3,17 +3,19 @@ import {
   createStyles,
   Divider,
   Drawer,
-  makeStyles
+  makeStyles,
+  MuiThemeProvider
 } from "@material-ui/core";
+import { createMuiTheme } from "@material-ui/core/styles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import classNames from "classnames";
-import { Provider } from "mobx-react";
+import { observer, Provider } from "mobx-react";
 import { SnackbarProvider } from "notistack";
 import * as React from "react";
 import Notification from "../components/Notification";
 import Settings from "../components/Settings";
 import config from "../config";
-import stores from "../stores/stores";
+import stores, { useStores } from "../stores/stores";
 import ChartEditor from "./ChartEditor";
 import ChartTab from "./ChartTab";
 import Inspector from "./Inspector";
@@ -92,10 +94,24 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-function Application() {
+const lightTheme = createMuiTheme({
+  palette: {
+    type: "light"
+  }
+});
+const darkTheme = createMuiTheme({
+  palette: {
+    type: "dark"
+  }
+});
+
+const Application = observer(function Application() {
+  const { editor } = useStores();
   const classes = useStyles();
   return (
-    <Provider {...stores}>
+    <MuiThemeProvider
+      theme={editor.setting.muiThemeType === "light" ? lightTheme : darkTheme}
+    >
       <div style={{ flexGrow: 1 }}>
         <div className={classes.appFrame} style={{ height: "100vh" }}>
           <AppBar
@@ -130,8 +146,14 @@ function Application() {
           <Layer />
         </div>
       </div>
+    </MuiThemeProvider>
+  );
+});
+
+export default function ApplicationProvider() {
+  return (
+    <Provider {...stores}>
+      <Application />
     </Provider>
   );
 }
-
-export default Application;

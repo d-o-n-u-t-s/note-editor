@@ -78,6 +78,20 @@ export default class EditorSetting {
     targetMeasureBorderAlpha: 0.5
   };
 
+  /**
+   * material-ui のテーマ
+   */
+  @observable
+  public muiThemeType: "light" | "dark" = "light";
+
+  /**
+   * material-ui のテーマを切り替える
+   */
+  @action
+  public toggleMuiTheme() {
+    this.muiThemeType = this.muiThemeType === "light" ? "dark" : "light";
+  }
+
   @observable
   customPropColor = "#ff0000";
 
