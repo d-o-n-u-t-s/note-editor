@@ -3,10 +3,9 @@ import {
   createStyles,
   FormGroup,
   IconButton,
+  makeStyles,
   Menu,
-  MenuItem,
-  withStyles,
-  WithStyles
+  MenuItem
 } from "@material-ui/core";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
@@ -27,9 +26,9 @@ import EditTargetSelect from "../components/EditTargetSelect";
 import NewChartDialog from "../components/NewChartDialog";
 import VerticalDivider from "../components/VerticalDivider";
 import EditorSetting from "../stores/EditorSetting";
-import { inject, InjectedComponent } from "../stores/inject";
+import { useStores } from "../stores/stores";
 
-const styles = (theme: Theme) =>
+const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     badge: {
       marginTop: ".8rem",
@@ -44,14 +43,24 @@ const styles = (theme: Theme) =>
       outline: 0,
       padding: theme.spacing(2)
     }
-  });
+  })
+);
 
-interface IProps extends WithStyles<typeof styles> {}
+export default observer(function Toolbar() {
+  const { editor } = useStores();
+  const classes = useStyles();
 
-@inject
-@observer
-class Toolbar extends InjectedComponent<IProps> {
-  state = {
+  const [state, setState] = React.useState<{
+    timelineDivisionSize: number;
+    laneDivisionSize: number;
+    laneAnchorEl: Element | null;
+    noteAnchorEl: Element | null;
+    otherAnchorEl: Element | null;
+    objectSizeAnchorEl: Element | null;
+    displaySettingAnchorEl: Element | null;
+    customColorAnchorEl: Element | null;
+    anchorEl: Element | null;
+  }>({
     // タイムライン上に配置するオブジェクトのサイズ
     timelineDivisionSize: 1,
     // レーン上に配置するオブジェクのサイズ
@@ -70,300 +79,284 @@ class Toolbar extends InjectedComponent<IProps> {
     customColorAnchorEl: null,
 
     anchorEl: null
-  };
+  });
 
-  handleClick = (event: any) => {
-    this.setState({ anchorEl: event.currentTarget });
-  };
+  function handleClick(event: any) {
+    setState({
+      ...state,
+      anchorEl: event.currentTarget as HTMLElement
+    });
+  }
 
-  handleClose = () => {
-    this.setState({ anchorEl: null });
-  };
+  function handleClose() {
+    setState({ ...state, anchorEl: null });
+  }
 
   /**
    * リロード
    */
-  handleReload = () => {
+  function handleReload() {
     localStorage.setItem(
       "filePaths",
-      JSON.stringify(
-        this.injected.editor.charts.map(c => c.filePath).filter(p => p)
-      )
+      JSON.stringify(editor.charts.map(c => c.filePath).filter(p => p))
     );
     location.reload();
-  };
+  }
 
-  render() {
-    const { editor } = this.injected;
-    const { setting } = editor;
+  const { setting } = editor;
 
-    const { anchorEl } = this.state;
+  const { anchorEl } = state;
 
-    const { classes } = this.props;
+  if (!editor.currentChart) return <div />;
 
-    if (!editor.currentChart) return <div />;
+  const chart = editor.currentChart!;
+  const otherTypes = chart.musicGameSystem!.otherObjectTypes;
 
-    const chart = editor.currentChart!;
-    const otherTypes = chart.musicGameSystem!.otherObjectTypes;
-
-    return (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row"
-        }}
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row"
+      }}
+    >
+      {/* Undo */}
+      <IconButton
+        disabled={!chart.canUndo}
+        onClick={() => chart!.timeline.undo()}
       >
-        {/* Undo */}
+        <ArrowBackIcon />
+      </IconButton>
+      {/* Redo */}
+      <IconButton
+        disabled={!chart.canRedo}
+        onClick={() => chart!.timeline.redo()}
+      >
+        <ArrowForwardIcon />
+      </IconButton>
+      {/* リロードボタン */}
+      <IconButton onClick={handleReload}>
+        <RefreshIcon />
+      </IconButton>
+
+      <VerticalDivider />
+
+      <Badge
+        badgeContent={setting.measureDivision}
+        color="primary"
+        classes={{ badge: classes.badge }}
+      >
+        <IconButton aria-label="Delete" onClick={handleClick}>
+          <MenuIcon />
+        </IconButton>
+      </Badge>
+
+      <Badge
+        badgeContent={setting.objectSize}
+        color="primary"
+        classes={{ badge: classes.badge }}
+      >
         <IconButton
-          disabled={!chart.canUndo}
-          onClick={() => chart!.timeline.undo()}
+          aria-label="Delete"
+          onClick={e =>
+            setState({ ...state, objectSizeAnchorEl: e.currentTarget })
+          }
         >
-          <ArrowBackIcon />
+          <MenuIcon />
         </IconButton>
-        {/* Redo */}
-        <IconButton
-          disabled={!chart.canRedo}
-          onClick={() => chart!.timeline.redo()}
-        >
-          <ArrowForwardIcon />
-        </IconButton>
-        {/* リロードボタン */}
-        <IconButton onClick={this.handleReload}>
-          <RefreshIcon />
-        </IconButton>
-
-        <VerticalDivider />
-
-        <Badge
-          badgeContent={setting.measureDivision}
-          color="primary"
-          classes={{ badge: this.props.classes.badge }}
-        >
-          <IconButton aria-label="Delete" onClick={this.handleClick}>
-            <MenuIcon />
-          </IconButton>
-        </Badge>
-
-        <Badge
-          badgeContent={setting.objectSize}
-          color="primary"
-          classes={{ badge: this.props.classes.badge }}
-        >
-          <IconButton
-            aria-label="Delete"
-            onClick={e =>
-              this.setState({ objectSizeAnchorEl: e.currentTarget })
-            }
+      </Badge>
+      <Menu
+        id="simple-menu"
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+      >
+        {EditorSetting.MEASURE_DIVISIONS.map((value, index) => (
+          <MenuItem
+            key={index}
+            onClick={(e: any) => {
+              setting.setMeasureDivision(value);
+              handleClose();
+            }}
           >
-            <MenuIcon />
-          </IconButton>
-        </Badge>
-        <Menu
-          id="simple-menu"
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={this.handleClose}
-        >
-          {EditorSetting.MEASURE_DIVISIONS.map((value, index) => (
+            {value}
+          </MenuItem>
+        ))}
+      </Menu>
+      {/* 配置オブジェクトサイズ */}
+      <Menu
+        anchorEl={state.objectSizeAnchorEl}
+        open={Boolean(state.objectSizeAnchorEl)}
+        onClose={() => setState({ ...state, objectSizeAnchorEl: null })}
+      >
+        {Array.from({ length: 16 })
+          .fill(0)
+          .map((_, index) => index + 1)
+          .map((value, index) => (
             <MenuItem
               key={index}
               onClick={(e: any) => {
-                setting.setMeasureDivision(value);
-                this.handleClose();
+                setting.setObjectSize(value);
+                setState({ ...state, objectSizeAnchorEl: null });
               }}
             >
               {value}
             </MenuItem>
           ))}
-        </Menu>
-        {/* 配置オブジェクトサイズ */}
-        <Menu
-          anchorEl={this.state.objectSizeAnchorEl}
-          open={Boolean(this.state.objectSizeAnchorEl)}
-          onClose={() => this.setState({ objectSizeAnchorEl: null })}
-        >
-          {Array.from({ length: 16 })
-            .fill(0)
-            .map((_, index) => index + 1)
-            .map((value, index) => (
-              <MenuItem
-                key={index}
-                onClick={(e: any) => {
-                  setting.setObjectSize(value);
-                  this.setState({ objectSizeAnchorEl: null });
-                }}
-              >
-                {value}
-              </MenuItem>
-            ))}
-        </Menu>
+      </Menu>
 
-        <EditModeSelect
-          value={setting.editMode}
-          onChange={editMode => setting.setEditMode(editMode)}
-        />
+      <EditModeSelect
+        value={setting.editMode}
+        onChange={editMode => setting.setEditMode(editMode)}
+      />
 
-        <EditTargetSelect
-          value={setting.editObjectCategory}
-          onChange={editObjectCategory =>
-            setting.setEditObjectCategory(editObjectCategory)
-          }
-          musicGameSystem={chart.musicGameSystem!}
-          editNoteTypeIndex={setting.editNoteTypeIndex}
-          editLaneTypeIndex={setting.editLaneTypeIndex}
-          editOtherTypeIndex={setting.editOtherTypeIndex}
-          otherValue={setting.otherValue}
-          onOtherValueChange={otherValue => setting.setOtherValue(otherValue)}
-          onNote={noteAnchorEl => this.setState({ noteAnchorEl })}
-          onLane={laneAnchorEl => this.setState({ laneAnchorEl })}
-          onOther={otherAnchorEl => this.setState({ otherAnchorEl })}
-        />
+      <EditTargetSelect
+        value={setting.editObjectCategory}
+        onChange={editObjectCategory =>
+          setting.setEditObjectCategory(editObjectCategory)
+        }
+        musicGameSystem={chart.musicGameSystem!}
+        editNoteTypeIndex={setting.editNoteTypeIndex}
+        editLaneTypeIndex={setting.editLaneTypeIndex}
+        editOtherTypeIndex={setting.editOtherTypeIndex}
+        otherValue={setting.otherValue}
+        onOtherValueChange={otherValue => setting.setOtherValue(otherValue)}
+        onNote={noteAnchorEl => setState({ ...state, noteAnchorEl })}
+        onLane={laneAnchorEl => setState({ ...state, laneAnchorEl })}
+        onOther={otherAnchorEl => setState({ ...state, otherAnchorEl })}
+      />
 
-        {/* 配置ノートタイプ */}
-        <Menu
-          anchorEl={this.state.noteAnchorEl}
-          open={Boolean(this.state.noteAnchorEl)}
-          onClose={(e: any) => {
-            this.setState({ noteAnchorEl: null });
-          }}
-        >
-          {(() => {
-            if (!editor.currentChart!.musicGameSystem) return;
-            return editor.currentChart!.musicGameSystem!.noteTypes.map(
-              ({ name }, index) => (
-                <MenuItem
-                  key={index}
-                  onClick={() => {
-                    setting.setEditNoteTypeIndex(index);
-                    this.setState({ noteAnchorEl: null });
-                  }}
-                >
-                  {index + 1}: {name}
-                </MenuItem>
-              )
-            );
-          })()}
-        </Menu>
-        {/* 配置レーンタイプ */}
-        <Menu
-          anchorEl={this.state.laneAnchorEl}
-          open={Boolean(this.state.laneAnchorEl)}
-          onClose={(e: any) => {
-            this.setState({ laneAnchorEl: null });
-          }}
-        >
-          {(() => {
-            if (!editor.currentChart!.musicGameSystem) return;
-            return editor.currentChart!.musicGameSystem!.laneTemplates.map(
-              ({ name }, index) => (
-                <MenuItem
-                  key={index}
-                  onClick={() => {
-                    setting.setEditLaneTypeIndex(index);
-                    this.setState({ laneAnchorEl: null });
-                  }}
-                >
-                  {name}
-                </MenuItem>
-              )
-            );
-          })()}
-        </Menu>
-        {/* その他オブジェクトメニュー */}
-        <Menu
-          anchorEl={this.state.otherAnchorEl}
-          open={Boolean(this.state.otherAnchorEl)}
-          onClose={(e: any) => {
-            this.setState({ otherAnchorEl: null });
-          }}
-        >
-          {(() => {
-            if (!editor.currentChart!.musicGameSystem) return;
-
-            return otherTypes.map(({ name }, index) => (
+      {/* 配置ノートタイプ */}
+      <Menu
+        anchorEl={state.noteAnchorEl}
+        open={Boolean(state.noteAnchorEl)}
+        onClose={(e: any) => {
+          setState({ ...state, noteAnchorEl: null });
+        }}
+      >
+        {(() => {
+          if (!editor.currentChart!.musicGameSystem) return;
+          return editor.currentChart!.musicGameSystem!.noteTypes.map(
+            ({ name }, index) => (
               <MenuItem
                 key={index}
                 onClick={() => {
-                  setting.setEditOtherTypeIndex(index);
-                  this.setState({ otherAnchorEl: null });
+                  setting.setEditNoteTypeIndex(index);
+                  setState({ ...state, noteAnchorEl: null });
+                }}
+              >
+                {index + 1}: {name}
+              </MenuItem>
+            )
+          );
+        })()}
+      </Menu>
+      {/* 配置レーンタイプ */}
+      <Menu
+        anchorEl={state.laneAnchorEl}
+        open={Boolean(state.laneAnchorEl)}
+        onClose={(e: any) => {
+          setState({ ...state, laneAnchorEl: null });
+        }}
+      >
+        {(() => {
+          if (!editor.currentChart!.musicGameSystem) return;
+          return editor.currentChart!.musicGameSystem!.laneTemplates.map(
+            ({ name }, index) => (
+              <MenuItem
+                key={index}
+                onClick={() => {
+                  setting.setEditLaneTypeIndex(index);
+                  setState({ ...state, laneAnchorEl: null });
                 }}
               >
                 {name}
               </MenuItem>
-            ));
-          })()}
-        </Menu>
-        {Array.from({ length: 0 }).map((_, index) => (
-          <IconButton key={index} aria-label="Delete">
-            <AddIcon />
-          </IconButton>
-        ))}
-        {/* 表示設定 */}
-        <IconButton
-          onClick={event => {
-            this.setState({
-              displaySettingAnchorEl: event.currentTarget
-            });
-          }}
-        >
-          <VisibilityIcon />
+            )
+          );
+        })()}
+      </Menu>
+      {/* その他オブジェクトメニュー */}
+      <Menu
+        anchorEl={state.otherAnchorEl}
+        open={Boolean(state.otherAnchorEl)}
+        onClose={(e: any) => {
+          setState({ ...state, otherAnchorEl: null });
+        }}
+      >
+        {(() => {
+          if (!editor.currentChart!.musicGameSystem) return;
+
+          return otherTypes.map(({ name }, index) => (
+            <MenuItem
+              key={index}
+              onClick={() => {
+                setting.setEditOtherTypeIndex(index);
+                setState({ ...state, otherAnchorEl: null });
+              }}
+            >
+              {name}
+            </MenuItem>
+          ));
+        })()}
+      </Menu>
+      {Array.from({ length: 0 }).map((_, index) => (
+        <IconButton key={index} aria-label="Delete">
+          <AddIcon />
         </IconButton>
-        <Menu
-          anchorEl={this.state.displaySettingAnchorEl}
-          open={Boolean(this.state.displaySettingAnchorEl)}
-          onClose={() =>
-            this.setState({
-              displaySettingAnchorEl: null
-            })
-          }
-        >
-          <FormGroup className={classes.displaySetting}>
-            {[
-              ["レーン中間ポイント", "lanePoint"],
-              ["レーン", "b"],
-              ["ノート", "b"]
-            ].map(([label, key], index) => (
-              <FormControlLabel
-                key={index}
-                control={
-                  <Switch
-                    onChange={(_, v) => {
-                      setting.setObjectVisibility({
-                        [key]: v
-                      });
-                    }}
-                    checked={(setting.objectVisibility as any)[key]}
-                  />
-                }
-                label={label}
-              />
-            ))}
-          </FormGroup>
-        </Menu>
+      ))}
+      {/* 表示設定 */}
+      <IconButton
+        onClick={event => {
+          setState({ ...state, displaySettingAnchorEl: event.currentTarget });
+        }}
+      >
+        <VisibilityIcon />
+      </IconButton>
+      <Menu
+        anchorEl={state.displaySettingAnchorEl}
+        open={Boolean(state.displaySettingAnchorEl)}
+        onClose={() => setState({ ...state, displaySettingAnchorEl: null })}
+      >
+        <FormGroup className={classes.displaySetting}>
+          {[
+            ["レーン中間ポイント", "lanePoint"],
+            ["レーン", "b"],
+            ["ノート", "b"]
+          ].map(([label, key], index) => (
+            <FormControlLabel
+              key={index}
+              control={
+                <Switch
+                  onChange={(_, v) => {
+                    setting.setObjectVisibility({
+                      [key]: v
+                    });
+                  }}
+                  checked={(setting.objectVisibility as any)[key]}
+                />
+              }
+              label={label}
+            />
+          ))}
+        </FormGroup>
+      </Menu>
 
-        <VerticalDivider />
+      <VerticalDivider />
 
-        <Menu
-          style={{ marginTop: "2rem" }}
-          anchorEl={this.state.customColorAnchorEl}
-          open={Boolean(this.state.customColorAnchorEl)}
-          onClose={() =>
-            this.setState({
-              customColorAnchorEl: null
-            })
-          }
-        >
-          <SketchPicker
-            color={editor.setting.customPropColor}
-            onChange={({ hex }) => {
-              editor.setting.setCustomPropColor(hex);
-            }}
-          />
-        </Menu>
-        <NewChartDialog />
-      </div>
-    );
-  }
-}
-
-export default withStyles(styles)(Toolbar);
+      <Menu
+        style={{ marginTop: "2rem" }}
+        anchorEl={state.customColorAnchorEl}
+        open={Boolean(state.customColorAnchorEl)}
+        onClose={() => setState({ ...state, customColorAnchorEl: null })}
+      >
+        <SketchPicker
+          color={editor.setting.customPropColor}
+          onChange={({ hex }) => {
+            editor.setting.setCustomPropColor(hex);
+          }}
+        />
+      </Menu>
+      <NewChartDialog />
+    </div>
+  );
+});

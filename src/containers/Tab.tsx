@@ -2,84 +2,77 @@ import { IconButton, Tab, Tabs } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import { observer } from "mobx-react";
 import * as React from "react";
+import { useEffect } from "react";
 import Chart from "../stores/Chart";
-import { inject, InjectedComponent } from "../stores/inject";
+import { useStores } from "../stores/stores";
 
-@inject
-@observer
-export default class ChartTab extends InjectedComponent {
-  handleChange = (event: any) => {
-    this.setState({ [event.target.name]: event.target.value });
-  };
+const closeButtonContainerId = "closeButtonContainerId";
+let tabElements: HTMLElement[] = [];
+let closeButtons: { chart: Chart; el: HTMLElement }[] = [];
 
-  private handleChartChange = (_: any, value: number) => {
-    this.injected.editor.setCurrentChart(value);
-  };
+export default observer(function ChartTab() {
+  const { editor } = useStores();
 
-  tabElements: HTMLElement[] = [];
-  closeButtons: { chart: Chart; el: HTMLElement }[] = [];
+  function handleChartChange(_: any, value: number) {
+    editor.setCurrentChart(value);
+  }
 
-  componentDidUpdate() {
-    for (let i = 0; i < this.tabElements.length; i++) {
-      this.tabElements[i].appendChild(this.closeButtons[i].el);
+  // componentDidUpdate
+  useEffect(() => {
+    for (let i = 0; i < tabElements.length; i++) {
+      tabElements[i].appendChild(closeButtons[i].el);
     }
-  }
+  });
 
-  readonly closeButtonContainerId = "closeButtonContainerId";
+  tabElements = [];
+  closeButtons = [];
 
-  render() {
-    const editor = this.injected.editor;
-
-    this.tabElements = [];
-    this.closeButtons = [];
-
-    return (
-      <div>
-        <div id={this.closeButtonContainerId}>
-          {editor.charts.map((chart, index) => (
-            <IconButton
-              style={{ marginLeft: "-1.5rem" }}
-              key={index}
-              aria-label="Delete"
-              buttonRef={(el: HTMLElement) => {
-                if (!el) return;
-                this.closeButtons.push({ chart, el });
-              }}
-              onClick={() => {
-                const container = document.querySelector(
-                  `#${this.closeButtonContainerId}`
-                )!;
-                for (const button of this.closeButtons) {
-                  container.appendChild(button.el);
-                }
-                editor.removeChart(index);
-              }}
-            >
-              <CloseIcon style={{ fontSize: 16 }} />
-            </IconButton>
-          ))}
-        </div>
-
-        <Tabs
-          value={editor.currentChartIndex}
-          onChange={this.handleChartChange}
-          variant="scrollable"
-          indicatorColor="primary"
-          textColor="primary"
-          scrollButtons="auto"
-        >
-          {editor.charts.map((chart, index) => (
-            <Tab
-              key={index}
-              label={chart.name}
-              buttonRef={(el: HTMLElement) => {
-                if (!el) return;
-                this.tabElements.push(el);
-              }}
-            />
-          ))}
-        </Tabs>
+  return (
+    <div>
+      <div id={closeButtonContainerId}>
+        {editor.charts.map((chart, index) => (
+          <IconButton
+            style={{ marginLeft: "-1.5rem" }}
+            key={index}
+            aria-label="Delete"
+            buttonRef={(el: HTMLElement) => {
+              if (!el) return;
+              closeButtons.push({ chart, el });
+            }}
+            onClick={() => {
+              const container = document.querySelector(
+                `#${closeButtonContainerId}`
+              )!;
+              for (const button of closeButtons) {
+                container.appendChild(button.el);
+              }
+              editor.removeChart(index);
+            }}
+          >
+            <CloseIcon style={{ fontSize: 16 }} />
+          </IconButton>
+        ))}
       </div>
-    );
-  }
-}
+
+      <Tabs
+        value={editor.currentChartIndex}
+        onChange={handleChartChange}
+        variant="scrollable"
+        indicatorColor="primary"
+        textColor="primary"
+        scrollButtons="auto"
+      >
+        {editor.charts.map((chart, index) => (
+          <Tab
+            key={index}
+            label={chart.name}
+            buttonRef={(el: HTMLElement) => {
+              if (!el) return;
+              tabElements.push(el);
+            }}
+          />
+        ))}
+      </Tabs>
+    </div>
+  );
+});

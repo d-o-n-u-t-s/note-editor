@@ -1,7 +1,7 @@
 import { ipcRenderer, remote } from "electron";
 import * as fs from "fs";
 import * as _ from "lodash";
-import { action, observable } from "mobx";
+import { action, flow, observable, runInAction } from "mobx";
 import * as path from "path";
 import * as util from "util";
 import {
@@ -42,15 +42,15 @@ export default class AssetStore {
   addMusicGameSystem = (value: MusicGameSystem) =>
     this.musicGameSystems.push(value);
 
-  async loadAssets() {
-    const urlParams = await this.getAssetPath;
+  private loadAssets = flow(function*(this: AssetStore) {
+    const urlParams = yield this.getAssetPath;
 
     // 音源のパスを設定する
     this.audioAssetPath = decodeURIComponent(urlParams.aap);
 
     // MusicGameSystem を読み込む
     {
-      const directories: any[] = await util.promisify(fs.readdir)(
+      const directories: any[] = yield util.promisify(fs.readdir)(
         urlParams.mgsp
       );
 
@@ -58,21 +58,21 @@ export default class AssetStore {
         const dirPath = path.join(urlParams.mgsp, directory);
         if (!fs.statSync(dirPath).isDirectory()) continue;
 
-        const files = (await util.promisify(fs.readdir)(dirPath)) as any[];
+        const files = (yield util.promisify(fs.readdir)(dirPath)) as any[];
 
         var fileList = files.filter(file => file.endsWith(".json"));
         console.log("MusicGameSystem を読み込みます", fileList);
         for (const file of fileList) {
-          const buffer: Buffer = await util.promisify(fs.readFile)(
+          const buffer: Buffer = yield util.promisify(fs.readFile)(
             path.join(urlParams.mgsp, directory, file)
           );
 
           const json = parseJSON(buffer.toString());
-          await this.loadMusicGameSystem(json, urlParams.mgsp, directory);
+          yield this.loadMusicGameSystem(json, urlParams.mgsp, directory);
         }
       }
     }
-  }
+  });
 
   /**
    * 音源を読み込む

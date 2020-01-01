@@ -522,8 +522,6 @@ export default class Chart {
       async (base: any, ...args: any[]) => {
         const audioBuffer = await base(...args);
 
-        console.warn("loaded", audioBuffer);
-
         self.setAudioBuffer(audioBuffer);
 
         return audioBuffer;

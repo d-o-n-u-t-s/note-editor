@@ -3,8 +3,7 @@ import {
   createStyles,
   Divider,
   Drawer,
-  withStyles,
-  WithStyles
+  makeStyles
 } from "@material-ui/core";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import classNames from "classnames";
@@ -14,9 +13,7 @@ import * as React from "react";
 import Notification from "../components/Notification";
 import Settings from "../components/Settings";
 import config from "../config";
-import Editor from "../stores/EditorStore";
-import { inject, InjectedComponent } from "../stores/inject";
-import stores from "../stores/stores";
+import stores, { useStores } from "../stores/stores";
 import Empty from "./Empty";
 import Inspector from "./Inspector";
 import Layer from "./Layer";
@@ -27,7 +24,7 @@ import Toolbar from "./Toolbar";
 
 const drawerWidth: number = config.sidebarWidth;
 
-const styles = (theme: Theme) =>
+const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       /* ... */
@@ -93,30 +90,25 @@ const styles = (theme: Theme) =>
       backgroundColor: theme.palette.background.default
       // padding: theme.spacing.unit * 3
     }
-  });
+  })
+);
 
-interface Props extends WithStyles<typeof styles> {
-  editor?: Editor;
-}
+const T = observer(() => {
+  const { editor } = useStores();
 
-@inject
-@observer
-class T extends InjectedComponent<{ editor?: Editor }, {}> {
-  render() {
-    if (!this.props.editor || !this.props.editor!.currentChart) {
-      return <Empty />;
-    }
-
-    return (
-      <div style={{ flex: 1, display: "flex" }}>
-        <Pixi />
-      </div>
-    );
+  if (!editor.currentChart) {
+    return <Empty />;
   }
-}
 
-const Application = (props: Props) => {
-  const { classes } = props;
+  return (
+    <div style={{ flex: 1, display: "flex" }}>
+      <Pixi />
+    </div>
+  );
+});
+
+function Application() {
+  const classes = useStyles();
   return (
     <Provider {...stores}>
       <div style={{ flexGrow: 1 }}>
@@ -130,7 +122,6 @@ const Application = (props: Props) => {
             <Divider />
             <ChartTab />
           </AppBar>
-
           <Drawer
             variant="permanent"
             classes={{
@@ -157,6 +148,6 @@ const Application = (props: Props) => {
       </div>
     </Provider>
   );
-};
+}
 
-export default withStyles(styles)(Application);
+export default Application;

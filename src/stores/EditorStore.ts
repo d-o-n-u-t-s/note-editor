@@ -1,7 +1,7 @@
 import { ipcRenderer, remote } from "electron";
 import * as fs from "fs";
 import * as _ from "lodash";
-import { action, observable } from "mobx";
+import { action, flow, observable } from "mobx";
 import * as Mousetrap from "mousetrap";
 import { VariantType } from "notistack";
 import * as util from "util";
@@ -88,8 +88,8 @@ export default class Editor {
   setting = new EditorSetting();
 
   @observable
-  asset: AssetStore = new AssetStore(() =>
-    this.openFiles(JSON.parse(localStorage.getItem("filePaths") || "[]"))
+  asset = new AssetStore(() =>
+    this.openCharts(JSON.parse(localStorage.getItem("filePaths") || "[]"))
   );
 
   @observable
@@ -263,17 +263,21 @@ export default class Editor {
         properties: ["openFile", "multiSelections"],
         filters: this.dialogFilters
       },
-      (paths: any) => this.openFiles(paths)
+      paths => this.openCharts(paths)
     );
   }
 
-  async openFiles(filePaths: string[]) {
+  /**
+   * 譜面を開く
+   * @param filePaths 譜面のパスのリスト
+   */
+  private openCharts = flow(function*(this: Editor, filePaths: string[]) {
     for (const filePath of filePaths) {
-      const file = await util.promisify(fs.readFile)(filePath);
+      const file = yield util.promisify(fs.readFile)(filePath);
       Chart.fromJSON(file.toString());
       this.currentChart!.filePath = filePath;
     }
-  }
+  });
 
   @action
   copy() {

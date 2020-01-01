@@ -4,8 +4,7 @@ import {
   ExpansionPanel,
   ExpansionPanelDetails,
   ExpansionPanelSummary,
-  withStyles,
-  WithStyles
+  makeStyles
 } from "@material-ui/core";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -14,7 +13,7 @@ import AssetSetting from "../containers/AssetSetting";
 import ChartSetting from "../containers/ChartSetting";
 import EditorSetting from "../containers/EditorSetting";
 
-const styles = (theme: Theme) =>
+const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     summary: {
       fontSize: "14px"
@@ -27,15 +26,14 @@ const styles = (theme: Theme) =>
       boxShadow: "none",
       margin: 0
     }
-  });
-
-interface IProps extends WithStyles<typeof styles> {}
+  })
+);
 
 /**
  * Settings Component
  */
-export default withStyles(styles)((props: IProps) => {
-  const { classes } = props;
+export default function Settings() {
+  const classes = useStyles();
 
   const settings = [
     {
@@ -82,4 +80,4 @@ export default withStyles(styles)((props: IProps) => {
       ))}
     </div>
   );
-});
+}
