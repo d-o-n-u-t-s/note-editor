@@ -610,6 +610,7 @@ export default class Chart {
     delete chart.audioBuffer;
     delete chart.isPlaying;
     delete chart.volume;
+    delete (chart as any)._musicGameSystem;
     delete chart.musicGameSystem;
     delete chart.currentLayerIndex;
     delete chart.canRedo;
