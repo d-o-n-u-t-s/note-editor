@@ -82,7 +82,7 @@ export class HowlPool {
   }
 }
 
-interface MusicGameSystem {
+export default interface MusicGameSystem {
   name: string;
   version: number;
 
@@ -162,5 +162,3 @@ export function normalizeMusicGameSystem(
 
   return system;
 }
-
-export default MusicGameSystem;

@@ -1,6 +1,6 @@
-import { createStyles, Theme } from "@material-ui/core";
+import { createStyles, makeStyles, Theme } from "@material-ui/core";
 
-export default (theme: Theme) =>
+export const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     input: {
       fontSize: 14,
@@ -9,7 +9,6 @@ export default (theme: Theme) =>
     label: {
       fontSize: 16
     },
-
     rightDrawer: {
       marginTop: 97,
       zIndex: 0,
@@ -17,9 +16,8 @@ export default (theme: Theme) =>
       width: 180
     },
     table: {
-      // minWidth: 700,
-
       outline: 0,
       padding: theme.spacing(2)
     }
-  });
+  })
+);

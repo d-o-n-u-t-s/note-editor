@@ -7,7 +7,7 @@ import { ObjectCategory } from "../stores/EditorSetting";
 import MusicGameSystem from "../stores/MusicGameSystem";
 import useStyles from "../styles/ToolBar";
 
-export default function({
+export default function EditTargetSelect({
   value,
   onChange,
   musicGameSystem,
@@ -34,7 +34,9 @@ export default function({
 }) {
   const classes = useStyles();
 
-  const otherTypes = musicGameSystem.otherObjectTypes;
+  const noteDisabled = musicGameSystem.noteTypes.length === 0;
+  const laneDisabled = musicGameSystem.laneTemplates.length === 0;
+  const otherDisabled = musicGameSystem.otherObjectTypes.length === 0;
 
   return (
     <div className={classes.toggleContainer}>
@@ -46,47 +48,54 @@ export default function({
           onChange(value);
         }}
       >
+        {/* Note */}
         <ToggleButton
           className={classes.toggleButton}
           value={ObjectCategory.Note}
+          disabled={noteDisabled}
         >
-          {musicGameSystem.noteTypes[editNoteTypeIndex].name}
-          <ArrowDropDownIcon onClick={(e: any) => onNote(e.currentTarget)} />
+          {musicGameSystem.noteTypes[editNoteTypeIndex]?.name}
+          <ArrowDropDownIcon onClick={e => onNote(e.currentTarget)} />
         </ToggleButton>
+        {/* Lane */}
         <ToggleButton
           className={classes.toggleButton}
           value={ObjectCategory.Lane}
+          disabled={laneDisabled}
         >
-          {musicGameSystem.laneTemplates[editLaneTypeIndex].name}
-          <ArrowDropDownIcon onClick={(e: any) => onLane(e.currentTarget)} />
+          {musicGameSystem.laneTemplates[editLaneTypeIndex]?.name}
+          <ArrowDropDownIcon onClick={e => onLane(e.currentTarget)} />
         </ToggleButton>
-        {/* その他オブジェクトメニュー */}
+        {/* Other */}
         <ToggleButton
           className={classes.toggleButton}
           value={ObjectCategory.Other}
+          disabled={otherDisabled}
         >
-          <span>
-            {otherTypes[editOtherTypeIndex].name}
-            <TextField
-              required
-              defaultValue={otherValue}
-              margin="none"
-              type="number"
-              InputProps={{
-                inputProps: {
-                  style: {
-                    width: "4rem",
-                    marginRight: "-.8rem",
-                    textAlign: "center"
+          {otherDisabled ? null : (
+            <span>
+              {musicGameSystem.otherObjectTypes[editOtherTypeIndex]?.name}
+              <TextField
+                required
+                defaultValue={otherValue}
+                margin="none"
+                type="number"
+                InputProps={{
+                  inputProps: {
+                    style: {
+                      width: "4rem",
+                      marginRight: "-.8rem",
+                      textAlign: "center"
+                    }
                   }
+                }}
+                style={{ height: 24 }}
+                onChange={({ target: { value } }) =>
+                  onOtherValueChange(Number(value))
                 }
-              }}
-              style={{ height: "24px" }}
-              onChange={({ target: { value } }) =>
-                onOtherValueChange(Number(value))
-              }
-            />
-          </span>
+              />
+            </span>
+          )}
           <ArrowDropDownIcon onClick={e => onOther(e.currentTarget)} />
         </ToggleButton>
       </ToggleButtonGroup>

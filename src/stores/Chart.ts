@@ -17,6 +17,7 @@ import {
 } from "../objects/Timeline";
 import { guid } from "../utils/guid";
 import HotReload from "../utils/HotReload";
+import box from "../utils/mobx-box";
 import Editor from "./EditorStore";
 import MusicGameSystem from "./MusicGameSystem";
 
@@ -221,7 +222,7 @@ export default class Chart {
    * @param index 小節番号
    */
   private createMeasure(index: number) {
-    const customProps = this.musicGameSystem!.measure.customProps.reduce(
+    const customProps = this.musicGameSystem.measure.customProps.reduce(
       (object: any, customProps) => {
         object[customProps.key] = customProps.defaultValue;
         return object;
@@ -235,7 +236,7 @@ export default class Chart {
         beat: new Fraction(4, 4),
         customProps
       },
-      this.musicGameSystem!.measure
+      this.musicGameSystem.measure
     );
   }
 
@@ -273,7 +274,7 @@ export default class Chart {
       const data = chartData.customProps || {};
 
       const newProps: any = {};
-      for (const prop of this.musicGameSystem!.customProps) {
+      for (const prop of this.musicGameSystem.customProps) {
         if (prop.key in data) {
           newProps[prop.key] = data[prop.key];
         } else {
@@ -286,7 +287,7 @@ export default class Chart {
 
     // 初期レーンのguidを固定
     if (chartData.version <= 1) {
-      for (let i = 0; i < this.musicGameSystem!.initialLanes.length; i++) {
+      for (let i = 0; i < this.musicGameSystem.initialLanes.length; i++) {
         const guid = "initialLane" + i;
         const oldGuid = chartData.timeline.lanes[i].guid;
         chartData.timeline.lanes[i].guid = guid;
@@ -350,7 +351,7 @@ export default class Chart {
   constructor(musicGameSystem: MusicGameSystem, audioSource: string) {
     this.timeline = TimelineRecord.new(this);
 
-    this.setMusicGameSystem(musicGameSystem);
+    this.musicGameSystem = musicGameSystem;
     this.setAudioFromSource(audioSource);
   }
 
@@ -368,12 +369,8 @@ export default class Chart {
     this.difficulty = difficulty;
   }
 
-  @observable
-  musicGameSystem?: MusicGameSystem;
-
-  @action
-  setMusicGameSystem = (value: MusicGameSystem) =>
-    (this.musicGameSystem = value);
+  @box
+  public musicGameSystem: MusicGameSystem;
 
   @observable
   audio?: Howl;
@@ -522,8 +519,6 @@ export default class Chart {
       async (base: any, ...args: any[]) => {
         const audioBuffer = await base(...args);
 
-        console.warn("loaded", audioBuffer);
-
         self.setAudioBuffer(audioBuffer);
 
         return audioBuffer;
@@ -549,7 +544,7 @@ export default class Chart {
               beat: new Fraction(4, 4),
               customProps: {}
             },
-            this.musicGameSystem!.measure
+            this.musicGameSystem.measure
           )
         )
     );
@@ -562,7 +557,7 @@ export default class Chart {
   loadInitialLanes() {
     console.log("loadInitialLane!");
 
-    const musicGameSystem = this.musicGameSystem!;
+    const musicGameSystem = this.musicGameSystem;
 
     musicGameSystem.initialLanes.forEach((initialLane, index) => {
       const laneTemplate = musicGameSystem.laneTemplateMap.get(
@@ -620,8 +615,8 @@ export default class Chart {
     delete chart.canRedo;
     delete chart.canUndo;
 
-    chart.musicGameSystemName = this.musicGameSystem!.name;
-    chart.musicGameSystemVersion = this.musicGameSystem!.version;
+    chart.musicGameSystemName = this.musicGameSystem.name;
+    chart.musicGameSystemVersion = this.musicGameSystem.version;
 
     chart.timeline = TimelineRecord.newnew(this, chart.timeline.toJS());
 

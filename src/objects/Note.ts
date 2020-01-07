@@ -174,7 +174,7 @@ export class NoteRecord extends Record<NoteData>(defaultNoteData) {
   private constructor(data: NoteData, chart: Chart) {
     super(
       (() => {
-        const noteType = chart.musicGameSystem!.noteTypeMap.get(data.type)!;
+        const noteType = chart.musicGameSystem.noteTypeMap.get(data.type)!;
 
         if (!noteType) {
           console.log(data);
@@ -208,11 +208,11 @@ export class NoteRecord extends Record<NoteData>(defaultNoteData) {
     );
     this.chart = chart;
 
-    const noteType = chart.musicGameSystem!.noteTypeMap.get(data.type)!;
+    const noteType = chart.musicGameSystem.noteTypeMap.get(data.type)!;
 
     if (noteType.editorProps.color === "$laneColor") {
       this.color = Number(
-        chart.musicGameSystem!.laneTemplateMap.get(
+        chart.musicGameSystem.laneTemplateMap.get(
           chart.timeline.laneMap.get(data.lane)!.templateName
         )!.color
       );

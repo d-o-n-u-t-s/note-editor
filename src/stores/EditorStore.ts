@@ -1,7 +1,7 @@
 import { ipcRenderer, remote } from "electron";
 import * as fs from "fs";
 import * as _ from "lodash";
-import { action, observable } from "mobx";
+import { action, flow, observable } from "mobx";
 import * as Mousetrap from "mousetrap";
 import { VariantType } from "notistack";
 import * as util from "util";
@@ -88,8 +88,8 @@ export default class Editor {
   setting = new EditorSetting();
 
   @observable
-  asset: AssetStore = new AssetStore(() =>
-    this.openFiles(JSON.parse(localStorage.getItem("filePaths") || "[]"))
+  asset = new AssetStore(() =>
+    this.openCharts(JSON.parse(localStorage.getItem("filePaths") || "[]"))
   );
 
   @observable
@@ -142,15 +142,15 @@ export default class Editor {
 
     this.setting.editNoteTypeIndex = Math.min(
       this.setting.editNoteTypeIndex,
-      this.currentChart.musicGameSystem!.noteTypes.length - 1
+      this.currentChart.musicGameSystem.noteTypes.length - 1
     );
     this.setting.editLaneTypeIndex = Math.min(
       this.setting.editLaneTypeIndex,
-      this.currentChart.musicGameSystem!.laneTemplates.length - 1
+      this.currentChart.musicGameSystem.laneTemplates.length - 1
     );
     this.setting.editOtherTypeIndex = Math.min(
       this.setting.editOtherTypeIndex,
-      this.currentChart.musicGameSystem!.otherObjectTypes.length - 1
+      this.currentChart.musicGameSystem.otherObjectTypes.length - 1
     );
   }
 
@@ -176,7 +176,7 @@ export default class Editor {
     // 譜面を最適化する
     chart.timeline.optimise();
 
-    chart.musicGameSystem!.eventListeners.onSerialize?.(chart);
+    chart.musicGameSystem.eventListeners.onSerialize?.(chart);
 
     // 保存
     const data = chart.toJSON();
@@ -190,7 +190,7 @@ export default class Editor {
     this.notify("譜面を保存しました");
 
     // イベント発火
-    const onSave = chart.musicGameSystem!.eventListeners.onSave;
+    const onSave = chart.musicGameSystem.eventListeners.onSave;
     if (onSave) {
       const alert = onSave(chart);
       if (alert) this.notify(alert, "error");
@@ -263,17 +263,21 @@ export default class Editor {
         properties: ["openFile", "multiSelections"],
         filters: this.dialogFilters
       },
-      (paths: any) => this.openFiles(paths)
+      paths => this.openCharts(paths)
     );
   }
 
-  async openFiles(filePaths: string[]) {
+  /**
+   * 譜面を開く
+   * @param filePaths 譜面のパスのリスト
+   */
+  private openCharts = flow(function*(this: Editor, filePaths: string[]) {
     for (const filePath of filePaths) {
-      const file = await util.promisify(fs.readFile)(filePath);
+      const file = yield util.promisify(fs.readFile)(filePath);
       Chart.fromJSON(file.toString());
       this.currentChart!.filePath = filePath;
     }
-  }
+  });
 
   @action
   copy() {
@@ -364,7 +368,7 @@ export default class Editor {
       if (lane === undefined) return;
 
       // 置けないならやめる
-      const typeMap = this.currentChart!.musicGameSystem!.noteTypeMap;
+      const typeMap = this.currentChart!.musicGameSystem.noteTypeMap;
       const excludeLanes = typeMap.get(note.type)!.excludeLanes || [];
       if (excludeLanes.includes(lane.templateName)) return;
 
@@ -471,7 +475,7 @@ export default class Editor {
       this.setting.setEditMode(index)
     );
     ipcRenderer.on("changeNoteTypeIndex", (_: any, index: number) => {
-      const max = this.currentChart!.musicGameSystem!.noteTypes.length - 1;
+      const max = this.currentChart!.musicGameSystem.noteTypes.length - 1;
       this.setting.setEditNoteTypeIndex(Math.min(index, max));
     });
 

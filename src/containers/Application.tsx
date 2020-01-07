@@ -3,9 +3,10 @@ import {
   createStyles,
   Divider,
   Drawer,
-  withStyles,
-  WithStyles
+  makeStyles,
+  MuiThemeProvider
 } from "@material-ui/core";
+import { createMuiTheme } from "@material-ui/core/styles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import classNames from "classnames";
 import { observer, Provider } from "mobx-react";
@@ -14,20 +15,17 @@ import * as React from "react";
 import Notification from "../components/Notification";
 import Settings from "../components/Settings";
 import config from "../config";
-import Editor from "../stores/EditorStore";
-import { inject, InjectedComponent } from "../stores/inject";
-import stores from "../stores/stores";
-import Empty from "./Empty";
+import stores, { useStores } from "../stores/stores";
+import ChartEditor from "./ChartEditor";
+import ChartTab from "./ChartTab";
 import Inspector from "./Inspector";
 import Layer from "./Layer";
-import Pixi from "./Pixi";
 import Player from "./Player";
-import ChartTab from "./Tab";
 import Toolbar from "./Toolbar";
 
 const drawerWidth: number = config.sidebarWidth;
 
-const styles = (theme: Theme) =>
+const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       /* ... */
@@ -93,70 +91,75 @@ const styles = (theme: Theme) =>
       backgroundColor: theme.palette.background.default
       // padding: theme.spacing.unit * 3
     }
-  });
+  })
+);
 
-interface Props extends WithStyles<typeof styles> {
-  editor?: Editor;
-}
-
-@inject
-@observer
-class T extends InjectedComponent<{ editor?: Editor }, {}> {
-  render() {
-    if (!this.props.editor || !this.props.editor!.currentChart) {
-      return <Empty />;
-    }
-
-    return (
-      <div style={{ flex: 1, display: "flex" }}>
-        <Pixi />
-      </div>
-    );
+const lightTheme = createMuiTheme({
+  palette: {
+    type: "light"
   }
-}
+});
+const darkTheme = createMuiTheme({
+  palette: {
+    type: "dark"
+  }
+});
 
-const Application = (props: Props) => {
-  const { classes } = props;
+const Application = observer(function Application() {
+  const classes = useStyles();
+  return (
+    <div style={{ flexGrow: 1 }}>
+      <div className={classes.appFrame} style={{ height: "100vh" }}>
+        <AppBar
+          position="absolute"
+          color="default"
+          className={classNames(classes.appBar, classes[`appBar-left`])}
+        >
+          <Toolbar />
+          <Divider />
+          <ChartTab />
+        </AppBar>
+        <Drawer
+          variant="permanent"
+          classes={{
+            paper: classes.drawerPaper
+          }}
+          anchor="left"
+        >
+          <Settings />
+          <Inspector />
+        </Drawer>
+        <main
+          className={classes.content}
+          style={{ display: "flex", flexDirection: "column" }}
+        >
+          <ChartEditor />
+          <Player />
+        </main>
+        <SnackbarProvider maxSnack={4}>
+          <Notification />
+        </SnackbarProvider>
+        <Layer />
+      </div>
+    </div>
+  );
+});
+
+const ThemeProvider = observer(function ThemeProvider() {
+  const { editor } = useStores();
+  return (
+    <MuiThemeProvider
+      theme={editor.setting.muiThemeType === "light" ? lightTheme : darkTheme}
+    >
+      <Application />
+    </MuiThemeProvider>
+  );
+});
+
+export default function ApplicationProvider() {
   return (
     <Provider {...stores}>
-      <div style={{ flexGrow: 1 }}>
-        <div className={classes.appFrame} style={{ height: "100vh" }}>
-          <AppBar
-            position="absolute"
-            color="default"
-            className={classNames(classes.appBar, classes[`appBar-left`])}
-          >
-            <Toolbar />
-            <Divider />
-            <ChartTab />
-          </AppBar>
-
-          <Drawer
-            variant="permanent"
-            classes={{
-              paper: classes.drawerPaper
-            }}
-            anchor="left"
-          >
-            <Settings />
-            <Inspector />
-          </Drawer>
-          <main
-            className={classes.content}
-            style={{ display: "flex", flexDirection: "column" }}
-          >
-            <div className={classes.toolbar} style={{ marginBottom: "25px" }} />
-            <T />
-            <Player />
-          </main>
-          <SnackbarProvider maxSnack={4}>
-            <Notification />
-          </SnackbarProvider>
-          <Layer />
-        </div>
-      </div>
+      <ThemeProvider />
     </Provider>
   );
-};
-
-export default withStyles(styles)(Application);
+}

@@ -73,7 +73,7 @@ export default class Inspector extends InjectedComponent {
       this.injected.editor.currentChart!.musicGameSystem
     ) {
       const onRenderInspector = this.injected.editor.currentChart!
-        .musicGameSystem!.eventListeners.onRenderInspector;
+        .musicGameSystem.eventListeners.onRenderInspector;
       if (onRenderInspector)
         onRenderInspector(Editor.instance!.currentChart!, guiUtil);
     }

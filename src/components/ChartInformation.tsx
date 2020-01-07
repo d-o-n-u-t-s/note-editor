@@ -4,39 +4,41 @@ import {
   TableBody,
   TableCell,
   TableHead,
-  TableRow,
-  WithStyles,
-  withStyles
+  TableRow
 } from "@material-ui/core";
 import * as _ from "lodash";
+import { observer } from "mobx-react";
 import * as React from "React";
-import Chart from "../stores/Chart";
-import styles from "../styles/styles";
+import { useStores } from "../stores/stores";
+import { useStyles } from "../styles/styles";
 
-interface IProps extends WithStyles<typeof styles> {
-  chart: Chart;
+interface IProps {
   open: boolean;
   onClose: any;
   anchorEl: HTMLElement;
 }
 
-export default withStyles(styles)((props: IProps) => {
-  if (!props.chart) return <div />;
+export default observer(function ChartInformation(props: IProps) {
+  const { editor } = useStores();
+  const classes = useStyles();
+  const chart = editor.currentChart;
+
+  if (!chart) return <div />;
 
   function renderTable() {
-    if (!props.open) return <div />;
+    if (!chart || !props.open) return <div />;
 
     // type でグループ化したノーツ
-    const getGroup = props.chart.musicGameSystem!.eventListeners.getGroup;
+    const getGroup = chart.musicGameSystem.eventListeners.getGroup;
     const groups = Object.entries(
       _.groupBy(
-        props.chart.timeline.notes,
-        getGroup ? n => getGroup(n, props.chart) : "type"
+        chart.timeline.notes,
+        getGroup ? n => getGroup(n, chart) : "type"
       )
     ).sort();
 
     return (
-      <Table className={props.classes.table}>
+      <Table className={classes.table}>
         <TableHead>
           <TableRow>
             <TableCell>合計</TableCell>
@@ -49,7 +51,7 @@ export default withStyles(styles)((props: IProps) => {
         </TableHead>
         <TableBody>
           <TableRow>
-            <TableCell>{props.chart.timeline.notes.length}</TableCell>
+            <TableCell>{chart.timeline.notes.length}</TableCell>
             {groups.map(([key, notes]) => (
               <TableCell align="right" key={key}>
                 {notes.length}
