@@ -10,7 +10,8 @@
     "plugin": "ts-node build-asset.ts",
     "dev:electron": "yarn run ts && cross-env NODE_ENV=development yarn run electron .",
     "build:win": "yarn run prod && yarn run ts && electron-builder -w --dir",
-    "build:mac": "yarn run prod && yarn run ts && electron-builder -m --dir"
+    "build:mac": "yarn run prod && yarn run ts && electron-builder -m --dir",
+    "build": "yarn run build:win && electron-builder -m --dir"
   },
   "license": "MIT",
   "devDependencies": {
