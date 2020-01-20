@@ -1,6 +1,6 @@
+import * as PIXI from "pixi.js";
 import { LinePointInfo } from "./Lane";
 import { Note } from "./Note";
-import * as PIXI from "pixi.js";
 
 export interface INoteRenderer {
   render(target: Note, graphics: PIXI.Graphics): void;
@@ -18,11 +18,12 @@ export function defaultRender(
 }
 
 export class NoteRenderer implements INoteRenderer {
-  customRender = defaultRender;
+  private customRender = defaultRender;
 
-  render(note: Note, graphics: PIXI.Graphics) {
+  public render(note: Note, graphics: PIXI.Graphics) {
     const linePointInfo = note.updateBounds();
-    this.customRender(graphics, note, linePointInfo!);
+    if (!linePointInfo) return;
+    this.customRender(graphics, note, linePointInfo);
   }
 }
 
