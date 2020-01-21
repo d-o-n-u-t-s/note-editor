@@ -555,8 +555,6 @@ export default class Chart {
    */
   @action
   loadInitialLanes() {
-    console.log("loadInitialLane!");
-
     const musicGameSystem = this.musicGameSystem;
 
     musicGameSystem.initialLanes.forEach((initialLane, index) => {

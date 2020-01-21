@@ -12,6 +12,7 @@ import { Measure, MeasureData, MeasureRecord, sortMeasure } from "./Measure";
 import { Note, NoteData, NoteRecord } from "./Note";
 import { NoteLine, NoteLineData, NoteLineRecord } from "./NoteLine";
 import { OtherObject, OtherObjectData, OtherObjectRecord } from "./OtherObject";
+import _ from "lodash";
 
 export type TimelineJsonData = {
   notes: NoteData[];
@@ -298,6 +299,17 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
   clearLanePoints() {
     this.mutable.lanePoints = [];
     this.updateLanePointMap();
+  }
+
+  /**
+   * ノートに合わせてレーンを拡張する
+   * @param note 対象ノート
+   */
+  public extendLane(note: Note) {
+    const targetLanePoint = this.lanePointMap.get(
+      _.last(this.laneMap.get(note.lane)!.points)!
+    )!;
+    targetLanePoint.measureIndex = note.measureIndex + 1;
   }
 
   /**
