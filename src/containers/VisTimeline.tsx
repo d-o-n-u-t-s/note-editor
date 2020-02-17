@@ -301,13 +301,17 @@ class VisTimeline extends InjectedComponent {
 
     return (
       <div>
-        {this.injected.editor.currentChart?.time}
+        <span style={{ display: "none" }}>
+          {this.injected.editor.currentChart?.time}
+        </span>
         <div
           style={{
-            display: this.injected.editor.currentChart?.musicGameSystem
-              ?.customTimeline
-              ? "block"
-              : "none",
+            display:
+              this.injected.editor.currentChart?.musicGameSystem
+                ?.customTimeline &&
+              this.injected.editor.setting.showCustomTimeline
+                ? "block"
+                : "none",
             width: "100%"
           }}
           ref={thisDiv => {
