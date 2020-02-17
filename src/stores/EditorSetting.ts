@@ -265,4 +265,10 @@ export default class EditorSetting {
 
   @box
   public tabHeight = 0;
+
+  @box
+  public showCustomCanvas = false;
+
+  @box
+  public showCustomTimeline = false;
 }

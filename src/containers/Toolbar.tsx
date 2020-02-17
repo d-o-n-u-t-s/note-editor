@@ -18,6 +18,7 @@ import {
 import AddIcon from "@material-ui/icons/Add";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
+import TheatersIcon from "@material-ui/icons/Theaters";
 import { observer } from "mobx-react";
 import * as React from "react";
 import { SketchPicker } from "react-color";
@@ -342,6 +343,17 @@ export default observer(function Toolbar() {
       </Menu>
 
       <ThemeButton />
+
+      {/* custom-timeline, custom-canvas */}
+      <IconButton
+        onClick={_ => {
+          editor.setting.showCustomCanvas = !editor.setting.showCustomCanvas;
+          editor.setting.showCustomTimeline = !editor.setting
+            .showCustomTimeline;
+        }}
+      >
+        <TheatersIcon />
+      </IconButton>
 
       <Menu
         style={{ marginTop: "2rem" }}

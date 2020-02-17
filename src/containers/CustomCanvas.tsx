@@ -97,7 +97,12 @@ export default class CustomCanvas extends InjectedComponent {
           component.container = thisDiv!;
           this.start();
         }}
-        style={{ flex: 1 }}
+        style={{
+          flex: 1,
+          display: this.injected.editor.setting.showCustomCanvas
+            ? "block"
+            : "none"
+        }}
       />
     );
   }
