@@ -450,9 +450,8 @@ export default class Pixi extends InjectedComponent {
 
     let targetNotePoint: NotePointInfo | null = null;
 
-    const newNoteType = chart.musicGameSystem.noteTypes[
-      setting.editNoteTypeIndex
-    ];
+    const newNoteType =
+      chart.musicGameSystem.noteTypes[setting.editNoteTypeIndex];
 
     // レーン描画
     for (const lane of chart.timeline.lanes) {
@@ -480,9 +479,8 @@ export default class Pixi extends InjectedComponent {
           continue;
         }
 
-        const newNoteType = chart.musicGameSystem.noteTypes[
-          setting.editNoteTypeIndex
-        ];
+        const newNoteType =
+          chart.musicGameSystem.noteTypes[setting.editNoteTypeIndex];
 
         // 配置できないレーンならやめる
         if ((newNoteType.excludeLanes || []).includes(lane.templateName)) {
@@ -661,9 +659,8 @@ export default class Pixi extends InjectedComponent {
       setting.editMode === EditMode.Add &&
       setting.editObjectCategory === ObjectCategory.Note
     ) {
-      const newNoteType = chart.musicGameSystem.noteTypes[
-        setting.editNoteTypeIndex
-      ];
+      const newNoteType =
+        chart.musicGameSystem.noteTypes[setting.editNoteTypeIndex];
 
       // 新規ノート
       const newNote = NoteRecord.new(
@@ -965,14 +962,16 @@ export default class Pixi extends InjectedComponent {
 
     return (
       <div
-        style={
+        style={Object.assign(
+          {},
           setting.preserve3D
             ? {
                 transformStyle: "preserve-3d",
                 perspective: setting.perspective + "px"
               }
-            : {}
-        }
+            : {},
+          { flex: 1 }
+        )}
         ref={thisDiv => {
           component.container = thisDiv!;
         }}

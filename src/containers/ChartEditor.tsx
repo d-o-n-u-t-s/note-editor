@@ -3,6 +3,7 @@ import * as React from "react";
 import { useStores } from "../stores/stores";
 import Empty from "./Empty";
 import Pixi from "./Pixi";
+import CustomCanvas from "./CustomCanvas";
 
 export default observer(function ChartEditor() {
   const { editor } = useStores();
@@ -17,6 +18,7 @@ export default observer(function ChartEditor() {
       {editor.currentChart ? (
         <div style={{ flex: 1, display: "flex" }}>
           <Pixi />
+          <CustomCanvas />
         </div>
       ) : (
         <Empty />

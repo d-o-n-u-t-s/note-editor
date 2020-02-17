@@ -299,8 +299,6 @@ class VisTimeline extends InjectedComponent {
   render() {
     const component = this;
 
-    console.log("VisTimeline:render");
-
     return (
       <div>
         {this.injected.editor.currentChart?.time}

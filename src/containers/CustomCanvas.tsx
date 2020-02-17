@@ -97,6 +97,7 @@ export default class CustomCanvas extends InjectedComponent {
           component.container = thisDiv!;
           this.start();
         }}
+        style={{ flex: 1 }}
       />
     );
   }
