@@ -22,6 +22,7 @@ import Inspector from "./Inspector";
 import Layer from "./Layer";
 import Player from "./Player";
 import Toolbar from "./Toolbar";
+import VisTimeline from "./VisTimeline";
 
 const drawerWidth: number = config.sidebarWidth;
 
@@ -134,6 +135,7 @@ const Application = observer(function Application() {
           style={{ display: "flex", flexDirection: "column" }}
         >
           <ChartEditor />
+          <VisTimeline />
           <Player />
         </main>
         <SnackbarProvider maxSnack={4}>

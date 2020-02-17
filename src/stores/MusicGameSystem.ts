@@ -1,4 +1,8 @@
 import IMusicGameSystemEventListener from "./musicGameSystem/eventListener";
+import {
+  defaultMusicGameSystemCustomTimeline,
+  MusicGameSystemCustomTimeline
+} from "./musicGameSystem/MusicGameSystemCustomTimeline";
 
 export interface LaneTemplate {
   name: string;
@@ -17,6 +21,12 @@ interface InitialLane {
   horizontalPosition: number;
 }
 
+type CustomProperty = {
+  key: string;
+  defaultValue: any;
+  config?: any;
+};
+
 export interface NoteType {
   name: string;
   renderer: string;
@@ -28,7 +38,7 @@ export interface NoteType {
   /**
    * カスタムプロパティ
    */
-  customProps: { key: string; defaultValue: any; config?: any }[];
+  customProps: CustomProperty[];
   customPropsInspectorConfig: any;
 
   /**
@@ -117,6 +127,8 @@ export default interface MusicGameSystem {
     config: string[] | null;
   }[];
 
+  customTimeline: MusicGameSystemCustomTimeline | null;
+
   eventListener: string | string[] | null;
   eventListeners: IMusicGameSystemEventListener;
 }
@@ -137,14 +149,14 @@ export function normalizeMusicGameSystem(
       editorProps: [],
       noteTypes: [],
       otherObjectTypes: [],
-
       measure: {
         renderer: "default",
         customProps: []
       },
-
+      customTimeline: null,
       eventListener: null,
-      eventListeners: {}
+      eventListeners: {},
+      timeline: defaultMusicGameSystemCustomTimeline
     },
     musicGameSystem
   );

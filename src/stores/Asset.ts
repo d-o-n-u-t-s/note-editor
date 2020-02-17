@@ -1,8 +1,9 @@
 import { ipcRenderer, remote } from "electron";
 import * as fs from "fs";
 import * as _ from "lodash";
-import { action, flow, observable, runInAction } from "mobx";
+import { action, flow, observable } from "mobx";
 import * as path from "path";
+import * as PIXI from "pixi.js";
 import * as util from "util";
 import {
   CustomNoteLineRenderer,
@@ -114,6 +115,7 @@ export default class AssetStore {
     const key = guid();
 
     (window as any).exports = { __esModule: true };
+    (window as any).PIXI = PIXI;
 
     const script = await this.readScript(scriptPath);
 

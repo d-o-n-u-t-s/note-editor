@@ -46,6 +46,7 @@
     "webpack-merge": "^4.2.1"
   },
   "dependencies": {
+    "@types/vis": "^4.21.19",
     "config": "^3.2.4",
     "dat.gui": "^0.7.5",
     "fast-json-patch": "^3.0.0-1",
@@ -58,10 +59,12 @@
     "mobx-remotedev": "^0.3.6",
     "mousetrap": "^1.6.3",
     "notistack": "^0.9.5",
+    "prettier": "^1.19.1",
     "react": "^16.11.0",
     "react-color": "^2.17.0",
     "react-dom": "^16.11.0",
-    "ts-loader": "^6.2.1"
+    "ts-loader": "^6.2.1",
+    "vis": "^4.21.0-EOL"
   },
   "engines": {
     "node": ">=10.12.0"

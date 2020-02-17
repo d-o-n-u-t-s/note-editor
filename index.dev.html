@@ -1,29 +1,104 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-  </head>
 
-  <style>
-    @import url("https://fonts.googleapis.com/css?family=Noto+Sans+JP");
-    * {
-      text-transform: none;
-      font-family: "Noto Sans JP", sans-serif !important;
-    }
-    #loading {
-      position: absolute;
-      width: 100vw;
-      text-align: center;
-      line-height: 100vh;
-      font-size: 3rem;
-      color: #fff;
-      background: #000;
-      z-index: -100;
-    }
-  </style>
+<head>
+  <meta charset="utf-8" />
+</head>
 
-  <body style="margin: 0">
-    <div id="loading">Now Loading...</div>
-    <div id="app"></div>
-  </body>
+<style>
+  @import url("https://fonts.googleapis.com/css?family=Noto+Sans+JP");
+
+  * {
+    text-transform: none;
+    font-family: "Noto Sans JP", sans-serif !important;
+  }
+
+  #loading {
+    position: absolute;
+    width: 100vw;
+    text-align: center;
+    line-height: 100vh;
+    font-size: 3rem;
+    color: #fff;
+    background: #000;
+    z-index: -100;
+  }
+</style>
+
+<link rel="stylesheet" type="text/css"
+  href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis-timeline-graph2d.min.css" />
+
+<style>
+  .visA {
+    background: #00000033 !important;
+  }
+
+  .visB {
+    background: #00000066 !important;
+  }
+
+  .vis-content {
+    background: #333;
+  }
+
+  .vis-custom-time {
+    z-index: 100;
+    background: red;
+  }
+
+  .vis-label {
+    color: #fff !important;
+  }
+
+  .vis-labelset .vis-label {
+    border-bottom: 1px solid #000 !important;
+  }
+
+  .vis-minor {
+    display: none;
+  }
+
+  .vis-panel {
+    border-color: #000 !important;
+  }
+
+  .vis-timeline {
+    box-shadow: none !important;
+    background: #222;
+    box-sizing: content-box;
+    border: none;
+    border-top: solid 14px #000;
+    border-bottom: solid 14px #000;
+  }
+
+  .vis-foreground .vis-group {
+    border-bottom: 1px solid #000000;
+  }
+
+  .vis-panel {
+    border-right: solid 1px #000 !important;
+  }
+
+  .custom-timeline-item .vis-item-content {
+    color: #000;
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  .vis-group,
+  .vis-label {
+    height: 38px !important;
+  }
+
+  .vis-item {
+    margin-top: -5px;
+    background-color: #000;
+    border-color: #333;
+  }
+</style>
+
+<body style="margin: 0">
+  <div id="loading">Now Loading...</div>
+  <div id="app"></div>
+</body>
+
 </html>

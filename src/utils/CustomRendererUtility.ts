@@ -13,15 +13,17 @@ const textures = new Map<string, PIXI.Texture>();
 
 const loading = new Map<string, boolean>();
 
-async function getImage(imagePath: string) {
+/**
+ * assets/musicGameSystems 以下の画像を読み込む
+ * @param imagePath 画像パス
+ */
+async function loadImageAsync(imagePath: string) {
   if (loading.has(imagePath)) return;
 
   loading.set(imagePath, true);
 
   const path = await store.editor.asset.getAssetPath;
-  const buffer: Buffer = await util.promisify(fs.readFile)(
-    path.mgsp + "/" + imagePath
-  );
+  const buffer: Buffer = await util.promisify(fs.readFile)(path.mgsp + "/" + imagePath);
 
   var blob = new Blob([buffer], { type: "image/jpg" });
   const p = URL.createObjectURL(blob);
@@ -49,14 +51,7 @@ class CustomRendererUtility {
     return Editor.instance!.setting.preserve3D;
   }
 
-  drawLine(
-    graphics: PIXI.Graphics,
-    p1: Vector2,
-    p2: Vector2,
-    lineWidth: number,
-    color: number,
-    alpha: number = 1
-  ) {
+  drawLine(graphics: PIXI.Graphics, p1: Vector2, p2: Vector2, lineWidth: number, color: number, alpha: number = 1) {
     graphics
       .lineStyle(lineWidth, color, alpha)
       .moveTo(p1.x, p1.y)
@@ -81,9 +76,7 @@ class CustomRendererUtility {
 
     while (true) {
       // 対象ノートを末尾に持っているノートライン
-      var nl = chart.timeline.noteLines.find(
-        noteLine => noteLine.tail === prevNote.guid
-      );
+      var nl = chart.timeline.noteLines.find(noteLine => noteLine.tail === prevNote.guid);
 
       if (!nl) return;
 
@@ -99,9 +92,7 @@ class CustomRendererUtility {
 
     while (true) {
       // 対象ノートを先頭に持っているノートライン
-      const nl = chart.timeline.noteLines.find(
-        noteLine => noteLine.head === prevNote.guid
-      );
+      const nl = chart.timeline.noteLines.find(noteLine => noteLine.head === prevNote.guid);
       if (!nl) return;
 
       // 無限ループチェック
@@ -112,7 +103,7 @@ class CustomRendererUtility {
   }
 
   getSprite(target: any, imagePath: string): PIXI.Sprite | null {
-    getImage(imagePath);
+    loadImageAsync(imagePath);
 
     if (!textures.has(imagePath)) return null;
 
@@ -132,6 +123,12 @@ class CustomRendererUtility {
 
     sprites.push(sprite);
 
+    return sprite;
+  }
+
+  async createSpriteAsync(uniqueId: any, imagePath: string): Promise<PIXI.Sprite> {
+    await loadImageAsync(imagePath);
+    const sprite = new PIXI.Sprite(textures.get(imagePath));
     return sprite;
   }
 }

@@ -274,7 +274,7 @@ export default class Editor {
   private openCharts = flow(function*(this: Editor, filePaths: string[]) {
     for (const filePath of filePaths) {
       const file = yield util.promisify(fs.readFile)(filePath);
-      Chart.fromJSON(file.toString());
+      Chart.loadFromJson(file.toString());
       this.currentChart!.filePath = filePath;
     }
   });

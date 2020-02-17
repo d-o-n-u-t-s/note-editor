@@ -3,7 +3,7 @@ import MusicGameSystem, {
   HowlPool,
   LaneTemplate,
   NoteType
-} from "../stores/MusicGameSystem";
+} from "./MusicGameSystem";
 
 /**
  * 空の譜面
@@ -46,6 +46,7 @@ export const emptyChart = {
       customProps: []
     },
     customProps: [],
+    customTimeline: null,
     eventListener: null,
     eventListeners: {}
   },

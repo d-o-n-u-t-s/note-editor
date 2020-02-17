@@ -3,6 +3,11 @@ import { List, Record } from "immutable";
 import * as _ from "lodash";
 import { action, computed, observable } from "mobx";
 import { Fraction } from "../math";
+import {
+  CustomTimeline,
+  CustomTimelineData,
+  CustomTimelineRecord
+} from "../objects/CustomTimeline";
 import { Lane } from "../objects/Lane";
 import { LanePoint } from "../objects/LanePoint";
 import { Layer, LayerData, LayerRecord } from "../objects/Layer";
@@ -65,10 +70,11 @@ export default class Chart {
 
   version: number = 2;
 
-  timeline: Timeline;
+  public timeline: Timeline;
+  public customTimeline: CustomTimeline;
 
   @observable.shallow
-  layers: Layer[] = [];
+  public layers: Layer[] = [];
 
   @observable
   currentLayerIndex = 0;
@@ -188,7 +194,11 @@ export default class Chart {
     this.timeline.save();
   }
 
-  static fromJSON(json: string) {
+  /**
+   * JSON から譜面を読み込む
+   * @param json JSON
+   */
+  public static loadFromJson(json: string) {
     const editor = Editor.instance!;
 
     const jsonChart: Chart = JSON.parse(json);
@@ -324,6 +334,10 @@ export default class Chart {
     }
 
     this.timeline = TimelineRecord.new(this, timelineData as TimelineData);
+    this.customTimeline = CustomTimelineRecord.new(
+      this,
+      chartData.customTimeline as CustomTimelineData
+    );
 
     const layers = (chartData.layers || []) as LayerData[];
 
@@ -348,9 +362,14 @@ export default class Chart {
     this.setDifficulty(chartData.difficulty || 0);
   }
 
-  constructor(musicGameSystem: MusicGameSystem, audioSource: string) {
+  /**
+   * コンストラクタ
+   * @param musicGameSystem
+   * @param audioSource
+   */
+  public constructor(musicGameSystem: MusicGameSystem, audioSource: string) {
     this.timeline = TimelineRecord.new(this);
-
+    this.customTimeline = CustomTimelineRecord.new(this);
     this.musicGameSystem = musicGameSystem;
     this.setAudioFromSource(audioSource);
   }

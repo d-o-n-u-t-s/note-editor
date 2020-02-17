@@ -436,7 +436,7 @@ export default class BMSImporter {
       newMeasures[measure.index].beat = measure.beat;
     }
 
-    Chart.fromJSON(
+    Chart.loadFromJson(
       JSON.stringify({
         version: 2,
         layers: [
