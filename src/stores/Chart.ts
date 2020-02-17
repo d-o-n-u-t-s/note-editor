@@ -646,6 +646,8 @@ export default class Chart {
       lastMeasureIndex
     );
 
+    delete (chart as any)._musicGameSystem;
+
     chart = JSON.parse(JSON.stringify(chart));
     const deleteConfigKey = (obj: any) => {
       for (const key of Object.keys(obj)) {
