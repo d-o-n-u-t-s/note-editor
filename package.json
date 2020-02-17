@@ -10,7 +10,8 @@
     "plugin": "ts-node build-asset.ts",
     "dev:electron": "yarn run ts && cross-env NODE_ENV=development yarn run electron .",
     "build:win": "yarn run prod && yarn run ts && electron-builder -w --dir",
-    "build:mac": "yarn run prod && yarn run ts && electron-builder -m --dir"
+    "build:mac": "yarn run prod && yarn run ts && electron-builder -m --dir",
+    "build": "yarn run build:win && electron-builder -m --dir"
   },
   "license": "MIT",
   "devDependencies": {
@@ -24,7 +25,7 @@
     "@types/lodash": "^4.14.145",
     "@types/mathjs": "^6.0.2",
     "@types/mousetrap": "^1.6.1",
-    "@types/react": "^16.9.11",
+    "@types/react": "^16.9.17",
     "@types/react-color": "^3.0.1",
     "@types/react-dom": "^16.9.4",
     "@types/webpack-merge": "^4.1.3",
@@ -60,9 +61,9 @@
     "mousetrap": "^1.6.3",
     "notistack": "^0.9.5",
     "prettier": "^1.19.1",
-    "react": "^16.11.0",
+    "react": "^16.12.0",
     "react-color": "^2.17.0",
-    "react-dom": "^16.11.0",
+    "react-dom": "^16.12.0",
     "ts-loader": "^6.2.1",
     "vis": "^4.21.0-EOL"
   },

@@ -151,7 +151,7 @@ class LaneRenderer implements ILaneRenderer {
    * @param horizontal
    * @param vertical
    */
-  getNotePointInfo(
+  public getNotePointInfo(
     lane: Lane,
     measure: Measure,
     horizontal: IFraction,

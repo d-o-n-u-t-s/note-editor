@@ -82,8 +82,8 @@ class NoteLineRenderer implements INoteLineRenderer {
       measurePosition: Fraction.clone(lanePoint.measurePosition)
     });
 
-    head.updateBounds();
-    tail.updateBounds();
+    if (!head.updateBounds()) return;
+    if (!tail.updateBounds()) return;
 
     const headBounds = head.getBounds();
     const tailBounds = tail.getBounds();

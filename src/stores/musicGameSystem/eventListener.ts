@@ -3,6 +3,11 @@ import { Note } from "../../objects/Note";
 import { GuiUtility } from "../../utils/GuiUtility";
 import Chart from "../Chart";
 
+interface IMusicGameSystemEventListenerNoteInformation {
+  sortedNoteTypeGroups: [string, Note[]][];
+  getClipboardText: () => string;
+}
+
 export default interface IMusicGameSystemEventListener {
   onSave?: (chart: Chart) => string;
   onSerialize?: (chart: Chart) => string;
@@ -14,4 +19,7 @@ export default interface IMusicGameSystemEventListener {
     item: CustomTimelineItem,
     chart: Chart
   ) => string;
+  getNoteInformation?: (
+    groups: [string, Note[]][]
+  ) => IMusicGameSystemEventListenerNoteInformation;
 }

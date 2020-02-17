@@ -9,6 +9,7 @@ import { Mutable } from "../utils/mutable";
 import { Lane, LinePointInfo } from "./Lane";
 import LaneRendererResolver from "./LaneRendererResolver";
 import { Measure } from "./Measure";
+import Vector2 from "../math/Vector2";
 
 interface INoteEditorProps {
   time: number;
@@ -102,7 +103,7 @@ export class NoteRecord extends Record<NoteData>(defaultNoteData) {
   /**
    * 描画領域を更新する
    */
-  updateBounds(): LinePointInfo | null {
+  public updateBounds(): LinePointInfo | null {
     // キャッシュのチェック
     const { currentFrame } = Editor.instance!;
     if (currentFrame == this.lastUpdateBoundsFrame) {
@@ -118,8 +119,9 @@ export class NoteRecord extends Record<NoteData>(defaultNoteData) {
       this.measurePosition
     );
 
+    // ノートの描画範囲が計算できない場合はレーンを拡張する
     if (!linePointInfo) {
-      console.error("ノートの描画範囲が計算できません");
+      this.chart.timeline.extendLane(this);
       return null;
     }
 
@@ -224,7 +226,7 @@ export class NoteRecord extends Record<NoteData>(defaultNoteData) {
   /**
    * クローンする
    */
-  clone() {
-    return NoteRecord.new(this.toJS(), this.chart);
+  public clone() {
+    return NoteRecord.new(_.cloneDeep(this.toJS()), this.chart);
   }
 }

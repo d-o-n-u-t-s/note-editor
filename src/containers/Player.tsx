@@ -1,14 +1,8 @@
-import {
-  createStyles,
-  IconButton,
-  makeStyles,
-  Slider
-} from "@material-ui/core";
+import { IconButton, makeStyles, Slider } from "@material-ui/core";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import NotesIcon from "@material-ui/icons/Notes";
 import PauseIcon from "@material-ui/icons/Pause";
 import PlayArrow from "@material-ui/icons/PlayArrow";
-import SettingsIcon from "@material-ui/icons/Settings";
 import SpeedIcon from "@material-ui/icons/Speed";
 import SeVolumeIcon from "@material-ui/icons/SurroundSound";
 import SpeakerIcon from "@material-ui/icons/VolumeUp";
@@ -17,29 +11,28 @@ import * as React from "react";
 import { useState } from "react";
 import ChartInformation from "../components/ChartInformation";
 import { useStores } from "../stores/stores";
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    playerButton: {},
-    timeSliderTrack: {
-      height: "4px",
-      background: "red"
-    },
-    timeSliderThumb: {
-      width: "14px",
-      height: "14px",
-      background: "red"
-    },
-    volumeSliderTrack: {
-      height: "4px",
-      background: "#fff"
-    },
-    volumeSliderThumb: {
-      width: "14px",
-      height: "14px",
-      background: "#fff"
-    }
-  })
-);
+
+const useStyles = makeStyles((theme: Theme) => ({
+  playerButton: {},
+  timeSliderTrack: {
+    height: "4px",
+    background: "red"
+  },
+  timeSliderThumb: {
+    width: "14px",
+    height: "14px",
+    background: "red"
+  },
+  volumeSliderTrack: {
+    height: "4px",
+    background: "#fff"
+  },
+  volumeSliderThumb: {
+    width: "14px",
+    height: "14px",
+    background: "#fff"
+  }
+}));
 
 const TimeSlider = (props: { classes: any; time: number; onChange: any }) => (
   <Slider
@@ -214,12 +207,6 @@ export default observer(function Player() {
           onClick={() => setState({ openInformation: true })}
         >
           <NotesIcon />
-        </IconButton>
-        <IconButton
-          style={{ color: "#fff", float: "right" }}
-          className={classes.playerButton}
-        >
-          <SettingsIcon />
         </IconButton>
 
         <ChartInformation

@@ -128,6 +128,8 @@ export default class Editor {
    */
   @action
   public setCurrentChart(chartIndex: number) {
+    this.currentChart?.pause();
+
     this.currentChartIndex = chartIndex;
 
     if (!this.charts.length) {
