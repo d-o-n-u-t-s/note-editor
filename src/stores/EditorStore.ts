@@ -61,6 +61,17 @@ export default class Editor {
     target.isSelected = true;
   }
 
+  /**
+   * 検証するオブジェクトを初期化する
+   */
+  @action
+  public clearInspectorTarget() {
+    for (const target of this.inspectorTargets) {
+      target.isSelected = false;
+    }
+    this.inspectorTargets = [];
+  }
+
   getInspectNotes(): Note[] {
     const notes = [];
     for (const target of this.inspectorTargets) {

@@ -15,11 +15,11 @@ import { Note, NoteRecord } from "../objects/Note";
 import { NoteLineRecord } from "../objects/NoteLine";
 import NoteLineRendererResolver from "../objects/NoteLineRendererResolver";
 import NoteRendererResolver from "../objects/NoteRendererResolver";
-import { OtherObjectRenderer, OtherObjectRecord } from "../objects/OtherObject";
+import { OtherObjectRecord, OtherObjectRenderer } from "../objects/OtherObject";
 import { EditMode, ObjectCategory } from "../stores/EditorSetting";
 import { inject, InjectedComponent } from "../stores/inject";
-import { guid } from "../utils/guid";
 import CustomRendererUtility from "../utils/CustomRendererUtility";
+import { guid } from "../utils/guid";
 import * as key from "../utils/keyboard";
 import * as pool from "../utils/pool";
 
@@ -30,6 +30,10 @@ export default class Pixi extends InjectedComponent {
   private container?: HTMLDivElement;
   private graphics?: PIXI.Graphics;
   private currentFrame = 0;
+
+  private isRangeSelection = false;
+  private rangeSelectStartPoint: PIXI.Point | null = null;
+  private rangeSelectEndPoint: PIXI.Point | null = null;
 
   componentDidMount() {
     this.app = new PIXI.Application({
@@ -49,6 +53,34 @@ export default class Pixi extends InjectedComponent {
         const chart = this.injected.editor.currentChart!;
         const direction = this.injected.editor.setting.reverseScroll ? -1 : 1;
         chart.setTime(chart.time + e.wheelDelta * 0.01 * direction, true);
+      },
+      false
+    );
+
+    this.container!.addEventListener(
+      "mousedown",
+      () => {
+        if (this.injected.editor.setting.editMode !== EditMode.Select) return;
+        this.isRangeSelection = true;
+        this.rangeSelectStartPoint = this.getMousePosition();
+        this.rangeSelectEndPoint = this.getMousePosition();
+      },
+      false
+    );
+
+    this.container!.addEventListener(
+      "mousemove",
+      () => {
+        if (!this.isRangeSelection) return;
+        this.rangeSelectEndPoint = this.getMousePosition();
+      },
+      false
+    );
+
+    this.container!.addEventListener(
+      "mouseup",
+      () => {
+        this.isRangeSelection = false;
       },
       false
     );
@@ -97,6 +129,17 @@ export default class Pixi extends InjectedComponent {
   static instance?: Pixi;
 
   private tempTextIndex = 0;
+
+  /**
+   * マウスの座標を取得する
+   */
+  private getMousePosition() {
+    const mousePosition = _.clone(
+      this.app!.renderer.plugins.interaction.mouse.global
+    );
+    mousePosition.x -= this.graphics!.x;
+    return mousePosition;
+  }
 
   getRenderAreaSize() {
     return new Vector2(this.app!.renderer.width, this.app!.renderer.height);
@@ -182,7 +225,7 @@ export default class Pixi extends InjectedComponent {
    */
   previousTime = 0.0;
 
-  inspectTarget: any = null;
+  private inspectTarget: any = null;
 
   private inspect(target: any) {
     this.inspectTarget = target;
@@ -445,9 +488,8 @@ export default class Pixi extends InjectedComponent {
 
     let targetNotePoint: NotePointInfo | null = null;
 
-    const newNoteType = chart.musicGameSystem.noteTypes[
-      setting.editNoteTypeIndex
-    ];
+    const newNoteType =
+      chart.musicGameSystem.noteTypes[setting.editNoteTypeIndex];
 
     // レーン描画
     for (const lane of chart.timeline.lanes) {
@@ -475,9 +517,8 @@ export default class Pixi extends InjectedComponent {
           continue;
         }
 
-        const newNoteType = chart.musicGameSystem.noteTypes[
-          setting.editNoteTypeIndex
-        ];
+        const newNoteType =
+          chart.musicGameSystem.noteTypes[setting.editNoteTypeIndex];
 
         // 配置できないレーンならやめる
         if ((newNoteType.excludeLanes || []).includes(lane.templateName)) {
@@ -651,9 +692,8 @@ export default class Pixi extends InjectedComponent {
       setting.editMode === EditMode.Add &&
       setting.editObjectCategory === ObjectCategory.Note
     ) {
-      const newNoteType = chart.musicGameSystem.noteTypes[
-        setting.editNoteTypeIndex
-      ];
+      const newNoteType =
+        chart.musicGameSystem.noteTypes[setting.editNoteTypeIndex];
 
       // 新規ノート
       const newNote = NoteRecord.new(
@@ -880,6 +920,44 @@ export default class Pixi extends InjectedComponent {
       }
     }
 
+    // 範囲選択
+    if (this.isRangeSelection) {
+      graphics
+        .lineStyle(2, 0x0099ff)
+        .beginFill(0x0099ff, 0.2)
+        .drawRect(
+          this.rangeSelectStartPoint!.x,
+          this.rangeSelectStartPoint!.y,
+          this.rangeSelectEndPoint!.x - this.rangeSelectStartPoint!.x,
+          this.rangeSelectEndPoint!.y - this.rangeSelectStartPoint!.y
+        )
+        .endFill();
+
+      // start, end を左上から近い順にソートする
+      const x = [
+        this.rangeSelectStartPoint!.x,
+        this.rangeSelectEndPoint!.x
+      ].sort((a, b) => a - b);
+      const y = [
+        this.rangeSelectStartPoint!.y,
+        this.rangeSelectEndPoint!.y
+      ].sort((a, b) => a - b);
+
+      const rect = new PIXI.Rectangle(x[0], y[0], x[1] - x[0], y[1] - y[0]);
+
+      // 選択範囲内に配置されているノートを選択する
+      for (const note of chart.timeline.notes) {
+        if (!note.isVisible) continue;
+
+        if (
+          rect.contains(note.x, note.y) &&
+          rect.contains(note.x + note.width, note.y + note.height)
+        ) {
+          editor.addInspectorTarget(note);
+        }
+      }
+    }
+
     this.seMap.clear();
 
     // 再生時間がノートの判定時間を超えたら SE を鳴らす
@@ -922,6 +1000,10 @@ export default class Pixi extends InjectedComponent {
       } else {
         editor.setInspectorTarget(this.inspectTarget);
       }
+    }
+
+    if (isClick && !this.inspectTarget) {
+      editor.clearInspectorTarget();
     }
   }
 

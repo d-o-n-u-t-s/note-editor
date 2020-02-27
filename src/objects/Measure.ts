@@ -85,6 +85,11 @@ export class MeasureRecord extends Record<MeasureData>(defaultMeasureData) {
   }
 
   /**
+   * 選択されているか
+   */
+  public isSelected = false;
+
+  /**
    * 領域を描画する
    * @param graphics 対象グラフィック
    * @param rgba 枠の色
