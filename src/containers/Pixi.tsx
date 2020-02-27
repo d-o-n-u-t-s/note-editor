@@ -315,6 +315,10 @@ export default class Pixi extends InjectedComponent {
           measure,
           chart.timeline.measures
         );
+
+        if (measure.isSelected) {
+          measure.drawBounds(graphics, theme.selected);
+        }
       }
 
       // 小節の中に現在時刻があるなら
@@ -372,18 +376,9 @@ export default class Pixi extends InjectedComponent {
 
     if (targetMeasure) {
       // ターゲット小節の枠を描画
-      graphics
-        .lineStyle(
-          theme.targetMeasureBorderWidth,
-          theme.targetMeasureBorderColor,
-          theme.targetMeasureBorderAlpha
-        )
-        .drawRect(
-          targetMeasure.x,
-          targetMeasure.y,
-          targetMeasure.width,
-          targetMeasure.height
-        );
+      if (!targetMeasure.isSelected) {
+        targetMeasure.drawBounds(graphics, theme.hover);
+      }
 
       const s = targetMeasure;
 
@@ -531,7 +526,7 @@ export default class Pixi extends InjectedComponent {
 
       // 選択中表示
       if (note.isSelected) {
-        note.drawBounds(graphics);
+        note.drawBounds(graphics, theme.selected);
       }
 
       // ノート関連の操作
@@ -546,7 +541,7 @@ export default class Pixi extends InjectedComponent {
         setting.editMode === EditMode.Select ||
         setting.editMode === EditMode.Delete
       ) {
-        note.drawBounds(graphics);
+        if (!note.isSelected) note.drawBounds(graphics, theme.hover);
 
         if (isClick) {
           if (setting.editMode === EditMode.Delete) {
@@ -563,9 +558,7 @@ export default class Pixi extends InjectedComponent {
       if (setting.editMode === EditMode.Connect) {
         graphics
           .lineStyle(2, 0xff9900)
-          //.beginFill(0x0099ff, 0.3)
           .drawRect(bounds.x, bounds.y, bounds.width, bounds.height);
-        //.endFill();
 
         if (
           this.connectTargetNote &&
@@ -600,15 +593,12 @@ export default class Pixi extends InjectedComponent {
               chart.timeline.addNoteLine(newNoteLine);
               chart.save();
 
-              console.log("接続 2");
-
               this.connectTargetNote = note;
             }
           }
         } else {
           if (isClick) {
             this.connectTargetNote = note;
-            console.log("接続 1");
           }
         }
       }

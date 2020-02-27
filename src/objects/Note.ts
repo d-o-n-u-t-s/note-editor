@@ -4,12 +4,12 @@ import * as PIXI from "pixi.js";
 import { Fraction, IFraction } from "../math";
 import Chart from "../stores/Chart";
 import Editor from "../stores/EditorStore";
+import { parseRgba } from "../utils/color";
 import { GUID } from "../utils/guid";
 import { Mutable } from "../utils/mutable";
 import { Lane, LinePointInfo } from "./Lane";
 import LaneRendererResolver from "./LaneRendererResolver";
 import { Measure } from "./Measure";
-import Vector2 from "../math/Vector2";
 
 interface INoteEditorProps {
   time: number;
@@ -161,10 +161,16 @@ export class NoteRecord extends Record<NoteData>(defaultNoteData) {
     return new PIXI.Rectangle(this.x, this.y, this.width, this.height);
   }
 
-  drawBounds(graphics: PIXI.Graphics) {
+  /**
+   * 領域を描画する
+   * @param graphics 対象グラフィック
+   * @param rgba 枠の色
+   */
+  public drawBounds(graphics: PIXI.Graphics, rgba: number) {
+    const { color, alpha } = parseRgba(rgba);
     const bounds = this.getBounds();
     graphics
-      .lineStyle(2, 0xff9900)
+      .lineStyle(2, color, alpha)
       .drawRect(
         bounds.x - 2,
         bounds.y - 2,

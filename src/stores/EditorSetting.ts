@@ -60,7 +60,7 @@ export default class EditorSetting {
   load() {
     const editorSetting = localStorage.getItem("editorSetting");
     if (editorSetting) {
-      _.assign(this, JSON.parse(editorSetting));
+      _.merge(this, JSON.parse(editorSetting));
     }
   }
 
@@ -68,14 +68,9 @@ export default class EditorSetting {
    * テーマ（仮）
    * TODO: 専用クラスを作る
    */
-  theme: {
-    targetMeasureBorderWidth: number;
-    targetMeasureBorderColor: number;
-    targetMeasureBorderAlpha: number;
-  } = {
-    targetMeasureBorderWidth: 4,
-    targetMeasureBorderColor: 0x00ff00,
-    targetMeasureBorderAlpha: 0.5
+  public theme = {
+    hover: 0xff990099,
+    selected: 0xff9900ff
   };
 
   /**
