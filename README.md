@@ -14,5 +14,5 @@ https://chrome.google.com/webstore/detail/mobx-developer-tools/pfgnfdagidkfgcclj
 
 ### ビルド
 
-1. `yarn run build:win` または `yarn run build:mac`
+1. `yarn run build`
 1. 生成された実行ファイルの階層に `assets/audio` フォルダと `assets/musicGameSystems` フォルダを生成する
