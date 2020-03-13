@@ -93,17 +93,7 @@ export default observer(function Toolbar() {
   function handleClose() {
     setState({ ...state, anchorEl: null });
   }
-
-  /**
-   * リロード
-   */
-  function handleReload() {
-    localStorage.setItem(
-      "filePaths",
-      JSON.stringify(editor.charts.map(c => c.filePath).filter(p => p))
-    );
-    location.reload();
-  }
+  
 
   const { setting } = editor;
 
@@ -133,10 +123,6 @@ export default observer(function Toolbar() {
         onClick={() => chart!.timeline.redo()}
       >
         <ArrowForwardIcon />
-      </IconButton>
-      {/* リロードボタン */}
-      <IconButton onClick={handleReload}>
-        <RefreshIcon />
       </IconButton>
 
       <VerticalDivider />
