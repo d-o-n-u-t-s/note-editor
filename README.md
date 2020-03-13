@@ -11,6 +11,7 @@ https://chrome.google.com/webstore/detail/mobx-developer-tools/pfgnfdagidkfgcclj
 
 1. `yarn install` 
 1. `yarn run dev` と `yarn run dev:electron` を同時に実行 
+1. プロジェクト固有のスクリプトがある場合は `yarn run plugin` も実行
 
 ### ビルド
 
