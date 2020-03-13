@@ -270,7 +270,7 @@ function initWindowMenu() {
       submenu: [
         {
           label: "再生/一時停止",
-          accelerator: "P",
+          accelerator: "Space",
           click() {
             mainWindow!.webContents.send("toggleMusicPlaying");
           }
