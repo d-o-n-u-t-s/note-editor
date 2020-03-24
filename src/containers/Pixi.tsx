@@ -61,6 +61,8 @@ export default class Pixi extends InjectedComponent {
     this.container!.addEventListener(
       "mousedown",
       () => {
+        if (!key.isDown("Control") && !key.isDown("Meta"))
+          this.injected.editor.clearInspectorTarget();
         if (this.injected.editor.setting.editMode !== EditMode.Select) return;
         this.isRangeSelection = true;
         this.rangeSelectStartPoint = this.getMousePosition();
@@ -74,14 +76,6 @@ export default class Pixi extends InjectedComponent {
       () => {
         if (!this.isRangeSelection) return;
         this.rangeSelectEndPoint = this.getMousePosition();
-      },
-      false
-    );
-
-    this.container!.addEventListener(
-      "mouseup",
-      () => {
-        this.isRangeSelection = false;
       },
       false
     );
@@ -268,7 +262,7 @@ export default class Pixi extends InjectedComponent {
 
     const buttons = this.app!.renderer.plugins.interaction.mouse.buttons;
 
-    let isClick = this.prev === 0 && buttons === 1;
+    let isClick = this.prev === 1 && buttons === 0;
 
     const viewRect = this.app!.view.getBoundingClientRect();
 
@@ -1002,16 +996,12 @@ export default class Pixi extends InjectedComponent {
 
     this.previousTime = currentTime;
 
-    if (this.inspectTarget) {
-      if (key.isDown("Control") || key.isDown("Meta")) {
+    if (isClick) {
+      this.isRangeSelection = false;
+      if (this.inspectTarget && this.rangeSelectedObjects.length === 0) {
         editor.addInspectorTarget(this.inspectTarget);
-      } else {
-        editor.setInspectorTarget(this.inspectTarget);
       }
-    }
-
-    if (isClick && !this.inspectTarget) {
-      editor.clearInspectorTarget();
+      this.rangeSelectedObjects = [];
     }
   }
 
