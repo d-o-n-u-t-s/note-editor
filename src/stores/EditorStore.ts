@@ -488,6 +488,14 @@ export default class Editor {
         : this.currentChart!.play()
     );
 
+    ipcRenderer.on("reload", () => {
+      localStorage.setItem(
+        "filePaths",
+        JSON.stringify(this.charts.map(c => c.filePath).filter(p => p))
+      );
+      location.reload();
+    });
+    
     ipcRenderer.on("close", () => {
       for (let i = 0; i < this.charts.length; i++) this.saveConfirm(i);
       localStorage.setItem(

@@ -270,13 +270,25 @@ function initWindowMenu() {
       submenu: [
         {
           label: "再生/一時停止",
-          accelerator: "P",
+          accelerator: "Space",
           click() {
             mainWindow!.webContents.send("toggleMusicPlaying");
           }
         }
       ]
-    }
+    },
+    {
+      label: "開発機能",
+      submenu: [
+        {
+          label: "リロード",
+          accelerator: "CmdOrCtrl+R",
+          click() {
+            mainWindow!.webContents.send("reload");
+          }
+        }
+      ]
+    },
   ];
 
   const menu = Menu.buildFromTemplate(template as any);
