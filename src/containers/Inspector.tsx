@@ -43,10 +43,30 @@ export default class Inspector extends InjectedComponent {
   folders: GUI[] = [];
   controllers: GUIController[] = [];
 
+  private readonly maxTargetCount = 5;
+
+  /**
+   * インスペクタをリセットする
+   */
+  private reset() {
+    // 既存のコントローラーを削除する
+    for (const controller of this.controllers) {
+      this.gui.remove(controller);
+    }
+
+    // 既存のフォルダを削除する
+    for (const folder of this.folders) (this.gui as any).removeFolder(folder);
+  }
+
   /**
    * オブジェクトをインスペクタにバインドする
    */
-  bind(targets: any[]) {
+  private bind(targets: any[]) {
+    if (targets.length >= this.maxTargetCount) {
+      this.reset();
+      return;
+    }
+
     // 今表示しているものと完全に一致したら更新しない
     if (
       _.difference(targets, this.currentObjects).length == 0 &&
@@ -56,13 +76,7 @@ export default class Inspector extends InjectedComponent {
     }
     this.currentObjects = targets;
 
-    // 既存のコントローラーを削除する
-    for (const controller of this.controllers) {
-      this.gui.remove(controller);
-    }
-
-    // 既存のフォルダを削除する
-    for (const folder of this.folders) (this.gui as any).removeFolder(folder);
+    this.reset();
 
     this.controllers = [];
     this.folders = [];
@@ -177,7 +191,8 @@ export default class Inspector extends InjectedComponent {
   }
 
   render() {
-    this.bind(this.injected.editor.inspectorTargets);
+    const targets = this.injected.editor.inspectorTargets;
+    this.bind(targets);
 
     let component = this;
     return (
@@ -187,6 +202,9 @@ export default class Inspector extends InjectedComponent {
             component.gameCanvas = thisDiv!;
           }}
         />
+        {targets.length >= this.maxTargetCount ? (
+          <span>{targets.length}個のオブジェクトを選択しています</span>
+        ) : null}
       </div>
     );
   }

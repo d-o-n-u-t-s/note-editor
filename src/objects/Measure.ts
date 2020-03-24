@@ -1,12 +1,13 @@
 import { Record } from "immutable";
 import * as _ from "lodash";
-import Pixi from "../containers/Pixi";
 import * as PIXI from "pixi.js";
+import Pixi from "../containers/Pixi";
 import { Fraction, IFraction } from "../math";
 import {
   MusicGameSystemMeasure,
   MusicGameSystemMeasureCustomProps
 } from "../stores/MusicGameSystem";
+import { parseRgba } from "../utils/color";
 import { Mutable } from "../utils/mutable";
 
 export interface IMeasureCustomProps {
@@ -81,6 +82,23 @@ export class MeasureRecord extends Record<MeasureData>(defaultMeasureData) {
       this.width,
       this.height
     );
+  }
+
+  /**
+   * 選択されているか
+   */
+  public isSelected = false;
+
+  /**
+   * 領域を描画する
+   * @param graphics 対象グラフィック
+   * @param rgba 枠の色
+   */
+  public drawBounds(graphics: PIXI.Graphics, rgba: number) {
+    const { color, alpha } = parseRgba(rgba);
+    graphics
+      .lineStyle(2, color, alpha)
+      .drawRect(this.x - 4, this.y - 4, this.width + 8, this.height + 8);
   }
 }
 
