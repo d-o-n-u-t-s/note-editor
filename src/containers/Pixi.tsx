@@ -358,10 +358,6 @@ export default class Pixi extends InjectedComponent {
           measure,
           chart.timeline.measures
         );
-
-        if (measure.isSelected) {
-          measure.drawBounds(graphics, theme.selected);
-        }
       }
 
       // 小節の中に現在時刻があるなら
@@ -565,11 +561,6 @@ export default class Pixi extends InjectedComponent {
 
       NoteRendererResolver.resolve(note).render(note, graphics);
 
-      // 選択中表示
-      if (note.isSelected) {
-        note.drawBounds(graphics, theme.selected);
-      }
-
       // ノート関連の操作
       if (setting.editObjectCategory !== ObjectCategory.Note) continue;
 
@@ -643,6 +634,11 @@ export default class Pixi extends InjectedComponent {
           }
         }
       }
+    }
+
+    // 選択中表示
+    for (const object of editor.inspectorTargets) {
+      object.drawBounds(graphics, theme.selected);
     }
 
     // 接続モードじゃないかノート外をタップしたら接続対象ノートを解除
