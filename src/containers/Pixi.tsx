@@ -34,6 +34,7 @@ export default class Pixi extends InjectedComponent {
   private isRangeSelection = false;
   private rangeSelectStartPoint: PIXI.Point | null = null;
   private rangeSelectEndPoint: PIXI.Point | null = null;
+  private rangeSelectedObjects: any[] = [];
 
   componentDidMount() {
     this.app = new PIXI.Application({
@@ -945,11 +946,22 @@ export default class Pixi extends InjectedComponent {
       for (const note of chart.timeline.notes) {
         if (!note.isVisible) continue;
 
-        if (
+        const inRange =
           rect.contains(note.x, note.y) &&
-          rect.contains(note.x + note.width, note.y + note.height)
-        ) {
+          rect.contains(note.x + note.width, note.y + note.height);
+        const isSelected = this.rangeSelectedObjects.includes(note);
+
+        // 範囲内のものが未選択なら選択
+        if (inRange && !isSelected) {
+          this.rangeSelectedObjects.push(note);
           editor.addInspectorTarget(note);
+        }
+        // 選択済みのものが範囲外になっていたら選択を外す
+        if (!inRange && isSelected) {
+          this.rangeSelectedObjects = this.rangeSelectedObjects.filter(
+            x => x !== note
+          );
+          editor.removeInspectorTarget(note);
         }
       }
     }

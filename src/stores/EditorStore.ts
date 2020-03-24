@@ -61,6 +61,12 @@ export default class Editor {
     target.isSelected = true;
   }
 
+  @action
+  removeInspectorTarget(target: any) {
+    this.inspectorTargets = this.inspectorTargets.filter(x => x !== target);
+    target.isSelected = false;
+  }
+
   /**
    * 検証するオブジェクトを初期化する
    */
