@@ -633,7 +633,7 @@ export default class Pixi extends InjectedComponent {
 
     // 選択中表示
     for (const object of editor.inspectorTargets) {
-      object.drawBounds(graphics, theme.selected);
+      object.drawBounds?.(graphics, theme.selected);
     }
 
     // 接続モードじゃないかノート外をタップしたら接続対象ノートを解除
