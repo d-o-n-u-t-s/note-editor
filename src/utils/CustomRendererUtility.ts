@@ -136,4 +136,6 @@ class CustomRendererUtility {
   }
 }
 
-export default new CustomRendererUtility();
+const customRendererUtility = new CustomRendererUtility();
+(window as any).CustomRendererUtility = customRendererUtility;
+export default customRendererUtility;

@@ -1,7 +1,7 @@
 import { ipcRenderer, remote } from "electron";
 import * as fs from "fs";
 import * as _ from "lodash";
-import { action, flow, observable, runInAction } from "mobx";
+import { action, flow, observable } from "mobx";
 import * as path from "path";
 import * as util from "util";
 import {
@@ -11,7 +11,6 @@ import {
   normalizeMusicGameSystem,
   NoteType
 } from "../stores/MusicGameSystem";
-import CustomRendererUtility from "../utils/CustomRendererUtility";
 import { guid } from "../utils/guid";
 import { replaceAsync } from "../utils/string";
 import MusicGameSystem from "./MusicGameSystem";
@@ -203,8 +202,6 @@ export default class AssetStore {
 
       musicGameSystems.noteTypeMap.set(noteType.name, noteType);
     }
-
-    (window as any).CustomRendererUtility = CustomRendererUtility;
 
     // レーンのカスタムレンダラーを読み込む
     {
