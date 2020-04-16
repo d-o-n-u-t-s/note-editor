@@ -139,6 +139,10 @@ function initWindowMenu() {
           label: "貼り付け",
           role: "paste"
         },
+        {
+          label: "削除",
+          role: "delete"
+        },
         { type: "separator" },
         {
           label: "ノートを上に移動",
@@ -288,7 +292,7 @@ function initWindowMenu() {
           }
         }
       ]
-    },
+    }
   ];
 
   const menu = Menu.buildFromTemplate(template as any);

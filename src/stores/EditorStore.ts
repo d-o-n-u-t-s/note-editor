@@ -470,6 +470,13 @@ export default class Editor {
     });
     Mousetrap.bind("mod+c", () => this.copy());
     Mousetrap.bind("mod+v", () => this.paste());
+    Mousetrap.bind(["del", "backspace"], () => {
+      const removeNotes = this.inspectorTargets.filter(
+        target => target instanceof NoteRecord
+      );
+      removeNotes.forEach(n => this.currentChart!.timeline.removeNote(n));
+      if (removeNotes.length > 0) this.currentChart!.save();
+    });
 
     ipcRenderer.on("moveDivision", (_: any, index: number) =>
       this.moveDivision(index)
@@ -512,7 +519,7 @@ export default class Editor {
       );
       location.reload();
     });
-    
+
     ipcRenderer.on("close", () => {
       for (let i = 0; i < this.charts.length; i++) this.saveConfirm(i);
       localStorage.setItem(
