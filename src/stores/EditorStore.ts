@@ -1,7 +1,7 @@
 import { ipcRenderer, remote } from "electron";
 import * as fs from "fs";
 import * as _ from "lodash";
-import { action, flow, observable } from "mobx";
+import { action, flow, observable, runInAction } from "mobx";
 import * as Mousetrap from "mousetrap";
 import { VariantType } from "notistack";
 import * as util from "util";
@@ -225,10 +225,12 @@ export default class Editor {
       properties: ["openFile", "createDirectory"]
     };
     dialog.showSaveDialog(window, options, (filePath: any) => {
-      if (filePath) {
-        this.currentChart!.filePath = filePath;
-        this.save();
-      }
+      runInAction(() => {
+        if (filePath) {
+          this.currentChart!.filePath = filePath;
+          this.save();
+        }
+      });
     });
   }
 
