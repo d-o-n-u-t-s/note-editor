@@ -643,9 +643,8 @@ export default class Pixi extends InjectedComponent {
 
     // その他オブジェクト選択/削除
     if (
-      (setting.editMode === EditMode.Select ||
-        setting.editMode === EditMode.Delete) &&
-      setting.editObjectCategory === ObjectCategory.Other
+      setting.editMode === EditMode.Select ||
+      setting.editMode === EditMode.Delete
     ) {
       for (const object of chart.timeline.otherObjects) {
         const bounds = OtherObjectRenderer.getBounds(
