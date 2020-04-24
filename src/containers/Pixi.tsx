@@ -263,6 +263,7 @@ export default class Pixi extends InjectedComponent {
     const buttons = this.app!.renderer.plugins.interaction.mouse.buttons;
 
     let isClick = this.prev === 1 && buttons === 0;
+    let isRight = buttons === 2;
 
     const viewRect = this.app!.view.getBoundingClientRect();
 
@@ -578,6 +579,12 @@ export default class Pixi extends InjectedComponent {
           if (setting.editMode === EditMode.Select) {
             this.inspect(note);
           }
+        }
+
+        if(isRight){
+          this.isRangeSelection = false;
+          chart.timeline.removeNote(note);
+          chart.save();
         }
       }
 
