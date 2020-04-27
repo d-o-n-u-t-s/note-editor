@@ -141,6 +141,21 @@ class VisTimeline extends InjectedComponent {
     item: TimelineItem,
     callback: (item: TimelineItem | null) => void
   ) {
+    const chart = this.injected.editor.currentChart!;
+    const measureSize = Math.abs(chart.timeline.measures[0].beginTime - chart.timeline.measures[1].beginTime) * 1000;
+
+    // 0以下にしない
+    item.start = Math.max(item.start.valueOf() as number, 0);
+
+    // 近いところにスナップ
+    item.start = Math.floor(item.start.valueOf() as number / measureSize) * (measureSize + 1);
+    item.end =  Math.floor(item.end!.valueOf() as number / measureSize) * (measureSize + 1);
+
+    // 最小サイズ以下にしない
+    if((item.end!.valueOf() as number - item.start.valueOf() as number) < measureSize) {
+        item.end = item.start + measureSize;
+    }
+
     const n = this.itemMap.get(item.id as number)!;
     n.start = (item.start.valueOf() as number) * 0.001;
     n.end = (item.end!.valueOf() as number) * 0.001;
@@ -184,10 +199,16 @@ class VisTimeline extends InjectedComponent {
         console.log(item);
 
         const chart = this.injected.editor.currentChart!;
+        const measureSize = Math.abs(chart.timeline.measures[0].beginTime - chart.timeline.measures[1].beginTime) * 1000;
+
+        // 近いところにスナップ
+        item.start = Math.floor(item.start.valueOf() as number / measureSize) * measureSize;
 
         // 開始, 終了時間
-        const start = item.start.valueOf() as number;
-        const end = (item.start.valueOf() as number) + 5000;
+        let start = item.start.valueOf() as number;
+
+        // 4小節分のサイズで初期配置
+        const end = start + measureSize * 4;
 
         const timeline = chart.customTimeline;
 
