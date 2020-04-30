@@ -180,6 +180,16 @@ export default class Editor {
 
     chart.musicGameSystem.eventListeners.onSerialize?.(chart);
 
+    // イベント発火
+    const onSave = chart.musicGameSystem.eventListeners.onSave;
+    if (onSave) {
+      const alert = onSave(chart);
+      if (alert) {
+        this.notify(alert, "error");
+        return;
+      }
+    }
+
     // 保存
     const data = chart.toJSON();
 
@@ -190,13 +200,6 @@ export default class Editor {
     });
 
     this.notify("譜面を保存しました");
-
-    // イベント発火
-    const onSave = chart.musicGameSystem.eventListeners.onSave;
-    if (onSave) {
-      const alert = onSave(chart);
-      if (alert) this.notify(alert, "error");
-    }
   }
 
   @action
