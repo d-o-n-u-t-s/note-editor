@@ -501,7 +501,7 @@ export default class Chart {
   updateTime() {
     if (!this.audio) return;
     const time = this.audio!.seek() as number;
-    if (this.time !== time) this.setTime(time);
+    if (this.time !== time && !isNaN(time)) this.setTime(time);
   }
 
   @action

@@ -306,8 +306,10 @@ class VisTimeline extends InjectedComponent {
 
       if (prevTime != chart.time) {
         prevTime = chart.time;
-        timeline.setCustomTime(chart.time * 1000, this.customTimeId);
-        if (!isNaN(chart.time)) timeline.moveTo(chart.time * 1000, {animation: false});
+        if (!isNaN(chart.time)) {
+          timeline.setCustomTime(chart.time * 1000, this.customTimeId);
+          timeline.moveTo(chart.time * 1000, {animation: false});
+        }
       }
       const duration = chart.audio!.duration();
       if (prevDuration != duration) {
