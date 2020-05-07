@@ -189,6 +189,7 @@ class VisTimeline extends InjectedComponent {
       },
       clickToUse: true,
       stack: false,
+      orientation: {axis : "left", item : "top" },
 
       // always snap to full hours, independent of the scale
       snap: (date, scale, step) => {
