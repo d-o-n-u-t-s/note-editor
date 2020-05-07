@@ -149,8 +149,8 @@ class VisTimeline extends InjectedComponent {
     item.start = Math.max(item.start.valueOf() as number, 0);
 
     // 近いところにスナップ
-    item.start = Math.floor(item.start.valueOf() as number / measureDivSize) * (measureDivSize + 1);
-    item.end =  Math.floor(item.end!.valueOf() as number / measureDivSize) * (measureDivSize + 1);
+    item.start = Math.round(item.start.valueOf() as number / measureDivSize) * measureDivSize;
+    item.end =  Math.round(item.end!.valueOf() as number / measureDivSize) * measureDivSize;
 
     // 最小サイズ以下にしない
     if((item.end!.valueOf() as number - item.start.valueOf() as number) < measureDivSize) {
