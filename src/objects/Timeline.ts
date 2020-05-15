@@ -84,6 +84,7 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
     );
 
     this.updateNoteMap();
+    this.updateNoteLineMap();
     this.updateLanePointMap();
     this.updateLaneMap();
   }
@@ -273,12 +274,30 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
     if (updateNoteMap) this.updateNoteMap();
   }
 
+  noteLineHeadMap = new Map<string, NoteLine>();
+  noteLineTailMap = new Map<string, NoteLine>();
+
+  updateNoteLineMap() {
+    this.noteLineHeadMap.clear();
+    this.noteLineTailMap.clear();
+
+    for (const noteLine of this.noteLines) {
+      this.noteLineHeadMap.set(noteLine.head, noteLine);
+      this.noteLineTailMap.set(noteLine.tail, noteLine);
+    }
+    console.log("noteLineHeadMap を更新しました");
+
+    this.calculateTime();
+  }
+
   addNoteLine(noteLine: NoteLine) {
     this.noteLines.push(noteLine);
+    this.updateNoteLineMap();
   }
 
   removeNoteLine(noteLine: NoteLine) {
     this.mutable.noteLines = this.noteLines.filter(_note => _note != noteLine);
+    this.updateNoteLineMap();
   }
 
   lanePointMap = new Map<string, LanePoint>();

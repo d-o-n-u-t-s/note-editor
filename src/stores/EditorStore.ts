@@ -337,6 +337,7 @@ export default class Editor {
     }
 
     tl.updateNoteMap();
+    tl.updateNoteLineMap();
 
     // ノートラインを複製する
     for (const line of oldChart.timeline.noteLines) {
