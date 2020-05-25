@@ -10,23 +10,14 @@ import { Mutable } from "../utils/mutable";
 import { Lane, LinePointInfo } from "./Lane";
 import LaneRendererResolver from "./LaneRendererResolver";
 import { Measure } from "./Measure";
+import TimelineObjectType from "./TimelineObject";
 
 interface INoteEditorProps {
   time: number;
 }
 
-export type NoteData = {
-  guid: GUID;
+export type NoteData = TimelineObjectType & {
   editorProps: INoteEditorProps;
-
-  /**
-   * 小節インデックス
-   */
-  measureIndex: number;
-  /**
-   * 小節内の位置
-   */
-  measurePosition: IFraction;
 
   horizontalSize: number;
   horizontalPosition: Fraction;

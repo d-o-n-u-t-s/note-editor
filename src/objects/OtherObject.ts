@@ -6,20 +6,11 @@ import { OtherObjectType } from "../stores/MusicGameSystem";
 import { GUID } from "../utils/guid";
 import { Mutable } from "../utils/mutable";
 import { Measure } from "./Measure";
+import TimelineObjectType from "./TimelineObject";
 
-export type OtherObjectData = {
+export type OtherObjectData = TimelineObjectType & {
   type: number;
   value: number;
-  guid: GUID;
-
-  /**
-   * 小節インデックス
-   */
-  measureIndex: number;
-  /**
-   * 小節内の位置
-   */
-  measurePosition: Fraction;
 };
 
 const defaultOtherObjectData: OtherObjectData = {
