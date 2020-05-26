@@ -581,7 +581,7 @@ export default class Pixi extends InjectedComponent {
           }
         }
 
-        if(isRight){
+        if (isRight) {
           this.isRangeSelection = false;
           chart.timeline.removeNote(note);
           chart.save();

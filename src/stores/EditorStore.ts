@@ -176,16 +176,24 @@ export default class Editor {
   public static instance: Editor | null = null;
 
   /**
+   * 譜面を開いてるかチェックする
+   * 開いてなかったら warning 出す
+   * @returns 譜面を開いているか
+   */
+  private existsCurrentChart(): boolean {
+    const exists = this.currentChart !== null;
+    if (!exists) console.warn("譜面を開いていません");
+    return exists;
+  }
+
+  /**
    * 譜面を保存する
    */
   @action
   private save() {
-    const chart = this.currentChart;
+    if (!this.existsCurrentChart()) return;
 
-    if (!chart) {
-      console.warn("譜面を開いていません");
-      return;
-    }
+    const chart = this.currentChart!;
 
     if (!chart.filePath) {
       this.saveAs();
@@ -218,6 +226,8 @@ export default class Editor {
 
   @action
   saveAs() {
+    if (!this.existsCurrentChart()) return;
+
     var window = remote.getCurrentWindow();
     var options = {
       title: "タイトル",
@@ -302,6 +312,7 @@ export default class Editor {
 
   @action
   copy() {
+    if (!this.existsCurrentChart()) return;
     this.copiedNotes = this.getInspectNotes();
 
     this.notify(`${this.copiedNotes.length} 個のオブジェクトをコピーしました`);
@@ -309,6 +320,7 @@ export default class Editor {
 
   @action
   paste() {
+    if (!this.existsCurrentChart()) return;
     if (this.inspectorTargets.length != 1) return;
     if (!(this.inspectorTargets[0] instanceof MeasureRecord)) return;
     if (this.copiedNotes.length == 0) return;
@@ -463,9 +475,10 @@ export default class Editor {
     ipcRenderer.on("importBMS", () => BMSImporter.import());
 
     // 編集
-    Mousetrap.bind("mod+z", () => this.currentChart!.timeline.undo());
-    Mousetrap.bind("mod+shift+z", () => this.currentChart!.timeline.redo());
+    Mousetrap.bind("mod+z", () => this.currentChart?.timeline.undo());
+    Mousetrap.bind("mod+shift+z", () => this.currentChart?.timeline.redo());
     Mousetrap.bind("mod+x", () => {
+      if (!this.existsCurrentChart()) return;
       this.copy();
       this.copiedNotes.forEach(n => this.currentChart!.timeline.removeNote(n));
       if (this.copiedNotes.length > 0) this.currentChart!.save();
@@ -473,11 +486,13 @@ export default class Editor {
     Mousetrap.bind("mod+c", () => this.copy());
     Mousetrap.bind("mod+v", () => this.paste());
     Mousetrap.bind(["del", "backspace"], () => {
+      if (!this.currentChart) return;
       const removeNotes = this.inspectorTargets.filter(
         target => target instanceof NoteRecord
       );
       removeNotes.forEach(n => this.currentChart!.timeline.removeNote(n));
       if (removeNotes.length > 0) this.currentChart!.save();
+      this.updateInspector();
     });
 
     ipcRenderer.on("moveDivision", (_: any, index: number) =>
