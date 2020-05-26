@@ -263,6 +263,7 @@ export default class Pixi extends InjectedComponent {
     const buttons = this.app!.renderer.plugins.interaction.mouse.buttons;
 
     let isClick = this.prev === 1 && buttons === 0;
+    let isRight = buttons === 2;
 
     const viewRect = this.app!.view.getBoundingClientRect();
 
@@ -579,6 +580,12 @@ export default class Pixi extends InjectedComponent {
             this.inspect(note);
           }
         }
+
+        if(isRight){
+          this.isRangeSelection = false;
+          chart.timeline.removeNote(note);
+          chart.save();
+        }
       }
 
       // ノート接続
@@ -643,9 +650,8 @@ export default class Pixi extends InjectedComponent {
 
     // その他オブジェクト選択/削除
     if (
-      (setting.editMode === EditMode.Select ||
-        setting.editMode === EditMode.Delete) &&
-      setting.editObjectCategory === ObjectCategory.Other
+      setting.editMode === EditMode.Select ||
+      setting.editMode === EditMode.Delete
     ) {
       for (const object of chart.timeline.otherObjects) {
         const bounds = OtherObjectRenderer.getBounds(

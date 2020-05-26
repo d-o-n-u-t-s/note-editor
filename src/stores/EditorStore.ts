@@ -1,7 +1,7 @@
 import { ipcRenderer, remote } from "electron";
 import * as fs from "fs";
 import * as _ from "lodash";
-import { action, flow, observable } from "mobx";
+import { action, flow, observable, runInAction } from "mobx";
 import * as Mousetrap from "mousetrap";
 import { VariantType } from "notistack";
 import * as util from "util";
@@ -225,10 +225,12 @@ export default class Editor {
       properties: ["openFile", "createDirectory"]
     };
     dialog.showSaveDialog(window, options, (filePath: any) => {
-      if (filePath) {
-        this.currentChart!.filePath = filePath;
-        this.save();
-      }
+      runInAction(() => {
+        if (filePath) {
+          this.currentChart!.filePath = filePath;
+          this.save();
+        }
+      });
     });
   }
 
@@ -470,6 +472,13 @@ export default class Editor {
     });
     Mousetrap.bind("mod+c", () => this.copy());
     Mousetrap.bind("mod+v", () => this.paste());
+    Mousetrap.bind(["del", "backspace"], () => {
+      const removeNotes = this.inspectorTargets.filter(
+        target => target instanceof NoteRecord
+      );
+      removeNotes.forEach(n => this.currentChart!.timeline.removeNote(n));
+      if (removeNotes.length > 0) this.currentChart!.save();
+    });
 
     ipcRenderer.on("moveDivision", (_: any, index: number) =>
       this.moveDivision(index)
@@ -512,7 +521,7 @@ export default class Editor {
       );
       location.reload();
     });
-    
+
     ipcRenderer.on("close", () => {
       for (let i = 0; i < this.charts.length; i++) this.saveConfirm(i);
       localStorage.setItem(

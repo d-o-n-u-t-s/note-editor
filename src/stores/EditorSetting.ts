@@ -197,7 +197,10 @@ export default class EditorSetting {
     24,
     32,
     48,
-    64
+    64,
+    96,
+    128,
+    192
   ];
 
   /**
