@@ -1,7 +1,13 @@
 import { Fraction } from "../math";
 import { GUID, guid } from "../utils/guid";
 
-export default class TimelineObject {
+export type TimelineObjectType = {
+  guid: GUID;
+  measureIndex: number;
+  measurePosition: Fraction;
+};
+
+export default class TimelineObject implements TimelineObjectType {
   guid: GUID = guid();
 
   /**
