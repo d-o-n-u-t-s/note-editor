@@ -9,9 +9,11 @@
     "ts": "tsc electron-main.ts --lib esnext --skipLibCheck",
     "plugin": "ts-node build-asset.ts",
     "dev:electron": "yarn run ts && cross-env NODE_ENV=development yarn run electron .",
-    "build:win": "yarn run prod && yarn run ts && electron-builder -w --dir",
-    "build:mac": "yarn run prod && yarn run ts && electron-builder -m --dir",
-    "build": "yarn run build:win && electron-builder -m --dir"
+    "make-assets-dir:win": "mkdir -p ./dist/win-unpacked/assets/audio && mkdir ./dist/win-unpacked/assets/musicGameSystems",
+    "make-assets-dir:mac": "mkdir -p ./dist/mac/assets/audio && mkdir ./dist/mac/assets/musicGameSystems",
+    "build:win": "yarn run prod && yarn run ts && electron-builder -w --dir && yarn run make-assets-dir:win",
+    "build:mac": "yarn run prod && yarn run ts && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder -m --dir && yarn run make-assets-dir:mac",
+    "build": "yarn run build:mac && electron-builder -w --dir && yarn run make-assets-dir:win"
   },
   "license": "MIT",
   "devDependencies": {
