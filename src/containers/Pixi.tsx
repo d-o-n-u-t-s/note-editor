@@ -674,8 +674,11 @@ export default class Pixi extends InjectedComponent {
             if (setting.editMode === EditMode.Select) {
               this.inspect(object);
             } else if (setting.editMode === EditMode.Delete) {
-              chart.timeline.removeOtherObject(object);
-              chart.save();
+              // 削除はオブジェクトモードの場合だけ行う
+              if (setting.editObjectCategory === ObjectCategory.Other) {
+                chart.timeline.removeOtherObject(object);
+                chart.save();
+              }
             }
           }
         }
