@@ -265,7 +265,11 @@ class VisTimeline extends InjectedComponent {
         const timeline = this.injected.editor.currentChart!.customTimeline;
         timeline.removeItem(this.itemMap.get(item.id as number)!);
         callback(item);
-      }
+      },
+      
+      groupOrder: (item1, item2) => {
+        return (item1 as MusicGameSystemCustomTimelineGroup).id - (item2 as MusicGameSystemCustomTimelineGroup).id;
+      } 
     };
 
     const timeline = new vis.Timeline(container!, new vis.DataSet([]), options);
