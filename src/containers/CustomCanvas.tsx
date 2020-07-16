@@ -53,8 +53,9 @@ export default class CustomCanvas extends InjectedComponent {
    */
   private renderCanvas() {
     if (!this.injected.editor.currentChart) return;
+    if (!this.injected.editor.setting.showCustomTimeline) return;
 
-    //console.warn("RenderCanvas!");
+    // console.warn("RenderCanvas!");
 
     const { editor } = this.injected;
     const { setting } = editor;

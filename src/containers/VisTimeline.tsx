@@ -303,6 +303,7 @@ class VisTimeline extends InjectedComponent {
     setInterval(() => {
       const chart = this.injected.editor.currentChart;
       if (!chart) return;
+      if (!this.injected.editor.setting.showCustomTimeline) return;
 
       if (prevChart != chart) {
         this.handleChartChange(chart);
