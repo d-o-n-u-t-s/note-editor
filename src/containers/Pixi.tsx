@@ -505,6 +505,8 @@ export default class Pixi extends InjectedComponent {
     for (const note of chart.timeline.notes) {
       const measure = chart.timeline.measures[note.measureIndex];
 
+      if(!measure) continue;
+
       // 小節とレイヤーが表示されているなら描画する
       note.isVisible = measure.isVisible && visibleLayers.has(note.layer);
     }
