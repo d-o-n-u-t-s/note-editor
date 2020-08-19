@@ -15,20 +15,17 @@ type Stop = {
 };
 
 export default class BMSImporter {
-  public static import() {
-    dialog.showOpenDialog(
-      {
-        properties: ["openFile", "multiSelections"]
-        // filters: [{ name: "BMS 譜面データ", extensions: ["bms", "bme"] }]
-      },
-      async (filenames: string[]) => {
-        for (const filename of filenames) {
-          const file = await util.promisify(fs.readFile)(filename);
+  public static async import() {
+    const result = await dialog.showOpenDialog({
+      properties: ["openFile", "multiSelections"]
+      // filters: [{ name: "BMS 譜面データ", extensions: ["bms", "bme"] }]
+    });
 
-          this.importImplement(file.toString());
-        }
-      }
-    );
+    for (const filename of result.filePaths) {
+      const file = await util.promisify(fs.readFile)(filename);
+
+      this.importImplement(file.toString());
+    }
   }
 
   public static importImplement(bmsChart: string) {

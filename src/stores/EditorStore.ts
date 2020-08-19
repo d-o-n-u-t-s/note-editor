@@ -228,20 +228,18 @@ export default class Editor {
   saveAs() {
     if (!this.existsCurrentChart()) return;
 
-    var window = remote.getCurrentWindow();
-    var options = {
-      title: "タイトル",
-      filters: this.dialogFilters,
-      properties: ["openFile", "createDirectory"]
-    };
-    dialog.showSaveDialog(window, options, (filePath: any) => {
-      runInAction(() => {
-        if (filePath) {
-          this.currentChart!.filePath = filePath;
+    dialog
+      .showSaveDialog(remote.getCurrentWindow(), {
+        title: "タイトル",
+        filters: this.dialogFilters,
+        properties: ["createDirectory"]
+      })
+      .then(result => {
+        if (result.filePath) {
+          this.currentChart!.filePath = result.filePath;
           this.save();
         }
       });
-    });
   }
 
   /**
@@ -289,13 +287,12 @@ export default class Editor {
 
   @action
   open() {
-    dialog.showOpenDialog(
-      {
+    dialog
+      .showOpenDialog({
         properties: ["openFile", "multiSelections"],
         filters: this.dialogFilters
-      },
-      paths => this.openCharts(paths)
-    );
+      })
+      .then(result => this.openCharts(result.filePaths));
   }
 
   /**

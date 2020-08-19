@@ -312,9 +312,10 @@ export default class AssetStore {
 
   @action
   openAudioAssetDirectory() {
-    const [dir] = remote.dialog.showOpenDialog({
-      properties: ["openDirectory"]
-    })!;
-    this.audioAssetPath = dir;
+    remote.dialog
+      .showOpenDialog({
+        properties: ["openDirectory"]
+      })
+      .then(result => (this.audioAssetPath = result.filePaths[0]));
   }
 }
