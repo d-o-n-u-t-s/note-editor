@@ -10,7 +10,7 @@ const enumerateFiles = (directoryPath: string) => {
   const files: string[] = [];
 
   const readTopDirSync = (directoryPath: string) => {
-    const items = fs.readdirSync(directoryPath).map(itemName => {
+    const items = fs.readdirSync(directoryPath).map((itemName) => {
       return path.join(directoryPath, itemName);
     });
 
@@ -49,20 +49,22 @@ function replaceImports(src: string) {
       .slice(s, e)!
       .replace(/\n|\{|\}|\,|\*| as |/g, "")
       .split(" ")
-      .filter(a => a.trim())
-      .map(a => `type ${a} = any;`)
+      .filter((a) => a.trim())
+      .map((a) => `type ${a} = any;`)
       .join("\n");
   });
 }
 
 const directoryPath = "./assets/musicGameSystems";
 
-const files = enumerateFiles(directoryPath).filter(f => f.match(/src\/.*.ts$/));
+const files = enumerateFiles(directoryPath).filter((f) =>
+  f.match(/src\/.*.ts$/)
+);
 
 console.log(files);
 
 function sleep(time: number) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     setTimeout(() => {
       resolve();
     }, time);
@@ -81,8 +83,8 @@ const transpile = async (file: string) => {
 
   const result = ts.transpileModule(data, {
     compilerOptions: {
-      module: ts.ModuleKind.CommonJS
-    }
+      module: ts.ModuleKind.CommonJS,
+    },
   });
 
   fs.writeFileSync(

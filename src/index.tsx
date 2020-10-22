@@ -4,7 +4,7 @@ import * as ReactDOM from "react-dom";
 import Application from "./containers/Application";
 
 configure({
-  enforceActions: "observed"
+  enforceActions: "observed",
 });
 
 ReactDOM.render(<Application />, document.getElementById("app"));

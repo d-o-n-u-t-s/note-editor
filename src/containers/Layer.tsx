@@ -3,7 +3,7 @@ import {
   Drawer,
   IconButton,
   List,
-  ListSubheader
+  ListSubheader,
 } from "@material-ui/core";
 import { Add, ArrowDownward, ArrowUpward, Delete } from "@material-ui/icons";
 import { observer } from "mobx-react";
@@ -39,11 +39,11 @@ export default observer(function Layer() {
     <Drawer
       variant="permanent"
       classes={{
-        paper: classes.rightDrawer
+        paper: classes.rightDrawer,
       }}
       anchor="right"
       style={{
-        marginTop: editor.setting.tabHeight - 48
+        marginTop: editor.setting.tabHeight - 48,
       }}
     >
       <List

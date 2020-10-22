@@ -5,7 +5,7 @@ import Pixi from "../containers/Pixi";
 import { Fraction, IFraction } from "../math";
 import {
   MusicGameSystemMeasure,
-  MusicGameSystemMeasureCustomProps
+  MusicGameSystemMeasureCustomProps,
 } from "../stores/MusicGameSystem";
 import { parseRgba } from "../utils/color";
 import { Mutable } from "../utils/mutable";
@@ -26,7 +26,7 @@ export type MeasureData = {
 const defaultMeasureData: MeasureData = {
   index: -1,
   beat: Fraction.none,
-  customProps: {}
+  customProps: {},
 };
 
 export type Measure = Mutable<MeasureRecord>;

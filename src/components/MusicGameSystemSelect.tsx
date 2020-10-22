@@ -11,7 +11,7 @@ interface IProps {
 
 export default observer(function MusicGameSystemSelect({
   value,
-  onChange
+  onChange,
 }: IProps) {
   const { editor } = useStores();
   const classes = useStyles();
@@ -30,7 +30,7 @@ export default observer(function MusicGameSystemSelect({
         inputProps={{
           className: classes.input,
           name: "currentMusicGameSystem",
-          id: "musicGameSystem"
+          id: "musicGameSystem",
         }}
       >
         <MenuItem value={-1}>

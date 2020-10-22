@@ -20,7 +20,7 @@ export default class NoteRendererResolver {
       // レンダラー作成
       const renderer = {
         render: defaultNoteRenderer.render,
-        customRender: noteType.rendererReference
+        customRender: noteType.rendererReference,
       };
       this.renderers.set(noteType.rendererReference, renderer);
       return renderer;

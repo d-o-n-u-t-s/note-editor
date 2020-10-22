@@ -29,10 +29,10 @@ export function getLines(points: LinePoint[], measures: Measure[]): LineInfo[] {
   const _points = points
     .slice()
     .sort(sortMeasure)
-    .map(p => ({
+    .map((p) => ({
       x: Fraction.to01(p.horizontalPosition),
       width: p.horizontalSize / p.horizontalPosition.denominator,
-      value: p.measureIndex + Fraction.to01(p.measurePosition)
+      value: p.measureIndex + Fraction.to01(p.measurePosition),
     }));
 
   for (let i = 0; i < _points.length - 1; ++i) {
@@ -162,7 +162,7 @@ class LaneRenderer implements ILaneRenderer {
 
     // y座標が含まれるライン
     const targetLine = (linesCache.get(lane) || []).find(
-      line =>
+      (line) =>
         line.measure === measure &&
         line.start.point.y >= y &&
         line.end.point.y <= y
@@ -185,7 +185,7 @@ class LaneRenderer implements ILaneRenderer {
 
     return {
       point: new Vector2(left, y),
-      width: right - left
+      width: right - left,
     };
   }
 
@@ -215,7 +215,7 @@ class LaneRenderer implements ILaneRenderer {
             lane,
             linePointInfo: data!,
             horizontalIndex: i,
-            verticalIndex: measureDivision - j - 1
+            verticalIndex: measureDivision - j - 1,
           };
         }
       }
@@ -236,7 +236,7 @@ class LaneRenderer implements ILaneRenderer {
     noteType: NoteType
   ): void {
     const lines = getLines(
-      lane.points.map(point => lanePointMap.get(point)!),
+      lane.points.map((point) => lanePointMap.get(point)!),
       measures
     );
 

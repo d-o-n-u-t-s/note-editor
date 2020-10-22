@@ -12,7 +12,7 @@ export default merge(common, {
   plugins: [
     new HtmlWebpackPlugin({
       template: src + "/index.prod.html",
-      filename: "index.html"
-    })
-  ]
+      filename: "index.html",
+    }),
+  ],
 });

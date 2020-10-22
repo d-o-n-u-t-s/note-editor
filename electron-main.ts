@@ -20,7 +20,7 @@ function createWindow() {
     width: 800,
     height: 600,
     // title: "NoteEditor",
-    webPreferences: { nodeIntegration: true }
+    webPreferences: { nodeIntegration: true },
   });
 
   if (isDevelopment) {
@@ -39,7 +39,7 @@ function createWindow() {
   mainWindow!.webContents.on("did-finish-load", () => {
     mainWindow!.webContents.send("assets", {
       aap: audioAssetPath,
-      mgsp: musicGameSystemsPath
+      mgsp: musicGameSystemsPath,
     });
   });
 
@@ -57,7 +57,7 @@ function createWindow() {
 
   mainWindow!.webContents.openDevTools();
 
-  mainWindow!.on("close", e => {
+  mainWindow!.on("close", (e) => {
     mainWindow!.webContents.send("close");
   });
   mainWindow!.on("closed", () => (mainWindow = null));
@@ -89,7 +89,7 @@ function initWindowMenu() {
           accelerator: "CmdOrCtrl+O",
           click() {
             mainWindow!.webContents.send("open");
-          }
+          },
         },
         { type: "separator" },
         {
@@ -97,51 +97,51 @@ function initWindowMenu() {
           accelerator: "CmdOrCtrl+S",
           click() {
             mainWindow!.webContents.send("save");
-          }
+          },
         },
         {
           label: "名前を付けて保存",
           accelerator: "CmdOrCtrl+Shift+S",
           click() {
             mainWindow!.webContents.send("saveAs");
-          }
+          },
         },
         { type: "separator" },
         {
           label: "BMS 譜面をインポート",
           click() {
             mainWindow!.webContents.send("importBMS");
-          }
-        }
-      ]
+          },
+        },
+      ],
     },
     {
       label: "編集",
       submenu: [
         {
           label: "元に戻す",
-          role: "undo"
+          role: "undo",
         },
         {
           label: "やり直す",
-          role: "redo"
+          role: "redo",
         },
         { type: "separator" },
         {
           label: "切り取り",
-          role: "cut"
+          role: "cut",
         },
         {
           label: "コピー",
-          role: "copy"
+          role: "copy",
         },
         {
           label: "貼り付け",
-          role: "paste"
+          role: "paste",
         },
         {
           label: "削除",
-          role: "delete"
+          role: "delete",
         },
         { type: "separator" },
         {
@@ -149,37 +149,37 @@ function initWindowMenu() {
           accelerator: "Up",
           click() {
             mainWindow!.webContents.send("moveDivision", 1);
-          }
+          },
         },
         {
           label: "ノートを下に移動",
           accelerator: "Down",
           click() {
             mainWindow!.webContents.send("moveDivision", -1);
-          }
+          },
         },
         {
           label: "ノートを左に移動",
           accelerator: "Left",
           click() {
             mainWindow!.webContents.send("moveLane", -1);
-          }
+          },
         },
         {
           label: "ノートを右に移動",
           accelerator: "Right",
           click() {
             mainWindow!.webContents.send("moveLane", 1);
-          }
+          },
         },
         {
           label: "ノートの位置を反転",
           accelerator: "CmdOrCtrl+F",
           click() {
             mainWindow!.webContents.send("flipLane");
-          }
-        }
-      ]
+          },
+        },
+      ],
     },
     {
       label: "選択",
@@ -192,16 +192,16 @@ function initWindowMenu() {
               accelerator: "CmdOrCtrl+Up",
               click() {
                 mainWindow!.webContents.send("changeMeasureDivision", 1);
-              }
+              },
             },
             {
               label: "ダウン",
               accelerator: "CmdOrCtrl+Down",
               click() {
                 mainWindow!.webContents.send("changeMeasureDivision", -1);
-              }
-            }
-          ]
+              },
+            },
+          ],
         },
         {
           label: "ノートサイズ",
@@ -211,16 +211,16 @@ function initWindowMenu() {
               accelerator: "CmdOrCtrl+Right",
               click() {
                 mainWindow!.webContents.send("changeObjectSize", 1);
-              }
+              },
             },
             {
               label: "ダウン",
               accelerator: "CmdOrCtrl+Left",
               click() {
                 mainWindow!.webContents.send("changeObjectSize", -1);
-              }
-            }
-          ]
+              },
+            },
+          ],
         },
         {
           label: "編集モード",
@@ -230,30 +230,30 @@ function initWindowMenu() {
               accelerator: "Q",
               click() {
                 mainWindow!.webContents.send("changeEditMode", 1);
-              }
+              },
             },
             {
               label: "追加モード",
               accelerator: "W",
               click() {
                 mainWindow!.webContents.send("changeEditMode", 2);
-              }
+              },
             },
             {
               label: "削除モード",
               accelerator: "E",
               click() {
                 mainWindow!.webContents.send("changeEditMode", 3);
-              }
+              },
             },
             {
               label: "接続モード",
               accelerator: "R",
               click() {
                 mainWindow!.webContents.send("changeEditMode", 4);
-              }
-            }
-          ]
+              },
+            },
+          ],
         },
         {
           label: "ノートタイプ",
@@ -263,11 +263,11 @@ function initWindowMenu() {
               accelerator: `${index + 1}`,
               click() {
                 mainWindow!.webContents.send("changeNoteTypeIndex", index);
-              }
-            }))
-          ]
-        }
-      ]
+              },
+            })),
+          ],
+        },
+      ],
     },
     {
       label: "制御",
@@ -277,9 +277,9 @@ function initWindowMenu() {
           accelerator: "Space",
           click() {
             mainWindow!.webContents.send("toggleMusicPlaying");
-          }
-        }
-      ]
+          },
+        },
+      ],
     },
     {
       label: "開発機能",
@@ -289,10 +289,10 @@ function initWindowMenu() {
           accelerator: "CmdOrCtrl+R",
           click() {
             mainWindow!.webContents.send("reload");
-          }
-        }
-      ]
-    }
+          },
+        },
+      ],
+    },
   ];
 
   const menu = Menu.buildFromTemplate(template as any);

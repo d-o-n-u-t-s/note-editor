@@ -4,7 +4,7 @@ import {
   Divider,
   Drawer,
   makeStyles,
-  MuiThemeProvider
+  MuiThemeProvider,
 } from "@material-ui/core";
 import { createMuiTheme } from "@material-ui/core/styles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
@@ -33,10 +33,10 @@ const useStyles = makeStyles((theme: Theme) =>
 
     drawerPaper: {
       position: "relative",
-      width: drawerWidth
+      width: drawerWidth,
     },
     button: {
-      margin: theme.spacing()
+      margin: theme.spacing(),
     },
 
     playerButton: {},
@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme: Theme) =>
       position: "absolute",
       top: theme.spacing(0.5),
       right: theme.spacing(2),
-      zIndex: 10000
+      zIndex: 10000,
     },
 
     appFrame: {
@@ -53,13 +53,13 @@ const useStyles = makeStyles((theme: Theme) =>
       overflow: "hidden",
       position: "relative",
       display: "flex",
-      width: "100%"
+      width: "100%",
     },
     appBar: {
-      width: `calc(100% - ${drawerWidth}px)`
+      width: `calc(100% - ${drawerWidth}px)`,
     },
     "appBar-left": {
-      marginLeft: drawerWidth
+      marginLeft: drawerWidth,
     },
     toolbar: theme.mixins.toolbar,
 
@@ -69,40 +69,40 @@ const useStyles = makeStyles((theme: Theme) =>
 
     timeSliderTrack: {
       height: "4px",
-      background: "red"
+      background: "red",
     },
     timeSliderThumb: {
       width: "14px",
       height: "14px",
-      background: "red"
+      background: "red",
     },
     volumeSliderTrack: {
       height: "4px",
-      background: "#fff"
+      background: "#fff",
     },
     volumeSliderThumb: {
       width: "14px",
       height: "14px",
-      background: "#fff"
+      background: "#fff",
     },
 
     content: {
       flexGrow: 1,
-      backgroundColor: theme.palette.background.default
+      backgroundColor: theme.palette.background.default,
       // padding: theme.spacing.unit * 3
-    }
+    },
   })
 );
 
 const lightTheme = createMuiTheme({
   palette: {
-    type: "light"
-  }
+    type: "light",
+  },
 });
 const darkTheme = createMuiTheme({
   palette: {
-    type: "dark"
-  }
+    type: "dark",
+  },
 });
 
 const Application = observer(function Application() {
@@ -122,7 +122,7 @@ const Application = observer(function Application() {
         <Drawer
           variant="permanent"
           classes={{
-            paper: classes.drawerPaper
+            paper: classes.drawerPaper,
           }}
           anchor="left"
         >

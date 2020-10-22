@@ -21,7 +21,7 @@ export default (props: IProps) => {
       button
       style={{
         padding: 0,
-        background: props.layer.lock ? "#eee" : ""
+        background: props.layer.lock ? "#eee" : "",
       }}
       disableRipple={props.layer.lock}
       selected={props.selected}

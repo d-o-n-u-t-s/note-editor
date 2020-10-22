@@ -22,7 +22,7 @@ const defaultNoteLineData: LanePointData = {
   templateName: "?",
   measureIndex: 0,
   measurePosition: Fraction.none,
-  color: 0xffffff
+  color: 0xffffff,
 };
 
 export type LanePoint = Mutable<LanePointRecord>;

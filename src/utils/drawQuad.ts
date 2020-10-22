@@ -52,7 +52,7 @@ export function drawQuad(
     pp3.x - margin,
     pp3.y - margin,
     pp4.x + margin,
-    pp4.y - margin
+    pp4.y - margin,
   ]);
   graphics.endFill();
 }
@@ -78,7 +78,7 @@ export function drawTriangle(
     pp2.x - margin,
     pp2.y + margin,
     pp3.x - margin,
-    pp3.y - margin
+    pp3.y - margin,
   ]);
   graphics.endFill();
 }

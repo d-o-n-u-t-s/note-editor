@@ -1,7 +1,7 @@
 import {
   Clear as ClearIcon,
   Create as CreateIcon,
-  ShowChart as ShowChartIcon
+  ShowChart as ShowChartIcon,
 } from "@material-ui/icons";
 import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import ToggleButton from "@material-ui/lab/ToggleButton";
@@ -10,9 +10,9 @@ import * as React from "react";
 import { EditMode } from "../stores/EditorSetting";
 import useStyles from "../styles/ToolBar";
 
-export default function({
+export default function ({
   value,
-  onChange
+  onChange,
 }: {
   value: EditMode;
   onChange: (editMode: EditMode) => void;

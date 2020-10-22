@@ -3,10 +3,10 @@ import { remote } from "electron";
 import * as React from "react";
 import { useStyles } from "../styles/styles";
 
-export default function({
+export default function ({
   value,
   onChange,
-  audioAssetPath
+  audioAssetPath,
 }: {
   value: string;
   onChange: (newValue: string) => void;
@@ -25,9 +25,9 @@ export default function({
           remote.dialog
             .showOpenDialog({
               defaultPath: audioAssetPath,
-              filters: [{ name: "音源", extensions: ["mp3", "wav"] }]
+              filters: [{ name: "音源", extensions: ["mp3", "wav"] }],
             })
-            .then(result =>
+            .then((result) =>
               onChange(result.filePaths[0].split(/[\/\\]/).pop()!)
             );
         }}

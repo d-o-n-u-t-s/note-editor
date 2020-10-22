@@ -22,7 +22,7 @@ Object.defineProperty(GUI.prototype, "removeFolder", {
     this.__ul.removeChild(folder.domElement.parentNode);
     delete this.__folders[name];
     this.onResize();
-  }
+  },
 });
 
 /**
@@ -175,7 +175,7 @@ export default class Inspector extends InjectedComponent {
     (window as any).GUI = GUI;
 
     // インスペクタの領域を調整する
-    new MutationObserver(_ => {
+    new MutationObserver((_) => {
       const w = gui.domElement.offsetWidth;
       const h = gui.domElement.offsetHeight;
       gui.domElement.style.transform = `scale(${scale})`;
@@ -198,7 +198,7 @@ export default class Inspector extends InjectedComponent {
     return (
       <div>
         <div
-          ref={thisDiv => {
+          ref={(thisDiv) => {
             component.gameCanvas = thisDiv!;
           }}
         />

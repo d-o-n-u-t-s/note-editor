@@ -56,7 +56,7 @@ class NoteLineRenderer implements INoteLineRenderer {
       lanePointMap,
       noteMap,
       laneMap,
-      measures
+      measures,
     } = Pixi.instance!.injected.editor!.currentChart!.timeline;
 
     let head = noteMap.get(noteLine.head)!;
@@ -79,7 +79,7 @@ class NoteLineRenderer implements INoteLineRenderer {
     const cloneLanePoint = (lanePoint: LanePoint) => ({
       ...lanePoint,
       horizontalPosition: Fraction.clone(lanePoint.horizontalPosition),
-      measurePosition: Fraction.clone(lanePoint.measurePosition)
+      measurePosition: Fraction.clone(lanePoint.measurePosition),
     });
 
     if (!head.updateBounds()) return;
@@ -90,15 +90,15 @@ class NoteLineRenderer implements INoteLineRenderer {
 
     // 先頭ノートと末尾ノートの間にあるレーン中間ポイントを取得する
     let lps = lane.points
-      .map(guid => lanePointMap.get(guid)!)
-      .filter(lp => {
+      .map((guid) => lanePointMap.get(guid)!)
+      .filter((lp) => {
         const n = lp.measureIndex + Fraction.to01(lp.measurePosition);
 
         return n > headPos && n < tailPos;
       })
       .sort(sortMeasure)
 
-      .map(lp => {
+      .map((lp) => {
         lp = cloneLanePoint(lp);
 
         const pos = lp.measureIndex + Fraction.to01(lp.measurePosition);
@@ -164,14 +164,14 @@ class NoteLineRenderer implements INoteLineRenderer {
           measures[note.measureIndex].width
         ),
         measureIndex: note.measureIndex,
-        measurePosition: Fraction.clone(note.measurePosition)
+        measurePosition: Fraction.clone(note.measurePosition),
       } as LanePoint;
     };
 
     lps = [
       noteToLanePoint(head, headBounds),
       ...lps,
-      noteToLanePoint(tail, tailBounds)
+      noteToLanePoint(tail, tailBounds),
     ];
 
     const lines = getLines(lps, measures);

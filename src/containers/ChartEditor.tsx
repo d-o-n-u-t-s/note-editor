@@ -11,7 +11,7 @@ export default observer(function ChartEditor() {
     <>
       <div
         style={{
-          marginTop: editor.setting.tabHeight + 48
+          marginTop: editor.setting.tabHeight + 48,
         }}
       />
       {editor.currentChart ? (

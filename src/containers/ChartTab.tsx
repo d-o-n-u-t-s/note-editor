@@ -42,7 +42,7 @@ export default observer(function ChartTab() {
   closeButtons = [];
 
   return (
-    <div ref={el => (container = el)}>
+    <div ref={(el) => (container = el)}>
       <div id={closeButtonContainerId}>
         {editor.charts.map((chart, index) => (
           <IconButton

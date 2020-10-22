@@ -42,7 +42,7 @@ export default class Editor {
     this.notification = {
       text,
       guid: guid(),
-      type
+      type,
     };
   }
 
@@ -63,7 +63,7 @@ export default class Editor {
 
   @action
   removeInspectorTarget(target: any) {
-    this.inspectorTargets = this.inspectorTargets.filter(x => x !== target);
+    this.inspectorTargets = this.inspectorTargets.filter((x) => x !== target);
     target.isSelected = false;
   }
 
@@ -87,7 +87,7 @@ export default class Editor {
       if (target instanceof MeasureRecord) {
         notes.push(
           ...this.currentChart!.timeline.notes.filter(
-            n => n.measureIndex == target.index
+            (n) => n.measureIndex == target.index
           )
         );
       }
@@ -232,9 +232,9 @@ export default class Editor {
       .showSaveDialog(remote.getCurrentWindow(), {
         title: "タイトル",
         filters: this.dialogFilters,
-        properties: ["createDirectory"]
+        properties: ["createDirectory"],
       })
-      .then(result => {
+      .then((result) => {
         if (result.filePath) {
           this.currentChart!.filePath = result.filePath;
           this.save();
@@ -261,7 +261,7 @@ export default class Editor {
       else if (t instanceof OtherObjectRecord) {
         this.inspectorTargets.push(
           this.currentChart!.timeline.otherObjects.find(
-            object => object.guid === t.guid
+            (object) => object.guid === t.guid
           )
         );
       }
@@ -290,16 +290,16 @@ export default class Editor {
     dialog
       .showOpenDialog({
         properties: ["openFile", "multiSelections"],
-        filters: this.dialogFilters
+        filters: this.dialogFilters,
       })
-      .then(result => this.openCharts(result.filePaths));
+      .then((result) => this.openCharts(result.filePaths));
   }
 
   /**
    * 譜面を開く
    * @param filePaths 譜面のパスのリスト
    */
-  private openCharts = flow(function*(this: Editor, filePaths: string[]) {
+  private openCharts = flow(function* (this: Editor, filePaths: string[]) {
     for (const filePath of filePaths) {
       const file = yield util.promisify(fs.readFile)(filePath);
       Chart.fromJSON(file.toString());
@@ -329,14 +329,14 @@ export default class Editor {
     }
 
     const tl = this.currentChart!.timeline;
-    if (!this.copiedNotes.every(note => tl.laneMap.has(note.lane))) {
+    if (!this.copiedNotes.every((note) => tl.laneMap.has(note.lane))) {
       this.notify("レーンIDが一致しません", "error");
       return;
     }
 
     const diff =
       this.inspectorTargets[0].index -
-      Math.min(...this.copiedNotes.map(note => note.measureIndex));
+      Math.min(...this.copiedNotes.map((note) => note.measureIndex));
 
     const guidMap = new Map<string, string>();
     for (let note of this.copiedNotes) {
@@ -391,10 +391,10 @@ export default class Editor {
     const lanes = this.currentChart!.timeline.lanes;
     const notes = this.getInspectNotes();
 
-    notes.forEach(note => {
+    notes.forEach((note) => {
       // 移動先レーンを取得
       const lane =
-        lanes[indexer(lanes.findIndex(lane => lane.guid === note.lane))];
+        lanes[indexer(lanes.findIndex((lane) => lane.guid === note.lane))];
       if (lane === undefined) return;
 
       // 置けないならやめる
@@ -445,7 +445,7 @@ export default class Editor {
     const notes = this.getInspectNotes();
     const measures = this.currentChart!.timeline.measures;
 
-    notes.forEach(note => {
+    notes.forEach((note) => {
       const p = Fraction.add(
         note.measurePosition,
         Fraction.div(frac, measures[note.measureIndex].beat)
@@ -477,7 +477,9 @@ export default class Editor {
     Mousetrap.bind("mod+x", () => {
       if (!this.existsCurrentChart()) return;
       this.copy();
-      this.copiedNotes.forEach(n => this.currentChart!.timeline.removeNote(n));
+      this.copiedNotes.forEach((n) =>
+        this.currentChart!.timeline.removeNote(n)
+      );
       if (this.copiedNotes.length > 0) this.currentChart!.save();
     });
     Mousetrap.bind("mod+c", () => this.copy());
@@ -485,9 +487,9 @@ export default class Editor {
     Mousetrap.bind(["del", "backspace"], () => {
       if (!this.currentChart) return;
       const removeNotes = this.inspectorTargets.filter(
-        target => target instanceof NoteRecord
+        (target) => target instanceof NoteRecord
       );
-      removeNotes.forEach(n => this.currentChart!.timeline.removeNote(n));
+      removeNotes.forEach((n) => this.currentChart!.timeline.removeNote(n));
       if (removeNotes.length > 0) this.currentChart!.save();
       this.updateInspector();
     });
@@ -496,11 +498,11 @@ export default class Editor {
       this.moveDivision(index)
     );
     ipcRenderer.on("moveLane", (_: any, index: number) => {
-      this.moveLane(i => i + index);
+      this.moveLane((i) => i + index);
       this.moveSelectedNotes(index);
     });
     ipcRenderer.on("flipLane", () => {
-      this.moveLane(i => this.currentChart!.timeline.lanes.length - i - 1);
+      this.moveLane((i) => this.currentChart!.timeline.lanes.length - i - 1);
       this.flipSelectedNotes();
     });
 
@@ -529,7 +531,7 @@ export default class Editor {
     ipcRenderer.on("reload", () => {
       localStorage.setItem(
         "filePaths",
-        JSON.stringify(this.charts.map(c => c.filePath).filter(p => p))
+        JSON.stringify(this.charts.map((c) => c.filePath).filter((p) => p))
       );
       location.reload();
     });
@@ -538,7 +540,7 @@ export default class Editor {
       for (let i = 0; i < this.charts.length; i++) this.saveConfirm(i);
       localStorage.setItem(
         "filePaths",
-        JSON.stringify(this.charts.map(c => c.filePath).filter(p => p))
+        JSON.stringify(this.charts.map((c) => c.filePath).filter((p) => p))
       );
     });
 

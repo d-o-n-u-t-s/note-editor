@@ -13,7 +13,7 @@ import {
   Timeline,
   TimelineData,
   TimelineJsonData,
-  TimelineRecord
+  TimelineRecord,
 } from "../objects/Timeline";
 import { guid } from "../utils/guid";
 import HotReload from "../utils/HotReload";
@@ -46,17 +46,17 @@ class ChartRecord extends Record<ChartData>({
   editorVersion: 1,
   musicGameSystem: {
     name: "string",
-    version: 1
+    version: 1,
   },
 
   audio: {
     source: "string",
-    startTime: 0
+    startTime: 0,
   },
 
   timeline: {
-    notes: List<Note>()
-  }
+    notes: List<Note>(),
+  },
 }) {}
 
 export default class Chart {
@@ -92,7 +92,7 @@ export default class Chart {
         guid: guid(),
         name: `レイヤー${this.layers.length + 1}`,
         visible: true,
-        lock: false
+        lock: false,
       })
     );
 
@@ -103,7 +103,7 @@ export default class Chart {
   removeLayer() {
     // 削除対象のノートを列挙する
     const removeNotes = this.timeline.notes.filter(
-      note => note.layer === this.currentLayer.guid
+      (note) => note.layer === this.currentLayer.guid
     );
 
     if (removeNotes.length) {
@@ -162,7 +162,7 @@ export default class Chart {
   mergeLayer() {
     // マージするノートを列挙する
     const mergeNotes = this.timeline.notes.filter(
-      note => note.layer === this.currentLayer.guid
+      (note) => note.layer === this.currentLayer.guid
     );
 
     const nextLayer = this.layers[this.currentLayerIndex + 1];
@@ -194,7 +194,7 @@ export default class Chart {
     const jsonChart: Chart = JSON.parse(json);
 
     const musicGameSystem = editor.asset.musicGameSystems.find(
-      mgs => mgs.name === jsonChart.musicGameSystemName
+      (mgs) => mgs.name === jsonChart.musicGameSystemName
     );
 
     if (!musicGameSystem) {
@@ -234,7 +234,7 @@ export default class Chart {
       {
         index,
         beat: new Fraction(4, 4),
-        customProps
+        customProps,
       },
       this.musicGameSystem.measure
     );
@@ -311,7 +311,7 @@ export default class Chart {
       timelineData.measures.push({
         index: i,
         beat: new Fraction(4, 4),
-        customProps: {}
+        customProps: {},
       });
     }
 
@@ -333,7 +333,7 @@ export default class Chart {
         guid: guid(),
         name: "レイヤー1",
         visible: true,
-        lock: false
+        lock: false,
       });
       // 全ノートを初期レイヤーに割り当てる
       for (const note of this.timeline.notes) {
@@ -341,7 +341,7 @@ export default class Chart {
       }
     }
 
-    this.layers = layers.map(layer => LayerRecord.new(layer));
+    this.layers = layers.map((layer) => LayerRecord.new(layer));
 
     this.setName(chartData.name);
     this.setStartTime(chartData.startTime);
@@ -542,7 +542,7 @@ export default class Chart {
             {
               index,
               beat: new Fraction(4, 4),
-              customProps: {}
+              customProps: {},
             },
             this.musicGameSystem.measure
           )
@@ -573,7 +573,7 @@ export default class Chart {
           horizontalPosition: new Fraction(
             initialLane.horizontalPosition,
             musicGameSystem.measureHorizontalDivision
-          )
+          ),
         } as LanePoint;
 
         this.timeline.addLanePoint(newLanePoint);
@@ -585,7 +585,7 @@ export default class Chart {
         guid: "initialLane" + index,
         templateName: laneTemplate.name,
         division: laneTemplate.division,
-        points: lanePoints
+        points: lanePoints,
       } as Lane;
       this.timeline.addLane(newLane);
     });
@@ -598,7 +598,7 @@ export default class Chart {
     // 最終小節のインデックスを取得
     const audioDuration = this.audio!.duration() - this.startTime;
     const lastMeasureIndex = this.timeline.measures.findIndex(
-      measure => measure.endTime >= audioDuration
+      (measure) => measure.endTime >= audioDuration
     );
 
     let chart = Object.assign({}, this);

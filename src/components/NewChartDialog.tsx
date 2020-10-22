@@ -23,20 +23,20 @@ export default observer(function NewChartDialog() {
   }>({
     open: false,
     audioPath: "",
-    musicGameSystemIndex: null
+    musicGameSystemIndex: null,
   });
 
   function handleClickOpen() {
     setState({
       ...state,
-      open: true
+      open: true,
     });
   }
 
   function handleClose() {
     setState({
       ...state,
-      open: false
+      open: false,
     });
   }
 
@@ -58,7 +58,7 @@ export default observer(function NewChartDialog() {
       style={{
         margin: 4,
         position: "absolute",
-        left: "calc(100% - 48px)"
+        left: "calc(100% - 48px)",
       }}
     >
       <Fab
@@ -82,10 +82,10 @@ export default observer(function NewChartDialog() {
           <div style={{ marginTop: ".5rem" }}>
             <MusicGameSystemSelect
               value={state.musicGameSystemIndex}
-              onChange={newValue =>
+              onChange={(newValue) =>
                 setState({
                   ...state,
-                  musicGameSystemIndex: newValue
+                  musicGameSystemIndex: newValue,
                 })
               }
             />
@@ -93,10 +93,10 @@ export default observer(function NewChartDialog() {
           <div style={{ marginTop: ".5rem" }}>
             <AudioSelect
               value={state.audioPath}
-              onChange={newValue =>
+              onChange={(newValue) =>
                 setState({
                   ...state,
-                  audioPath: newValue
+                  audioPath: newValue,
                 })
               }
               audioAssetPath={editor.asset.audioAssetPath}

@@ -82,7 +82,7 @@ class CustomRendererUtility {
     while (true) {
       // 対象ノートを末尾に持っているノートライン
       var nl = chart.timeline.noteLines.find(
-        noteLine => noteLine.tail === prevNote.guid
+        (noteLine) => noteLine.tail === prevNote.guid
       );
 
       if (!nl) return;
@@ -100,7 +100,7 @@ class CustomRendererUtility {
     while (true) {
       // 対象ノートを先頭に持っているノートライン
       const nl = chart.timeline.noteLines.find(
-        noteLine => noteLine.head === prevNote.guid
+        (noteLine) => noteLine.head === prevNote.guid
       );
       if (!nl) return;
 

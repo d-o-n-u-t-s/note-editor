@@ -11,7 +11,7 @@ export type NoteLineData = {
 const defaultNoteLineData: NoteLineData = {
   guid: "GUID",
   head: "GUID",
-  tail: "GUID"
+  tail: "GUID",
 };
 
 export type NoteLine = Mutable<NoteLineRecord>;

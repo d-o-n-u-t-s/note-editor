@@ -140,11 +140,11 @@ export function normalizeMusicGameSystem(
 
       measure: {
         renderer: "default",
-        customProps: []
+        customProps: [],
       },
 
       eventListener: null,
-      eventListeners: {}
+      eventListeners: {},
     },
     musicGameSystem
   );
@@ -152,7 +152,7 @@ export function normalizeMusicGameSystem(
   for (const noteType of system.noteTypes) {
     noteType.editorProps = Object.assign(
       {
-        color: "0xffffff"
+        color: "0xffffff",
       },
       noteType.editorProps
     );
