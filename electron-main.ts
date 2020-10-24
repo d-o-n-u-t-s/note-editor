@@ -20,7 +20,7 @@ function createWindow() {
     width: 800,
     height: 600,
     // title: "NoteEditor",
-    webPreferences: { nodeIntegration: true },
+    webPreferences: { nodeIntegration: true, enableRemoteModule: true },
   });
 
   if (isDevelopment) {
