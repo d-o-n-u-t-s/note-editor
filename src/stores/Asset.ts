@@ -288,7 +288,7 @@ export default class AssetStore {
     })();
   }
 
-  loadAudioAsset(fileName: string) {
+  public loadAudioAsset(fileName: string) {
     // サブディレクトリも検索
     const findRecursive = (dir: string): string | undefined => {
       for (const file of fs.readdirSync(dir)) {
@@ -301,9 +301,11 @@ export default class AssetStore {
       }
     };
 
-    console.log("loadAudioAsset", fileName);
     const foundPath = findRecursive(this.audioAssetPath);
-    if (!foundPath) return;
+    if (!foundPath) {
+      alert("音源が見つかりませんでした\n" + fileName);
+      return;
+    }
 
     const buffer: Buffer = fs.readFileSync(foundPath);
 
