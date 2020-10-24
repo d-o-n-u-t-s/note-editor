@@ -24,30 +24,37 @@ import Player from "./Player";
 import Toolbar from "./Toolbar";
 
 const drawerWidth: number = config.sidebarWidth;
+const rightDrawerWidth = 180;
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      /* ... */
+      display: "flex",
     },
-
-    drawerPaper: {
-      position: "relative",
+    leftDrawer: {
       width: drawerWidth,
+      flexShrink: 0,
+    },
+    leftDrawerPaper: {
+      width: drawerWidth,
+    },
+    rightDrawer: {
+      width: rightDrawerWidth,
+      flexShrink: 0,
+      zIndex: 0,
+    },
+    rightDrawerPaper: {
+      width: rightDrawerWidth,
     },
     button: {
       margin: theme.spacing(),
     },
-
-    playerButton: {},
-
     fab: {
       position: "absolute",
       top: theme.spacing(0.5),
       right: theme.spacing(2),
       zIndex: 10000,
     },
-
     appFrame: {
       zIndex: 1,
       overflow: "hidden",
@@ -55,18 +62,19 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "flex",
       width: "100%",
     },
-    appBar: {
+    appBarOpen: {
       width: `calc(100% - ${drawerWidth}px)`,
     },
-    "appBar-left": {
+    appBarClose: {
+      width: "100%",
+    },
+    appBarLeftOpen: {
       marginLeft: drawerWidth,
     },
-    toolbar: theme.mixins.toolbar,
-
-    paper: {
-      /* ... */
+    appBarLeftClose: {
+      marginLeft: 0,
     },
-
+    toolbar: theme.mixins.toolbar,
     timeSliderTrack: {
       height: "4px",
       background: "red",
@@ -85,11 +93,16 @@ const useStyles = makeStyles((theme: Theme) =>
       height: "14px",
       background: "#fff",
     },
-
+    chartEditorContainer: {
+      flex: 1,
+      overflow: "hidden",
+    },
     content: {
       flexGrow: 1,
+      display: "flex",
+      flexDirection: "column",
       backgroundColor: theme.palette.background.default,
-      // padding: theme.spacing.unit * 3
+      height: "100vh",
     },
   })
 );
@@ -107,40 +120,61 @@ const darkTheme = createMuiTheme({
 
 const Application = observer(function Application() {
   const classes = useStyles();
+  const { editor } = useStores();
+
+  const appBarHeight = editor.setting.tabHeight + 48;
+
   return (
-    <div style={{ flexGrow: 1 }}>
-      <div className={classes.appFrame} style={{ height: "100vh" }}>
-        <AppBar
-          position="absolute"
-          color="default"
-          className={classNames(classes.appBar, classes[`appBar-left`])}
-        >
-          <Toolbar />
-          <Divider />
-          <ChartTab />
-        </AppBar>
-        <Drawer
-          variant="permanent"
-          classes={{
-            paper: classes.drawerPaper,
+    <div className={classes.root}>
+      <AppBar
+        position="absolute"
+        color="default"
+        className={classNames(classes.appBarOpen, classes.appBarLeftOpen)}
+      >
+        <Toolbar />
+        <Divider />
+        <ChartTab />
+      </AppBar>
+      <Drawer
+        className={classes.leftDrawer}
+        variant="permanent"
+        classes={{
+          paper: classes.leftDrawerPaper,
+        }}
+        anchor="left"
+      >
+        <Settings />
+        <Inspector />
+      </Drawer>
+      <main className={classes.content}>
+        <div
+          style={{
+            marginTop: appBarHeight,
           }}
-          anchor="left"
-        >
-          <Settings />
-          <Inspector />
-        </Drawer>
-        <main
-          className={classes.content}
-          style={{ display: "flex", flexDirection: "column" }}
-        >
+        />
+        <div className={classes.chartEditorContainer}>
           <ChartEditor />
-          <Player />
-        </main>
-        <SnackbarProvider maxSnack={4}>
-          <Notification />
-        </SnackbarProvider>
+        </div>
+        <Player />
+      </main>
+      <Drawer
+        className={classes.rightDrawer}
+        variant="permanent"
+        classes={{
+          paper: classes.rightDrawerPaper,
+        }}
+        anchor="right"
+      >
+        <div
+          style={{
+            marginTop: appBarHeight,
+          }}
+        />
         <Layer />
-      </div>
+      </Drawer>
+      <SnackbarProvider maxSnack={4}>
+        <Notification />
+      </SnackbarProvider>
     </div>
   );
 });

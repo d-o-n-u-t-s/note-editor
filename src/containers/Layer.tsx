@@ -1,10 +1,4 @@
-import {
-  Divider,
-  Drawer,
-  IconButton,
-  List,
-  ListSubheader,
-} from "@material-ui/core";
+import { Divider, IconButton, List, ListSubheader } from "@material-ui/core";
 import { Add, ArrowDownward, ArrowUpward, Delete } from "@material-ui/icons";
 import { observer } from "mobx-react";
 import * as React from "react";
@@ -14,7 +8,6 @@ import { useStyles } from "../styles/styles";
 
 export default observer(function Layer() {
   const { editor } = useStores();
-  const classes = useStyles();
 
   function handleSelect(index: number) {
     editor.currentChart!.selectLayer(index);
@@ -36,16 +29,7 @@ export default observer(function Layer() {
   if (!chart) return <div />;
 
   return (
-    <Drawer
-      variant="permanent"
-      classes={{
-        paper: classes.rightDrawer,
-      }}
-      anchor="right"
-      style={{
-        marginTop: editor.setting.tabHeight - 48,
-      }}
-    >
+    <>
       <List
         component="nav"
         subheader={<ListSubheader component="div">Layers</ListSubheader>}
@@ -95,6 +79,6 @@ export default observer(function Layer() {
           <ArrowDownward fontSize="small" />
         </IconButton>
       </div>
-    </Drawer>
+    </>
   );
 });

@@ -1044,13 +1044,19 @@ export default class Pixi extends InjectedComponent {
 
     return (
       <div
+        id="3d-container"
         style={
           setting.preserve3D
             ? {
                 transformStyle: "preserve-3d",
                 perspective: setting.perspective + "px",
+                height: "100%",
+                overflow: "hidden",
               }
-            : {}
+            : {
+                height: "100%",
+                overflow: "hidden",
+              }
         }
         ref={(thisDiv) => {
           component.container = thisDiv!;
