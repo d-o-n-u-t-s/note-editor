@@ -45,8 +45,9 @@ export default observer(function NewChartDialog() {
       editor.asset.musicGameSystems[Number(state.musicGameSystemIndex)],
       state.audioPath
     );
-    newChart.loadInitialMeasures();
-    newChart.loadInitialLanes();
+    newChart.createInitialMeasures();
+    newChart.createInitialObjects();
+    newChart.createInitialLanes();
     newChart.addLayer();
     editor.setCurrentChart(editor.charts.length - 1);
 

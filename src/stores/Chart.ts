@@ -8,7 +8,7 @@ import { LanePoint } from "../objects/LanePoint";
 import { Layer, LayerData, LayerRecord } from "../objects/Layer";
 import { MeasureRecord } from "../objects/Measure";
 import { Note } from "../objects/Note";
-import { OtherObjectData } from "../objects/OtherObject";
+import { OtherObjectData, OtherObjectRecord } from "../objects/OtherObject";
 import {
   Timeline,
   TimelineData,
@@ -530,10 +530,10 @@ export default class Chart {
   private musicGameSystemVersion = 0;
 
   /**
-   * 初期小節を読み込む
+   * 初期小節を生成する
    */
   @action
-  loadInitialMeasures() {
+  public createInitialMeasures() {
     this.timeline.setMeasures(
       Array(1000)
         .fill(0)
@@ -551,10 +551,10 @@ export default class Chart {
   }
 
   /**
-   * 初期レーンを読み込む
+   * 初期レーンを生成する
    */
   @action
-  loadInitialLanes() {
+  public createInitialLanes() {
     const musicGameSystem = this.musicGameSystem;
 
     musicGameSystem.initialLanes.forEach((initialLane, index) => {
@@ -589,6 +589,22 @@ export default class Chart {
       } as Lane;
       this.timeline.addLane(newLane);
     });
+  }
+
+  /**
+   * 新規譜面のオブジェクトを生成する
+   */
+  @action
+  public createInitialObjects() {
+    this.timeline.addOtherObject(
+      OtherObjectRecord.new({
+        type: 0,
+        guid: guid(),
+        measureIndex: 0,
+        measurePosition: new Fraction(0, 1),
+        value: 120,
+      })
+    );
   }
 
   @action
