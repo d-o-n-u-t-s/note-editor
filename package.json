@@ -55,7 +55,7 @@
     "fast-json-patch": "^3.0.0-1",
     "howler": "^2.1.1",
     "immutable": "^4.0.0-rc.12",
-    "lodash": "^4.17.13",
+    "lodash": "^4.17.19",
     "mathjs": "^6.2.3",
     "mobx": "^5.15.0",
     "mobx-react": "^6.1.4",
