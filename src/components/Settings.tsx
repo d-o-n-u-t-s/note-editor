@@ -1,9 +1,9 @@
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   createStyles,
   Divider,
-  ExpansionPanel,
-  ExpansionPanelDetails,
-  ExpansionPanelSummary,
   makeStyles,
 } from "@material-ui/core";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
@@ -54,17 +54,17 @@ export default function Settings() {
     <>
       {settings.map((setting, index) => (
         <div key={index}>
-          <ExpansionPanel className={classes.panel}>
-            <ExpansionPanelSummary
+          <Accordion className={classes.panel}>
+            <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               className={classes.panelSummary}
             >
               {setting.key}
-            </ExpansionPanelSummary>
-            <ExpansionPanelDetails className={classes.panelDetails}>
+            </AccordionSummary>
+            <AccordionDetails className={classes.panelDetails}>
               {setting.render()}
-            </ExpansionPanelDetails>
-          </ExpansionPanel>
+            </AccordionDetails>
+          </Accordion>
           <Divider />
         </div>
       ))}
