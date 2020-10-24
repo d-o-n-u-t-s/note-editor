@@ -18,7 +18,7 @@ export class GuiUtility {
     (window as any).customButtons.push(
       this.gui.add(
         {
-          [name]: onClick
+          [name]: onClick,
         },
         name
       )

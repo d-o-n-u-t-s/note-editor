@@ -16,15 +16,15 @@ export default merge(
       // new HardSourceWebpackPlugin(),
       new HtmlWebpackPlugin({
         template: src + "/index.dev.html",
-        filename: "index.html"
-      })
-    ]
+        filename: "index.html",
+      }),
+    ],
   },
   {
     devServer: {
       contentBase: path.join(__dirname, "dist"),
       compress: true,
-      port: 9000
-    }
+      port: 9000,
+    },
   } as any
 );

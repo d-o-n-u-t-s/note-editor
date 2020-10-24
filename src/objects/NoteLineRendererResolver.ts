@@ -17,7 +17,7 @@ export default class NoteLineRendererResolver {
     if (customRenderer.rendererReference) {
       return {
         customRender: customRenderer.rendererReference as any,
-        render: NoteLineRenderer.render
+        render: NoteLineRenderer.render,
       };
     } else return NoteLineRenderer;
   }

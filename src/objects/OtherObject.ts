@@ -18,7 +18,7 @@ const defaultOtherObjectData: OtherObjectData = {
   guid: "",
   measureIndex: 0,
   measurePosition: Fraction.none,
-  value: 1
+  value: 1,
 };
 
 export type OtherObject = Mutable<OtherObjectRecord>;

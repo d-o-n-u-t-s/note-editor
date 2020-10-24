@@ -1,10 +1,10 @@
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   createStyles,
   Divider,
-  ExpansionPanel,
-  ExpansionPanelDetails,
-  ExpansionPanelSummary,
-  makeStyles
+  makeStyles,
 } from "@material-ui/core";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -17,15 +17,15 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     panel: {
       boxShadow: "none",
-      marginBottom: "0 !important"
+      marginBottom: "0 !important",
     },
     panelSummary: {
-      fontSize: 14
+      fontSize: 14,
     },
     panelDetails: {
       background: theme.palette.background.default,
-      borderTop: `solid 1px ${theme.palette.divider}`
-    }
+      borderTop: `solid 1px ${theme.palette.divider}`,
+    },
   })
 );
 
@@ -38,33 +38,33 @@ export default function Settings() {
   const settings = [
     {
       key: "譜面設定",
-      render: () => <ChartSetting />
+      render: () => <ChartSetting />,
     },
     {
       key: "エディタ設定",
-      render: () => <EditorSetting />
+      render: () => <EditorSetting />,
     },
     {
       key: "アセット設定",
-      render: () => <AssetSetting />
-    }
+      render: () => <AssetSetting />,
+    },
   ];
 
   return (
     <>
       {settings.map((setting, index) => (
         <div key={index}>
-          <ExpansionPanel className={classes.panel}>
-            <ExpansionPanelSummary
+          <Accordion className={classes.panel}>
+            <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               className={classes.panelSummary}
             >
               {setting.key}
-            </ExpansionPanelSummary>
-            <ExpansionPanelDetails className={classes.panelDetails}>
+            </AccordionSummary>
+            <AccordionDetails className={classes.panelDetails}>
               {setting.render()}
-            </ExpansionPanelDetails>
-          </ExpansionPanel>
+            </AccordionDetails>
+          </Accordion>
           <Divider />
         </div>
       ))}

@@ -4,7 +4,7 @@ import {
   TableBody,
   TableCell,
   TableHead,
-  TableRow
+  TableRow,
 } from "@material-ui/core";
 import Popover from "@material-ui/core/Popover";
 import FileCopyIcon from "@material-ui/icons/FileCopy";
@@ -39,7 +39,7 @@ export default observer(function ChartInformation(props: IProps) {
     let groups = Object.entries(
       _.groupBy(
         chart.timeline.notes,
-        getGroup ? n => getGroup(n, chart) : "type"
+        getGroup ? (n) => getGroup(n, chart) : "type"
       )
     ).sort();
 
@@ -59,7 +59,7 @@ export default observer(function ChartInformation(props: IProps) {
     const cellStyle = smallMode
       ? {
           maxWidth: "1rem",
-          lineHeight: "1rem"
+          lineHeight: "1rem",
         }
       : {};
 

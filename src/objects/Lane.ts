@@ -21,7 +21,7 @@ const defaultLaneData: LaneData = {
   guid: "GUID",
   points: [],
   templateName: "",
-  division: 0
+  division: 0,
 };
 
 export type Lane = Mutable<LaneRecord>;

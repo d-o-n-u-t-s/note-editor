@@ -2,7 +2,7 @@ import * as React from "react";
 import Editor from "./EditorStore";
 
 export const stores = {
-  editor: new Editor()
+  editor: new Editor(),
 };
 export const context = React.createContext(stores);
 

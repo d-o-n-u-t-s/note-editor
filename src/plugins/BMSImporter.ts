@@ -15,20 +15,17 @@ type Stop = {
 };
 
 export default class BMSImporter {
-  public static import() {
-    dialog.showOpenDialog(
-      {
-        properties: ["openFile", "multiSelections"]
-        // filters: [{ name: "BMS 譜面データ", extensions: ["bms", "bme"] }]
-      },
-      async (filenames: string[]) => {
-        for (const filename of filenames) {
-          const file = await util.promisify(fs.readFile)(filename);
+  public static async import() {
+    const result = await dialog.showOpenDialog({
+      properties: ["openFile", "multiSelections"],
+      // filters: [{ name: "BMS 譜面データ", extensions: ["bms", "bme"] }]
+    });
 
-          this.importImplement(file.toString());
-        }
-      }
-    );
+    for (const filename of result.filePaths) {
+      const file = await util.promisify(fs.readFile)(filename);
+
+      this.importImplement(file.toString());
+    }
   }
 
   public static importImplement(bmsChart: string) {
@@ -103,7 +100,7 @@ export default class BMSImporter {
       }
     };
 
-    const longNotes: any[][] = Array.from({ length: 8 }).map(_ => []);
+    const longNotes: any[][] = Array.from({ length: 8 }).map((_) => []);
 
     const longNote = (index: number, id: number, values: string) => {
       const mc = values.match(/.{2}/g)!;
@@ -178,7 +175,7 @@ export default class BMSImporter {
         bpms.push({
           bpm: bpm,
           laneIndex: laneIndex,
-          position: new Fraction(index, denominator)
+          position: new Fraction(index, denominator),
         });
       }
     };
@@ -197,7 +194,7 @@ export default class BMSImporter {
         bpms.push({
           bpm: exBpms.get(bpmIndex),
           laneIndex: laneIndex,
-          position: new Fraction(index, denominator)
+          position: new Fraction(index, denominator),
         });
       }
     };
@@ -216,7 +213,7 @@ export default class BMSImporter {
         stops.push({
           value: stopDefines.get(bpmIndex)!,
           laneIndex: laneIndex,
-          position: new Fraction(index, denominator)
+          position: new Fraction(index, denominator),
         });
       }
     };
@@ -245,7 +242,7 @@ export default class BMSImporter {
         measures.push({
           index: laneIndex,
           beat: new Fraction(value, 1),
-          customProps: {}
+          customProps: {},
         });
 
         // console.log("Tempo", value, laneIndex);
@@ -354,7 +351,7 @@ export default class BMSImporter {
           bpms.push({
             bpm: bpm,
             laneIndex: 0,
-            position: new Fraction(0, 1)
+            position: new Fraction(0, 1),
           });
 
           continue;
@@ -390,14 +387,14 @@ export default class BMSImporter {
       horizontalSize: 1,
       horizontalPosition: {
         numerator: note.id,
-        denominator: 8
+        denominator: 8,
       },
       measureIndex: note.laneIndex,
       measurePosition: note.position,
       type: "tap",
       lane: "60914b20c1205ff1563407fa2d2b233d",
       layer: "<layer>",
-      editorProps: {}
+      editorProps: {},
     });
 
     const noteLines: any[] = [];
@@ -412,14 +409,14 @@ export default class BMSImporter {
 
         noteLines.push({
           head: head.guid,
-          tail: tail.guid
+          tail: tail.guid,
         });
 
         notes2.push(head, tail);
       }
     }
 
-    const maxMeasureIndex = Math.max(...measures.map(m => m.index));
+    const maxMeasureIndex = Math.max(...measures.map((m) => m.index));
 
     const newMeasures: MeasureData[] = Array(maxMeasureIndex + 1)
       .fill(0)
@@ -428,7 +425,7 @@ export default class BMSImporter {
           index,
           beat: new Fraction(4, 4),
           editorProps: { time: 0 },
-          customProps: {}
+          customProps: {},
         };
       });
 
@@ -444,62 +441,62 @@ export default class BMSImporter {
             guid: "<layer>",
             name: "defaultLayer",
             visible: true,
-            lock: true
-          }
+            lock: true,
+          },
         ],
         timeline: {
           speedChanges: [],
           horizontalLaneDivision: 8,
           otherObjects: [
-            ...bpms.map(bpm => ({
+            ...bpms.map((bpm) => ({
               type: 0,
               measureIndex: bpm.laneIndex,
               measurePosition: bpm.position,
               value: bpm.bpm,
-              guid: guid()
+              guid: guid(),
             })),
-            ...stops.map(stop => ({
+            ...stops.map((stop) => ({
               type: 2,
               measureIndex: stop.laneIndex,
               measurePosition: stop.position,
               value: stop.value,
-              guid: guid()
-            }))
+              guid: guid(),
+            })),
           ],
           lanePoints: [
             {
               measureIndex: 0,
               measurePosition: {
                 numerator: 0,
-                denominator: 1
+                denominator: 1,
               },
               guid: "2937357cffe6bec2c44cb9c13e3b17e4",
               horizontalSize: 1,
               templateName: "normal",
               horizontalPosition: {
                 numerator: 0,
-                denominator: 1
-              }
+                denominator: 1,
+              },
             },
             {
               measureIndex: laneLength + 1,
               measurePosition: {
                 numerator: 0,
-                denominator: 1
+                denominator: 1,
               },
               guid: "a90db42627230b200865d972b31196dc",
               horizontalSize: 1,
               templateName: "normal",
               horizontalPosition: {
                 numerator: 0,
-                denominator: 1
-              }
-            }
+                denominator: 1,
+              },
+            },
           ],
           notes: notes
             .map(toNote)
             .concat(notes2)
-            .map(note => {
+            .map((note) => {
               (note as any).customProps = {
                 color:
                   note.horizontalPosition.numerator === -1
@@ -508,7 +505,7 @@ export default class BMSImporter {
                     ? "#ff0000"
                     : note.horizontalPosition.numerator % 2
                     ? "#ffffff"
-                    : "#0000ff"
+                    : "#0000ff",
               };
               return note;
             }),
@@ -520,19 +517,19 @@ export default class BMSImporter {
               division: 8,
               points: [
                 "2937357cffe6bec2c44cb9c13e3b17e4",
-                "a90db42627230b200865d972b31196dc"
-              ]
-            }
+                "a90db42627230b200865d972b31196dc",
+              ],
+            },
           ],
           measures: newMeasures,
           lanePointMap: {},
-          noteMap: {}
+          noteMap: {},
         },
         startTime: 0,
         name: "新規譜面",
         audioSource: title + ".wav",
         musicGameSystemName: "BMS",
-        musicGameSystemVersion: 0.1
+        musicGameSystemVersion: 0.1,
       })
     );
   }

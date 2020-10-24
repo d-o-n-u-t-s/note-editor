@@ -3,12 +3,12 @@ const releaseActions: Map<string, () => void> = new Map<string, () => void>();
 const isDowns: Map<string, boolean> = new Map<string, boolean>();
 
 export function beginWatch() {
-  window.addEventListener("keydown", e => {
+  window.addEventListener("keydown", (e) => {
     const action = pressActions.get(e.key);
     if (action) action();
     isDowns.set(e.key, true);
   });
-  window.addEventListener("keyup", e => {
+  window.addEventListener("keyup", (e) => {
     const action = releaseActions.get(e.key);
     if (action) action();
     isDowns.set(e.key, false);

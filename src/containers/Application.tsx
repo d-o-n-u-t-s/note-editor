@@ -4,7 +4,7 @@ import {
   Divider,
   Drawer,
   makeStyles,
-  MuiThemeProvider
+  MuiThemeProvider,
 } from "@material-ui/core";
 import { createMuiTheme } from "@material-ui/core/styles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
@@ -24,123 +24,157 @@ import Player from "./Player";
 import Toolbar from "./Toolbar";
 
 const drawerWidth: number = config.sidebarWidth;
+const rightDrawerWidth = 180;
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      /* ... */
+      display: "flex",
     },
-
-    drawerPaper: {
-      position: "relative",
-      width: drawerWidth
+    leftDrawer: {
+      width: drawerWidth,
+      flexShrink: 0,
+    },
+    leftDrawerPaper: {
+      width: drawerWidth,
+    },
+    rightDrawer: {
+      width: rightDrawerWidth,
+      flexShrink: 0,
+      zIndex: 0,
+    },
+    rightDrawerPaper: {
+      width: rightDrawerWidth,
     },
     button: {
-      margin: theme.spacing()
+      margin: theme.spacing(),
     },
-
-    playerButton: {},
-
     fab: {
       position: "absolute",
       top: theme.spacing(0.5),
       right: theme.spacing(2),
-      zIndex: 10000
+      zIndex: 10000,
     },
-
     appFrame: {
       zIndex: 1,
       overflow: "hidden",
       position: "relative",
       display: "flex",
-      width: "100%"
+      width: "100%",
     },
-    appBar: {
-      width: `calc(100% - ${drawerWidth}px)`
+    appBarOpen: {
+      width: `calc(100% - ${drawerWidth}px)`,
     },
-    "appBar-left": {
-      marginLeft: drawerWidth
+    appBarClose: {
+      width: "100%",
+    },
+    appBarLeftOpen: {
+      marginLeft: drawerWidth,
+    },
+    appBarLeftClose: {
+      marginLeft: 0,
     },
     toolbar: theme.mixins.toolbar,
-
-    paper: {
-      /* ... */
-    },
-
     timeSliderTrack: {
       height: "4px",
-      background: "red"
+      background: "red",
     },
     timeSliderThumb: {
       width: "14px",
       height: "14px",
-      background: "red"
+      background: "red",
     },
     volumeSliderTrack: {
       height: "4px",
-      background: "#fff"
+      background: "#fff",
     },
     volumeSliderThumb: {
       width: "14px",
       height: "14px",
-      background: "#fff"
+      background: "#fff",
     },
-
+    chartEditorContainer: {
+      flex: 1,
+      overflow: "hidden",
+    },
     content: {
       flexGrow: 1,
-      backgroundColor: theme.palette.background.default
-      // padding: theme.spacing.unit * 3
-    }
+      display: "flex",
+      flexDirection: "column",
+      backgroundColor: theme.palette.background.default,
+      height: "100vh",
+    },
   })
 );
 
 const lightTheme = createMuiTheme({
   palette: {
-    type: "light"
-  }
+    type: "light",
+  },
 });
 const darkTheme = createMuiTheme({
   palette: {
-    type: "dark"
-  }
+    type: "dark",
+  },
 });
 
 const Application = observer(function Application() {
   const classes = useStyles();
+  const { editor } = useStores();
+
+  const appBarHeight = editor.setting.tabHeight + 48;
+
   return (
-    <div style={{ flexGrow: 1 }}>
-      <div className={classes.appFrame} style={{ height: "100vh" }}>
-        <AppBar
-          position="absolute"
-          color="default"
-          className={classNames(classes.appBar, classes[`appBar-left`])}
-        >
-          <Toolbar />
-          <Divider />
-          <ChartTab />
-        </AppBar>
-        <Drawer
-          variant="permanent"
-          classes={{
-            paper: classes.drawerPaper
+    <div className={classes.root}>
+      <AppBar
+        position="absolute"
+        color="default"
+        className={classNames(classes.appBarOpen, classes.appBarLeftOpen)}
+      >
+        <Toolbar />
+        <Divider />
+        <ChartTab />
+      </AppBar>
+      <Drawer
+        className={classes.leftDrawer}
+        variant="permanent"
+        classes={{
+          paper: classes.leftDrawerPaper,
+        }}
+        anchor="left"
+      >
+        <Settings />
+        <Inspector />
+      </Drawer>
+      <main className={classes.content}>
+        <div
+          style={{
+            marginTop: appBarHeight,
           }}
-          anchor="left"
-        >
-          <Settings />
-          <Inspector />
-        </Drawer>
-        <main
-          className={classes.content}
-          style={{ display: "flex", flexDirection: "column" }}
-        >
+        />
+        <div className={classes.chartEditorContainer}>
           <ChartEditor />
-          <Player />
-        </main>
-        <SnackbarProvider maxSnack={4}>
-          <Notification />
-        </SnackbarProvider>
+        </div>
+        <Player />
+      </main>
+      <Drawer
+        className={classes.rightDrawer}
+        variant="permanent"
+        classes={{
+          paper: classes.rightDrawerPaper,
+        }}
+        anchor="right"
+      >
+        <div
+          style={{
+            marginTop: appBarHeight,
+          }}
+        />
         <Layer />
-      </div>
+      </Drawer>
+      <SnackbarProvider maxSnack={4}>
+        <Notification />
+      </SnackbarProvider>
     </div>
   );
 });

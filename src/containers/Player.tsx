@@ -16,22 +16,22 @@ const useStyles = makeStyles((theme: Theme) => ({
   playerButton: {},
   timeSliderTrack: {
     height: "4px",
-    background: "red"
+    background: "red",
   },
   timeSliderThumb: {
     width: "14px",
     height: "14px",
-    background: "red"
+    background: "red",
   },
   volumeSliderTrack: {
     height: "4px",
-    background: "#fff"
+    background: "#fff",
   },
   volumeSliderThumb: {
     width: "14px",
     height: "14px",
-    background: "#fff"
-  }
+    background: "#fff",
+  },
 }));
 
 const TimeSlider = (props: { classes: any; time: number; onChange: any }) => (
@@ -42,7 +42,7 @@ const TimeSlider = (props: { classes: any; time: number; onChange: any }) => (
     step={Number.EPSILON}
     classes={{
       track: props.classes.timeSliderTrack,
-      thumb: props.classes.timeSliderThumb
+      thumb: props.classes.timeSliderThumb,
     }}
     onChange={props.onChange}
   />
@@ -52,7 +52,7 @@ export default observer(function Player() {
   const { editor } = useStores();
   const classes = useStyles();
   const [state, setState] = useState({
-    openInformation: false
+    openInformation: false,
   });
 
   function formatTime(time: number) {
@@ -70,14 +70,14 @@ export default observer(function Player() {
   return (
     <div
       style={{
-        marginTop: "calc((62px - 48px) * -1)"
+        marginTop: "calc((62px - 48px) * -1)",
       }}
     >
       <div
         style={{
           display: "flex",
           background: "#000",
-          margin: "0 14px"
+          margin: "0 14px",
         }}
       >
         <TimeSlider
@@ -141,11 +141,11 @@ export default observer(function Player() {
             marginBottom: "-10px",
             marginRight: "10px",
             width: "100px",
-            display: "inline-block"
+            display: "inline-block",
           }}
           classes={{
             track: classes.volumeSliderTrack,
-            thumb: classes.volumeSliderThumb
+            thumb: classes.volumeSliderThumb,
           }}
           onChange={(_, value) => {
             editor!.currentChart!.setVolume(value as number);
@@ -165,11 +165,11 @@ export default observer(function Player() {
             marginBottom: "-10px",
             marginRight: "10px",
             width: "100px",
-            display: "inline-block"
+            display: "inline-block",
           }}
           classes={{
             track: classes.volumeSliderTrack,
-            thumb: classes.volumeSliderThumb
+            thumb: classes.volumeSliderThumb,
           }}
           onChange={(_, value) => {
             chart.setSpeed(value as number);
@@ -189,11 +189,11 @@ export default observer(function Player() {
             marginBottom: "-10px",
             marginRight: "10px",
             width: "100px",
-            display: "inline-block"
+            display: "inline-block",
           }}
           classes={{
             track: classes.volumeSliderTrack,
-            thumb: classes.volumeSliderThumb
+            thumb: classes.volumeSliderThumb,
           }}
           onChange={(_, value) => {
             chart.setSeVolume(value as number);

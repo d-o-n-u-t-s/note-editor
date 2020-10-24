@@ -2,7 +2,7 @@ import MusicGameSystem, {
   CustomNoteLineRenderer,
   HowlPool,
   LaneTemplate,
-  NoteType
+  NoteType,
 } from "../stores/MusicGameSystem";
 
 /**
@@ -24,7 +24,7 @@ export interface IEmptyChart {
 export const emptyChart = {
   timeline: {
     undo() {},
-    redo() {}
+    redo() {},
   },
   musicGameSystem: {
     name: "",
@@ -43,12 +43,12 @@ export const emptyChart = {
     measure: {
       renderer: "",
       rendererReference: null,
-      customProps: []
+      customProps: [],
     },
     customProps: [],
     eventListener: null,
-    eventListeners: {}
+    eventListeners: {},
   },
   canUndo: false,
-  canRedo: false
+  canRedo: false,
 };

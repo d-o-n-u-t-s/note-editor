@@ -38,7 +38,7 @@ const defaultTimelineData: TimelineData = {
   measures: [],
   lanes: [],
   lanePoints: [],
-  otherObjects: []
+  otherObjects: [],
 };
 
 type History = {
@@ -66,20 +66,20 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
    * 各 Record を mutable に変換する
    */
   private toMutable(data: TimelineJsonData) {
-    this.mutable.notes = data.notes.map(note =>
+    this.mutable.notes = data.notes.map((note) =>
       NoteRecord.new(note, this.chart!)
     );
-    this.mutable.noteLines = data.noteLines.map(noteLine =>
+    this.mutable.noteLines = data.noteLines.map((noteLine) =>
       NoteLineRecord.new(noteLine)
     );
-    this.mutable.measures = data.measures.map(measure =>
+    this.mutable.measures = data.measures.map((measure) =>
       MeasureRecord.new(measure, this.chart!.musicGameSystem.measure)
     );
-    this.mutable.lanes = data.lanes.map(lane => LaneRecord.new(lane));
-    this.mutable.lanePoints = data.lanePoints.map(lanePoint =>
+    this.mutable.lanes = data.lanes.map((lane) => LaneRecord.new(lane));
+    this.mutable.lanePoints = data.lanePoints.map((lanePoint) =>
       LanePointRecord.new(lanePoint)
     );
-    this.mutable.otherObjects = data.otherObjects.map(object =>
+    this.mutable.otherObjects = data.otherObjects.map((object) =>
       OtherObjectRecord.new(object)
     );
 
@@ -131,7 +131,9 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
   }
 
   removeOtherObject(object: OtherObject) {
-    this.mutable.otherObjects = this.otherObjects.filter(obj => obj !== object);
+    this.mutable.otherObjects = this.otherObjects.filter(
+      (obj) => obj !== object
+    );
     if (object.isBPM()) this.calculateTime();
   }
 
@@ -159,7 +161,7 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
 
     this.histories.push({
       undo: jsonpatch.compare(a, b),
-      redo: jsonpatch.compare(b, a)
+      redo: jsonpatch.compare(b, a),
     });
 
     this.historyIndex++;
@@ -183,7 +185,7 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
 
     this.histories.push({
       undo: jsonpatch.compare(jsonpatch.deepClone(a), b),
-      redo: jsonpatch.compare(b, jsonpatch.deepClone(a))
+      redo: jsonpatch.compare(b, jsonpatch.deepClone(a)),
     });
 
     this.historyIndex++;
@@ -261,13 +263,13 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
   removeNote(note: Note, updateNoteMap = true) {
     // ノートを参照しているノートラインを削除する
     for (const noteLine of this.noteLines.filter(
-      noteLine => noteLine.head === note.guid || noteLine.tail === note.guid
+      (noteLine) => noteLine.head === note.guid || noteLine.tail === note.guid
     )) {
       this.removeNoteLine(noteLine);
     }
 
     (this as Mutable<TimelineRecord>).notes = this.notes.filter(
-      _note => _note != note
+      (_note) => _note != note
     );
 
     if (updateNoteMap) this.updateNoteMap();
@@ -278,7 +280,9 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
   }
 
   removeNoteLine(noteLine: NoteLine) {
-    this.mutable.noteLines = this.noteLines.filter(_note => _note != noteLine);
+    this.mutable.noteLines = this.noteLines.filter(
+      (_note) => _note != noteLine
+    );
   }
 
   lanePointMap = new Map<string, LanePoint>();
@@ -355,7 +359,7 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
       // 先頭と末尾をソートして正しい順序にする
       const [head, tail] = [
         this.noteMap.get(noteLine.head)!,
-        this.noteMap.get(noteLine.tail)!
+        this.noteMap.get(noteLine.tail)!,
       ].sort(sortMeasure);
 
       noteLine.head = head.guid;
@@ -380,8 +384,8 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
     // レーンポイントをソートする
     for (const lane of this.lanes) {
       lane.points = lane.points.slice().sort((a, b) => {
-        const lp1 = this.lanePoints.find(lp => lp.guid === a)!;
-        const lp2 = this.lanePoints.find(lp => lp.guid === b)!;
+        const lp1 = this.lanePoints.find((lp) => lp.guid === a)!;
+        const lp2 = this.lanePoints.find((lp) => lp.guid === b)!;
 
         const p1 = lp1.measureIndex + Fraction.to01(lp1.measurePosition);
         const p2 = lp2.measureIndex + Fraction.to01(lp2.measurePosition);
@@ -397,7 +401,7 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
         const lastLanePoint = lane.points[lane.points.length - 1];
 
         // 後方に結合するレーン
-        const nextLane = this.lanes.find(lane2 => {
+        const nextLane = this.lanes.find((lane2) => {
           if (lane === lane2) return false;
 
           return lane2.points[0] === lastLanePoint;
@@ -406,12 +410,12 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
         if (nextLane) {
           // 古いレーンを参照していたノートのレーン情報を更新
           for (const note of this.notes.filter(
-            note => note.lane === nextLane.guid
+            (note) => note.lane === nextLane.guid
           )) {
             note.lane = lane.guid;
           }
 
-          const nextLaneIndex = this.lanes.findIndex(l => l === nextLane);
+          const nextLaneIndex = this.lanes.findIndex((l) => l === nextLane);
           lane.points.push(...nextLane.points.slice(1));
 
           this.setLanes(
@@ -430,6 +434,6 @@ export class TimelineRecord extends Record<TimelineData>(defaultTimelineData) {
    * BPM変更オブジェクトを取得する
    */
   public get bpmChanges() {
-    return this.otherObjects.filter(object => object.isBPM());
+    return this.otherObjects.filter((object) => object.isBPM());
   }
 }

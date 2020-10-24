@@ -10,7 +10,7 @@ export default class MeasureRendererResolver {
 
     if (measureOption.rendererReference) {
       return {
-        render: measureOption.rendererReference
+        render: measureOption.rendererReference,
       };
     } else return MeasureRenderer;
   }

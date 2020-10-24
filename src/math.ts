@@ -20,7 +20,7 @@ export class Fraction {
   static add(a: IFraction, b: IFraction) {
     const fraction = {
       numerator: a.numerator * b.denominator + b.numerator * a.denominator,
-      denominator: a.denominator * b.denominator
+      denominator: a.denominator * b.denominator,
     };
     this.reduce(fraction);
     return fraction;
@@ -29,7 +29,7 @@ export class Fraction {
   static mul(a: IFraction, b: IFraction) {
     const fraction = {
       numerator: a.numerator * b.numerator,
-      denominator: a.denominator * b.denominator
+      denominator: a.denominator * b.denominator,
     };
     this.reduce(fraction);
     return fraction;
@@ -38,7 +38,7 @@ export class Fraction {
   static div(a: IFraction, b: IFraction) {
     return Fraction.mul(a, {
       numerator: b.denominator,
-      denominator: b.numerator
+      denominator: b.numerator,
     });
   }
 

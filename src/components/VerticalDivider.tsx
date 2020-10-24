@@ -6,8 +6,8 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     divider: {
       width: 1,
-      background: theme.palette.divider
-    }
+      background: theme.palette.divider,
+    },
   })
 );
 

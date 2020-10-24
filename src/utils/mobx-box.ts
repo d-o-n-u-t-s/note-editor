@@ -20,6 +20,6 @@ export default function box(
     },
     set(value: any) {
       (this as any)[privateName] = value;
-    }
+    },
   });
 }

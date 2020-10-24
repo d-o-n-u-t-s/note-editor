@@ -20,8 +20,8 @@ const Notification = observer((props: WithSnackbarProps) => {
       variant: notification.type,
       anchorOrigin: {
         vertical: "bottom",
-        horizontal: "right"
-      }
+        horizontal: "right",
+      },
     });
   }
 

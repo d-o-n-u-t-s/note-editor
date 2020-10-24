@@ -1,3 +1,3 @@
 export default {
-  sidebarWidth: 250
+  sidebarWidth: 250,
 };

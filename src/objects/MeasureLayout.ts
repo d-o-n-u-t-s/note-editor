@@ -57,7 +57,7 @@ export class DefaultMeasureLayout implements IMeasureLayout {
   }
 
   getScrollOffsetY(y: number, measure: Measure, measures: Measure[]) {
-    measures = measures.filter(m => m.x == measure.x);
+    measures = measures.filter((m) => m.x == measure.x);
     const top = measures[measures.length - 1].y;
     return (y - top) / (measures[0].y + measures[0].height - top);
   }
