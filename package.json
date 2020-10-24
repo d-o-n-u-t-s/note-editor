@@ -17,9 +17,9 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@material-ui/core": "^4.8.1",
-    "@material-ui/icons": "4.5.1",
-    "@material-ui/lab": "^4.0.0-alpha.37",
+    "@material-ui/core": "^4.11.0",
+    "@material-ui/icons": "^4.9.1",
+    "@material-ui/lab": "^4.0.0-alpha.56",
     "@types/classnames": "^2.2.7",
     "@types/config": "0.0.36",
     "@types/dat.gui": "^0.7.2",
