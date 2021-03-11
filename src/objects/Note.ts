@@ -184,7 +184,7 @@ export class NoteRecord extends Record<NoteData>(defaultNoteData) {
           inspectorConfig: noteType.customPropsInspectorConfig,
         };
         for (const prop of noteType.customProps) {
-          if (prop.key in data.customProps) {
+          if (data.customProps !== undefined && prop.key in data.customProps) {
             newProps[prop.key] = data.customProps[prop.key];
           } else if (
             typeof prop.defaultValue !== "string" ||
